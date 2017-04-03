@@ -24,20 +24,24 @@ toRevDigits n
 
 -- Double every second number in a list starting on the left.
 doubleEveryOther :: [Integer] -> [Integer]
-doubleEveryOther = undefined
+doubleEveryOther (x:y:zs) = x : (y*2) : (doubleEveryOther zs)
+doubleEveryOther rest = rest
 
 -- Exercise 4 -----------------------------------------
 
 -- Calculate the sum of all the digits in every Integer.
 sumDigits :: [Integer] -> Integer
-sumDigits = undefined
+sumDigits xs = sum (concat (map toRevDigits xs))
+--sumDigits xs = sum $ concat $ map toRevDigits xs
 
 
 -- Exercise 5 -----------------------------------------
 
 -- Validate a credit card number using the above functions.
 luhn :: Integer -> Bool
-luhn = undefined
+luhn n
+    | (sumDigits (doubleEveryOther (toRevDigits n)) `mod` 10) == 0 = True
+    | otherwise = False
 
 -- Exercise 6 -----------------------------------------
 
