@@ -49,5 +49,8 @@ luhn n
 type Peg = String
 type Move = (Peg, Peg)
 
+-- Move n disc from peg a to peg c using b as temporary storage
 hanoi :: Integer -> Peg -> Peg -> Peg -> [Move]
-hanoi = undefined
+hanoi n pa pb pc
+    | (n <= 1) = [(pa,pc)]
+    | otherwise = hanoi (n-1) pa pc pb ++ (pa, pc) : hanoi (n-1) pb pa pc
