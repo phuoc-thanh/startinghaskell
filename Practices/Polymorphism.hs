@@ -1,5 +1,5 @@
 -- Polymorphism and Functional Programming Paradigms
--- CIS-194 Spring 2015, Lecture 02
+-- CIS 194 Spring 2015, Lecture 02
 -- http://www.cis.upenn.edu/~cis194/spring15/lectures/02-lists.html
 
 

@@ -1,6 +1,5 @@
 {-# OPTIONS_GHC -Wall #-}
 module HW02 where
-import Data.List
 
 -- Mastermind -----------------------------------------
 
@@ -36,8 +35,7 @@ countColors code = [length $ filter (==c) code | c <- colors]
 
 -- Count number of matches between the actual code and the guess
 matches :: Code -> Code -> Int
-matches xs ys = length $ intersect xs ys
--- matches xs ys = sum $ zipWith min (countColors xs) (countColors ys)
+matches xs ys = sum $ zipWith min (countColors xs) (countColors ys)
 
 -- Exercise 3 -----------------------------------------
 
@@ -56,17 +54,25 @@ isConsistent (Move xs m n) ys = m == m' && n == n'
 -- Exercise 5 -----------------------------------------
 
 filterCodes :: Move -> [Code] -> [Code]
-filterCodes = undefined
+filterCodes m xs = filter (isConsistent m) xs
 
 -- Exercise 6 -----------------------------------------
 
 allCodes :: Int -> [Code]
-allCodes = undefined
+allCodes 0 = [[]]
+allCodes n = [c : code | c <- colors, code <- allCodes (n - 1)]
 
 -- Exercise 7 -----------------------------------------
 
 solve :: Code -> [Move]
-solve = undefined
+solve c = choose c $ allCodes 4
+
+choose :: Code -> [Code] -> [Move]
+choose _ [] = []
+choose c (x:xs)
+    | x == c = [m]
+    | otherwise = m : (choose c $ filterCodes m xs)
+    where m = getMove c x
 
 -- Bonus ----------------------------------------------
 
