@@ -77,7 +77,7 @@ desugar (If e st st')      = DIf e (desugar st) (desugar st')
 desugar (Incr v)           = DAssign v (Op (Var v) Plus (Val 1) )
 desugar (While e st)       = DWhile e (desugar st)
 desugar (For st e st' std) = DSequence (desugar st) (DWhile e d)
-    where d = DSequence (desugar st') (desugar std)
+    where d = DSequence (desugar std) (desugar st')
 desugar (Sequence st st')  = DSequence (desugar st) (desugar st')
 desugar Skip               = DSkip
 
