@@ -31,6 +31,7 @@ data Statement =
 
 type State = String -> Int
 
+-- extend :: State -> String -> Int -> (String -> Int)
 extend :: State -> String -> Int -> State
 extend st k v k'
     | k' == k = v
