@@ -74,12 +74,12 @@ data DietStatement = DAssign String Expression
 
 desugar :: Statement -> DietStatement
 desugar (Assign v e)       = DAssign v e
-desugar (If e st st')      = DIf e (desugar st) (desugar st')
+desugar (If cond thenS elseS)      = DIf cond (desugar thenS) (desugar elseS)
 desugar (Incr v)           = DAssign v (Op (Var v) Plus (Val 1) )
-desugar (While e st)       = DWhile e (desugar st)
-desugar (For st e st' std) = DSequence (desugar st) (DWhile e d)
-    where d = DSequence (desugar std) (desugar st')
-desugar (Sequence st st')  = DSequence (desugar st) (desugar st')
+desugar (While cond body)       = DWhile cond (desugar body)
+desugar (For initS cond loopIncr body) = DSequence (desugar initS) (DWhile cond d)
+    where d = DSequence (desugar body) (desugar loopIncr)
+desugar (Sequence x y)  = DSequence (desugar x) (desugar y)
 desugar Skip               = DSkip
 
 
@@ -87,11 +87,11 @@ desugar Skip               = DSkip
 
 evalSimple :: State -> DietStatement -> State
 evalSimple st (DAssign v e) = extend st v (evalE st e)
-evalSimple st (DIf e x y)
-    | (evalE st e) == 1 = evalSimple st x
-    | otherwise = evalSimple st y
-evalSimple st w@(DWhile e x)
-    | (evalE st e) == 1 = evalSimple (evalSimple st x) w
+evalSimple st (DIf cond thenS elseS)
+    | (evalE st cond) == 1 = evalSimple st thenS
+    | otherwise = evalSimple st elseS
+evalSimple st w@(DWhile cond body)
+    | (evalE st cond) == 1 = evalSimple (evalSimple st body) w
     | otherwise = st
 evalSimple st (DSequence x y) = evalSimple (evalSimple st x) y
 evalSimple st DSkip = st
@@ -172,4 +172,5 @@ fibonacci = slist [ Assign "F0" (Val 1)
                        )
                   ]
 
--- Thanks to https://gist.github.com/adolfopa/2df36cc66dc7ecd2985e                
+-- Thanks to https://gist.github.com/adolfopa/2df36cc66dc7ecd2985e
+-- Thanks to https://github.com/WentaoZero/UPenn-CIS-194-2015/blob/master/Homework-3/HW03.hs                
