@@ -47,7 +47,7 @@ boolToInt b = if b then 1 else 0
 
 evalE :: State -> Expression -> Int
 evalE st (Var v) = st v
-evalE _ (Val i) = i
+evalE _ (Val i) = i  
 evalE st (Op lEx op rEx) =
     case op of
         Plus   -> x + y
@@ -62,7 +62,6 @@ evalE st (Op lEx op rEx) =
     where x = evalE st lEx
           y = evalE st rEx
 
-
 -- Exercise 3 -----------------------------------------
 
 data DietStatement = DAssign String Expression
@@ -73,28 +72,28 @@ data DietStatement = DAssign String Expression
                      deriving (Show, Eq)
 
 desugar :: Statement -> DietStatement
-desugar (Assign v e)       = DAssign v e
-desugar (If cond thenS elseS)      = DIf cond (desugar thenS) (desugar elseS)
-desugar (Incr v)           = DAssign v (Op (Var v) Plus (Val 1) )
-desugar (While cond body)       = DWhile cond (desugar body)
+desugar (Assign v e)                   = DAssign v e
+desugar (If cond thenS elseS)          = DIf cond (desugar thenS) (desugar elseS)
+desugar (Incr v)                       = DAssign v (Op (Var v) Plus (Val 1) )
+desugar (While cond body)              = DWhile cond (desugar body)
 desugar (For initS cond loopIncr body) = DSequence (desugar initS) (DWhile cond d)
     where d = DSequence (desugar body) (desugar loopIncr)
-desugar (Sequence x y)  = DSequence (desugar x) (desugar y)
-desugar Skip               = DSkip
+desugar (Sequence x y)                 = DSequence (desugar x) (desugar y)
+desugar Skip                           = DSkip
 
 
 -- Exercise 4 -----------------------------------------
 
 evalSimple :: State -> DietStatement -> State
-evalSimple st (DAssign v e) = extend st v (evalE st e)
+evalSimple st (DAssign v e)   = extend st v (evalE st e)
 evalSimple st (DIf cond thenS elseS)
-    | (evalE st cond) == 1 = evalSimple st thenS
-    | otherwise = evalSimple st elseS
+    | (evalE st cond) == 1    = evalSimple st thenS
+    | otherwise               = evalSimple st elseS
 evalSimple st w@(DWhile cond body)
-    | (evalE st cond) == 1 = evalSimple (evalSimple st body) w
-    | otherwise = st
+    | (evalE st cond) == 1    = evalSimple (evalSimple st body) w
+    | otherwise               = st
 evalSimple st (DSequence x y) = evalSimple (evalSimple st x) y
-evalSimple st DSkip = st
+evalSimple st DSkip           = st
 
 run :: State -> Statement -> State
 run st stmt = evalSimple st (desugar stmt)
