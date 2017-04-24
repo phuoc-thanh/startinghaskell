@@ -38,7 +38,7 @@ a = map (+1) exampleList
 b = map (*2) exampleList
 c = filter even exampleList
 d = filter (>0) exampleList
--- fold left (from left) with initvalue = 1. Operation (+) is an associative operation
+-- fold left (from left) with initvalue = 1. Operation (*) is an associative operation
 -- ref: https://en.wikipedia.org/wiki/Monoid
 e = foldl (*) 1 exampleList
 
