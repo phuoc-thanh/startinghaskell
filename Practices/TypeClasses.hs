@@ -1,6 +1,6 @@
 -- Monoid Practices
 module TypeClasses where
-import Data.Monoid hiding (Sum)
+import Data.Monoid hiding (Sum, Product)
 -- import Prelude hiding (Sum)
 
 -- mappend, mconcat, mempty
@@ -24,3 +24,23 @@ newtype Sum a = Sum { getSum :: a }
 instance Num a => Monoid (Sum a) where
     mempty = Sum 0
     mappend (Sum x) (Sum y) = Sum (x + y)
+
+-- / Monoid under multiplication
+newtype Product a = Product { getProduct :: a }
+    deriving (Eq, Ord, Show)
+
+instance Num a => Monoid (Product a) where
+    mempty = Product 1
+    mappend (Product x) (Product y) = Product (x*y)
+
+-- / Functor
+
+data Tree a = Leaf a | Branch (Tree a) (Tree a)
+    deriving (Show)
+
+instance Functor Tree where
+    fmap f (Leaf x) = Leaf (f x)
+    fmap f (Branch left right) = Branch (fmap f left) (fmap f right)
+
+-- fmap (2*) (Branch (Branch (Leaf 1) (Leaf 2)) (Leaf 3)) = Branch (Branch (Leaf 2) (Leaf 4)) (Leaf 6)
+ 
