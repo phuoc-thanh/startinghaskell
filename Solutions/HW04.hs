@@ -1,18 +1,20 @@
 {-# OPTIONS_GHC -Wall #-}
 module HW04 where
 
+import Data.List
+
 newtype Poly a = P [a]
 
 -- Exercise 1 -----------------------------------------
 
 x :: Num a => Poly a
-x = undefined
+x = P [0,1]
 
 -- Exercise 2 ----------------------------------------
 
 instance (Num a, Eq a) => Eq (Poly a) where
-    (==) = undefined
- 
+    (==) (P f1) (P f2) = (dropWhileEnd (==0) f1) == (dropWhileEnd (==0) f2)
+
 -- Exercise 3 -----------------------------------------
 
 instance (Num a, Eq a, Show a) => Show (Poly a) where
