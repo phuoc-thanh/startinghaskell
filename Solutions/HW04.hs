@@ -18,7 +18,16 @@ instance (Num a, Eq a) => Eq (Poly a) where
 -- Exercise 3 -----------------------------------------
 
 instance (Num a, Eq a, Show a) => Show (Poly a) where
-    show = undefined
+    show (P f) = showP $ dropWhileEnd (==0) (reverse f)
+
+showP :: (Num a, Eq a, Show a) => [a] -> String
+showP [] = ""
+showP (z:zs)
+    | zs == [] = show z
+    | z == 0 = showP zs
+    | z == 1 = "x" ++ "^" ++ show (length zs) ++ " + " ++ showP zs
+    | length zs == 1 = show z ++ "x" ++ " + " ++ showP zs
+    | otherwise = show z ++ "x" ++ "^" ++ show (length zs) ++ " + " ++ showP zs
 
 -- Exercise 4 -----------------------------------------
 
