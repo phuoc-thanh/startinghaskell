@@ -32,7 +32,7 @@ showP (z:zs)
 -- Exercise 4 -----------------------------------------
 
 plus :: Num a => Poly a -> Poly a -> Poly a
-plus = undefined
+plus (P xs) (P ys) = P (zipWith (+) xs ys)
 
 -- Exercise 5 -----------------------------------------
 
