@@ -27,13 +27,13 @@ zipWithIndex :: [a] -> [(Int, a)]
 zipWithIndex = zip [0,1..]
 
 toTerm :: (Num a, Eq a, Show a) => (Int, a) -> String
-toTerm (0, c)  =  show c
+toTerm (0, c)  = show c
 toTerm (_, 0)  = ""
 toTerm (1, 1)  = "x"
 toTerm (1, -1) = "-x"
 toTerm (1, c)  = show c ++ "x"
-toTerm (d, 1)  = "x" ++ "^" ++ show d
-toTerm (d, -1) = "-x" ++ "^" ++ show d
+toTerm (d, 1)  = "x"    ++ "^" ++ show d
+toTerm (d, -1) = "-x"   ++ "^" ++ show d
 toTerm (d, c)  = show c ++ "x" ++ "^" ++ show d
 
 -- Exercise 4 -----------------------------------------
@@ -42,14 +42,10 @@ plus :: Num a => Poly a -> Poly a -> Poly a
 plus (P a) (P b) = P (rewrite a b)
 
 rewrite ::Num a => [a] -> [a] -> [a]
--- rewrite i xs
---     | i > length xs = rewrite i (xs ++ [0])
---     | otherwise = xs
 rewrite ys zs
     | length ys == length zs = zipWith (+) ys zs
     | length ys > length zs = rewrite ys (zs ++ [0])
     | otherwise = rewrite (ys ++ [0]) zs
-
 
 -- Exercise 5 -----------------------------------------
 
