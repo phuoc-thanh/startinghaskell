@@ -50,7 +50,11 @@ rewrite ys zs
 -- Exercise 5 -----------------------------------------
 
 times :: Num a => Poly a -> Poly a -> Poly a
-times = undefined
+times (P y) (P z) = foldr (+) (P [0]) $ termTimes y z
+
+termTimes :: Num a => [a] -> [a] -> [Poly a]
+termTimes (y:ys) zs = P (map (*y) zs) : termTimes ys (0:zs)
+termTimes _ _ = []
 
 -- Exercise 6 -----------------------------------------
 
