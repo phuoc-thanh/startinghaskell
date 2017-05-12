@@ -54,15 +54,15 @@ times (P y) (P z) = foldr (+) (P [0]) $ termTimes y z
 
 termTimes :: Num a => [a] -> [a] -> [Poly a]
 termTimes (y:ys) zs = P (map (*y) zs) : termTimes ys (0:zs)
-termTimes _ _ = []
+termTimes [] _ = []
 
 -- Exercise 6 -----------------------------------------
 
 instance Num a => Num (Poly a) where
     (+) = plus
     (*) = times
-    negate      = undefined
-    fromInteger = undefined
+    negate (P zs)     = P (map negate zs)
+    fromInteger i = P [(fromInteger i)]
     -- No meaningful definitions exist
     abs    = undefined
     signum = undefined
@@ -70,18 +70,28 @@ instance Num a => Num (Poly a) where
 -- Exercise 7 -----------------------------------------
 
 applyP :: Num a => Poly a -> a -> a
-applyP = undefined
+applyP (P (z:zs)) v = v^(length zs) * z + applyP (P zs) v
+applyP (P []) _ = 0
+
 
 -- Exercise 8 -----------------------------------------
 
+-- Differentiation is the action of computing a derivative
+-- Deriative means "Đạo Hàm" - Tốc độ biến thiên của f(x) theo x
 class Num a => Differentiable a where
     deriv  :: a -> a
     nderiv :: Int -> a -> a
-    nderiv = undefined
+    nderiv n 
+        | n > 0 = nderiv (n-1) . deriv
+        | otherwise = id
 
 -- Exercise 9 -----------------------------------------
 
 instance Num a => Differentiable (Poly a) where
-    deriv = undefined
+    deriv (P z) = P . termDeriv . reverse $ tail z
+
+termDeriv :: (Num a) => [a] -> [a]
+termDeriv [] = []
+termDeriv (z:zs) = termDeriv zs ++ z * fromIntegral (length $ z:zs):[]
 
 --thanks to https://github.com/amar47shah/cis-194/tree/master/2015-noamz
