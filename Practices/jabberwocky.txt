@@ -1,0 +1,21 @@
+This is Jabber title
+
+
+the first stanza
+first line
+second line
+third line
+
+the second stanza
+first line
+second line
+third line
+
+the third stanza
+first line
+second line
+
+the fourth stanza
+first line
+
+end
