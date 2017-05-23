@@ -2,6 +2,7 @@
 {-# LANGUAGE OverloadedStrings, RecordWildCards #-}
 module HW05 where
 
+import Data.Bits
 import Data.ByteString.Lazy (ByteString)
 import Data.Map.Strict (Map)
 import System.Environment (getArgs)
@@ -14,7 +15,11 @@ import Parser
 -- Exercise 1 -----------------------------------------
 
 getSecret :: FilePath -> FilePath -> IO ByteString
-getSecret = undefined
+getSecret fp1 fp2 = do
+    modified <- BS.readFile fp1
+    original <- BS.readFile fp2
+    BS.putStr $ (BS.filter (/= 0) . BS.pack) $ BS.zipWith xor modified original
+    return $ (BS.filter (/= 0) . BS.pack) $ BS.zipWith xor modified original
 
 -- Exercise 2 -----------------------------------------
 

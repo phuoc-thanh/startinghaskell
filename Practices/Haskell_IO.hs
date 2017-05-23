@@ -4,6 +4,7 @@ module Haskell_IO (main) where
 import qualified Data.ByteString as BS
 import Data.ByteString (ByteString)
 import Data.Functor
+import Data.Word8
 
 
 main :: IO ()
@@ -42,3 +43,22 @@ getWords = BS.split 32 <$> BS.getLine
 -- getWords = do
 --   ln <- BS.getLine
 --   return $ BS.split 32 ln -- 32 is the ASCII code for ' '
+
+data ByteString' a = ByteString' (Word8 -> a) BS.ByteString
+
+wrap :: BS.ByteString -> ByteString' Word8
+wrap bs = ByteString' id bs
+
+-- The type ensures you can only unwrap with a function Word8 -> Word8.
+unwrap :: ByteString' Word8 -> ByteString
+unwrap (ByteString' f bs) = BS.map f bs
+
+-- Functor instance just concatenates the fmapped function.
+instance Functor ByteString' where
+    fmap f (ByteString' g bs) = ByteString' (f . g) bs
+
+-- Foldable instance just uses the fmapped function.
+instance Foldable ByteString' where
+    foldr f z (ByteString' g bs) = BS.foldr (f . g) z bs
+-- You could define foldr', foldl, etc. based on the ones in Data.ByteString.
+-- Not strictly necessary, but nice to have.
