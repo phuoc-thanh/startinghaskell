@@ -18,8 +18,7 @@ getSecret :: FilePath -> FilePath -> IO ByteString
 getSecret fp1 fp2 = do
     modified <- BS.readFile fp1
     original <- BS.readFile fp2
-    BS.putStr $ (BS.filter (/= 0) . BS.pack) $ BS.zipWith xor modified original
-    return $ (BS.filter (/= 0) . BS.pack) $ BS.zipWith xor modified original
+    return . BS.filter (/= 0) (BS.pack $ BS.zipWith xor modified original)
 
 -- Exercise 2 -----------------------------------------
 
@@ -90,3 +89,7 @@ main = do
                         "new-transactions.json"
   putStrLn crim
 
+-- https://github.com/shinew/cis194/blob/master/05-IO/homework.hs
+-- https://en.wikipedia.org/wiki/XOR_cipher
+-- https://hackage.haskell.org/package/bytestring-0.10.8.1/docs/Data-ByteString-Lazy.html
+-- https://hackage.haskell.org/package/base-4.9.1.0/docs/Data-Bits.html
