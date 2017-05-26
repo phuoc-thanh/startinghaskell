@@ -9,6 +9,7 @@ import System.Environment (getArgs)
 
 import qualified Data.ByteString.Lazy as BS
 import qualified Data.Map.Strict as Map
+import qualified Data.ByteString.Lazy.Char8 as B
 
 import Parser
 
@@ -18,12 +19,17 @@ getSecret :: FilePath -> FilePath -> IO ByteString
 getSecret fp1 fp2 = do
     modified <- BS.readFile fp1
     original <- BS.readFile fp2
-    return . BS.filter (/= 0) (BS.pack $ BS.zipWith xor modified original)
+    return $ BS.filter (/= 0) (BS.pack $ BS.zipWith xor modified original)
 
 -- Exercise 2 -----------------------------------------
 
+--to Test
+--decryptWithKey (B.pack "Haskell Is Great!") "clues/victims.json"
 decryptWithKey :: ByteString -> FilePath -> IO ()
-decryptWithKey = undefined
+decryptWithKey k f = do
+    enc <- BS.readFile (f ++ ".enc")
+    BS.writeFile f (BS.pack $ BS.zipWith xor repK enc)
+        where repK = BS.pack . cycle $ BS.unpack k
 
 -- Exercise 3 -----------------------------------------
 
