@@ -34,15 +34,22 @@ decryptWithKey k f = do
 -- Exercise 3 -----------------------------------------
 
 parseFile :: FromJSON a => FilePath -> IO (Maybe a)
-parseFile file =
-  do
+parseFile file = do
     contents <- BS.readFile file
     return $ decode contents
 
 -- Exercise 4 -----------------------------------------
 
 getBadTs :: FilePath -> FilePath -> IO (Maybe [Transaction])
-getBadTs = undefined
+getBadTs v t = do
+    victims <- parseFile v :: IO (Maybe [TId])
+    transactions <- parseFile t :: IO (Maybe [Transaction])
+    return $ filterT victims transactions
+
+filterT (Just vs) (Just ts) = Just $ filter (\t -> any (\v -> v == tid t) vs) ts
+filterT _ Nothing = Nothing
+filterT Nothing _ = Nothing
+
 
 -- Exercise 5 -----------------------------------------
 
