@@ -54,7 +54,19 @@ filterT Nothing _ = Nothing
 -- Exercise 5 -----------------------------------------
 
 getFlow :: [Transaction] -> Map String Integer
-getFlow = undefined
+getFlow transactions =
+  let
+    newVal val x = case x of (Just a) -> Just (a + val)
+                             _        -> Just val
+    updateT t m =
+      let
+        money = amount t
+        fromP = from t
+        toP = to t
+      in
+        (Map.alter (newVal (-money)) fromP . Map.alter (newVal money) toP) m
+
+  in foldr updateT Map.empty transactions
 
 -- Exercise 6 -----------------------------------------
 
