@@ -46,6 +46,7 @@ getBadTs v t = do
     transactions <- parseFile t :: IO (Maybe [Transaction])
     return $ filterT victims transactions
 
+filterT :: Foldable t => Maybe (t TId) -> Maybe [Transaction] -> Maybe [Transaction]
 filterT (Just vs) (Just ts) = Just $ filter (\t -> any (\v -> v == tid t) vs) ts
 filterT _ Nothing = Nothing
 filterT Nothing _ = Nothing
@@ -54,19 +55,14 @@ filterT Nothing _ = Nothing
 -- Exercise 5 -----------------------------------------
 
 getFlow :: [Transaction] -> Map String Integer
-getFlow transactions =
-  let
-    newVal val x = case x of (Just a) -> Just (a + val)
-                             _        -> Just val
-    updateT t m =
-      let
-        money = amount t
-        fromP = from t
-        toP = to t
-      in
-        (Map.alter (newVal (-money)) fromP . Map.alter (newVal money) toP) m
+getFlow transactions = foldr updateT Map.empty transactions
 
-  in foldr updateT Map.empty transactions
+updateT :: Transaction -> Map String Integer -> Map String Integer
+updateT t m = (Map.alter outAmount fromP . Map.alter inAmount toP) m
+        where inAmount _  = Just (amount t)
+              outAmount _ = Just (- (amount t))
+              fromP       = from t
+              toP         = to t
 
 -- Exercise 6 -----------------------------------------
 
