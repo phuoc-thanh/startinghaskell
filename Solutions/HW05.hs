@@ -6,10 +6,11 @@ import Data.Bits
 import Data.ByteString.Lazy (ByteString)
 import Data.Map.Strict (Map)
 import System.Environment (getArgs)
+import Data.Function
+import Data.List
 
 import qualified Data.ByteString.Lazy as BS
 import qualified Data.Map.Strict as Map
-import qualified Data.ByteString.Lazy.Char8 as B
 
 import Parser
 
@@ -67,17 +68,32 @@ updateT t m = (Map.alter outAmount fromP . Map.alter inAmount toP) m
 -- Exercise 6 -----------------------------------------
 
 getCriminal :: Map String Integer -> String
-getCriminal = undefined
+getCriminal = fst . maximumBy (compare `on` snd) . Map.toList
 
 -- Exercise 7 -----------------------------------------
 
+-- s: sender, r: receiver
 undoTs :: Map String Integer -> [TId] -> [Transaction]
-undoTs = undefined
+undoTs m tids = pairTrans payers payees tids
+    where reverseSort = sortBy (flip compare `on` snd)
+          payers = (reverseSort . filter (\(_, i) -> i > 0)) $ Map.toList m
+          payees = (reverseSort . filter (\(_, i) -> i < 0)) $ Map.toList m
+
+-- s: sender, r: receiver
+pairTrans :: [(String, Integer)] -> [(String, Integer)] -> [TId] -> [Transaction]
+pairTrans [] [] _ = []
+pairTrans (s:ss) (r:rs) (i:is)
+    | diff == 0 = trans (fst s) (fst r) (snd s) i     : pairTrans ss rs is
+    | diff > 0  = trans (fst s) (fst r) (- (snd r)) i : pairTrans ((fst s, diff):ss) rs is
+    | otherwise = trans (fst s) (fst r) (snd s) i     : pairTrans ss ((fst r, diff):rs) is
+    where diff                    = snd s + snd r
+          trans se re money newId = Transaction { from = se, to = re, amount = money, tid = newId }
+pairTrans _ _ _ = []
 
 -- Exercise 8 -----------------------------------------
 
 writeJSON :: ToJSON a => FilePath -> a -> IO ()
-writeJSON = undefined
+writeJSON fp a = BS.writeFile fp $ encode a
 
 -- Exercise 9 -----------------------------------------
 
@@ -105,12 +121,12 @@ main = do
     case args of
       dog1:dog2:trans:vict:ids:out:_ ->
           doEverything dog1 dog2 trans vict ids out
-      _ -> doEverything "dog-original.jpg"
-                        "dog.jpg"
-                        "transactions.json"
-                        "victims.json"
-                        "new-ids.json"
-                        "new-transactions.json"
+      _ -> doEverything "clues/dog-original.jpg"
+                        "clues/dog.jpg"
+                        "clues/transactions.json"
+                        "clues/victims.json"
+                        "clues/new-ids.json"
+                        "clues/new-transactions.json"
   putStrLn crim
 
 -- https://github.com/shinew/cis194/blob/master/05-IO/homework.hs
