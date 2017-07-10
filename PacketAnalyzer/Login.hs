@@ -24,6 +24,7 @@ getUserURI = "/payclient.ashx?op=GetUser"
 -- 210.245.26.186
 apiHost = "api.kimdungqq.com"
 -- 104.28.17.37
+-- 104.28.16.37
 payHost = "m-pay.kimdungqq.com"
 
 checkUserRq     = setRequestPath checkUserURI
