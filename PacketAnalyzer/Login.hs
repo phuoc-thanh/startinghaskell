@@ -21,8 +21,9 @@ loginVerifyURI = "/jinyong/vega/loginVerify"
 checkUserURI = "/payclient.ashx?op=CheckUser"
 getUserURI = "/payclient.ashx?op=GetUser"
 
--- 104.28.17.37
+-- 210.245.26.186
 apiHost = "api.kimdungqq.com"
+-- 104.28.17.37
 payHost = "m-pay.kimdungqq.com"
 
 checkUserRq     = setRequestPath checkUserURI

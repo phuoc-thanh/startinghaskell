@@ -1,5 +1,9 @@
-9P\CE@;VA7$;P9
-"1[{"type":1,"code":1040,"amount":1},{"type":1,"code":2104,"amount":1},{"type":2,"code":5098,"amount":1},{"type":1,"code":1029,"amount":1}]
 
-onlinetime info (last gift 1h)
-9P\CE:@;A7%,P9B[{"type":1,"code":1041,"amount":1},{"type":1,"code":2105,"amount":1},{"type":2,"code":5099,"amount":1},{"type":1,"code":1029,"amount":1}]
+MILOGIN 0.0.1 10 1 11111 123 1499664017 ee7152cb9a27a8be4b81c6ebdea208ea 0
+
+ENTER 11111 130
+
+0000   14 00 08 ff 10 00 65 64 65 6e 54 72 65 65 20 64  ......edenTree d
+0010   72 6f 70 20 32 00                                rop 2.
+ qPp/0xE>@GAXzPN
+ edenTree drop 2
