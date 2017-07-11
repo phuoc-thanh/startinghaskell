@@ -11,4 +11,4 @@ Learning Haskell with CIS-194 Spring 2015
 
 4. Install Haskell Syntax Highlighting, Haskell ghc-mod Extension (search on VS Code)
 
-5. Network package: network, HTTP, http-conduit, yaml, hexstring
+5. Network package: network, HTTP, http-conduit, yaml, hex, hexstring, tcp-streams
