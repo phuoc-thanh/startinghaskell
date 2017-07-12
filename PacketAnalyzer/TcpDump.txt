@@ -17,4 +17,4 @@ length 31 = 1f, real data length 27 = 1b
  {"data":{"acc":"11111","uid":"11111","opname":"10","defaultsid":"1","displayNovice":1,"create_time":1499788083,"key":"de324200440393cacf54e564a253e230"},"serv_mes":[{"uid":"1","sname":"kd-01","ip":"210.245.26.188","port":"8001","isopen":1,"update_time":"\u4eca\u65e511\u70b9"},{"uid":"2","sname":"kd-02","ip":"210.245.26.188","port":"8002","isopen":1,"update_time":"\u4eca\u65e511\u70b9"}],"error_code":0,"pay_callback_url":"http:\/\/m-pay.kimdungqq.com\/jinyong\/vega\/payApi"}                  
 
  4d0001ff4900.4c4f47494e20302e302e312031302031203131313131203132332031343939373838303833206465333234323030343430333933636163663534653536346132353365323330203000
- MI.LOGIN 0.0.1 10 1 11111 123 1499788083 de324200440393cacf54e564a253e230 0
+              LOGIN 0.0.1 10 1 11111 123 1499788083 de324200440393cacf54e564a253e230 0

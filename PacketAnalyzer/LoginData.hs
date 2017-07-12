@@ -1,62 +1,44 @@
-{-# LANGUAGE OverloadedStrings #-}
-
-
+{-# OPTIONS_GHC -Wall #-}
+{-# LANGUAGE ScopedTypeVariables , OverloadedStrings #-}
 
 module LoginData where
 
-import System.IO
-import Data.List
-import Data.List.Split
-import Data.ByteString.Lazy (ByteString)
-import Data.ByteString.Base16.Lazy
-import Data.Aeson           (Value)
-import Network.HTTP.Simple
-
-import qualified Data.ByteString.Lazy       as BS
 import qualified Data.ByteString.Lazy.Char8 as C
-import qualified Data.Yaml                  as Yaml
+import Data.ByteString.Base16.Lazy
+import Data.Time.Clock
+import Data.Time.Clock.POSIX
+import Data.Time.Clock.System
+import System.Locale
 
-loginVerifyURI = "/jinyong/vega/loginVerify"
-checkUserURI = "/payclient.ashx?op=CheckUser"
-getUserURI = "/payclient.ashx?op=GetUser"
 
--- 210.245.26.186
-apiHost = "api.kimdungqq.com"
--- 104.28.17.37
--- 104.28.16.37
-payHost = "m-pay.kimdungqq.com"
 
-checkUserRq     = setRequestPath checkUserURI
-                $ setRequestHost payHost
-                $ setRequestBodyLBS "partnerId=0&userName=reply1988&deviceId=d80f998b16396187&serverMode=UNKNOWN&password=haxinhdep&refcode=0&gameId=46"
-                $ setRequestMethod "POST"
-                $ defaultRequest
---"result=1&fullName=reply1988&userId=11111&session=9929ea82-151f-492d-8a2c-94346d35f14f&IP=172.31.16.101"
+-- 0x00
+flagByte :: C.ByteString
+flagByte = "00"
+-- 0xff
+indexfByte :: C.ByteString
+indexfByte = "ff"
 
-getSession :: ByteString -> ByteString
-getSession = fst . BS.splitAt 36 . snd . BS.splitAt 49 
+-- Packet 01 structure
+-- packet info = 2 bytes (1 byte info + 1 flag byte) represents the length of data packet
+-- index info  = 2 bytes (1 index byte + 1 byte: ff) represents the index of this packet in the streams
+-- data info   = 2 bytes (1 byte info + 1 flag byte) represents the length of data
+-- login data   = 73 bytes (72 bytes data + 1 flag byte) contains the string:
+--      "LOGIN 0.0.1 10 1 11111 123 1499788083 de324200440393cacf54e564a253e230 0"
 
-getUserRq       = setRequestPath getUserURI
-                $ setRequestHost payHost
-                $ setRequestBodyLBS "session=9929ea82-151f-492d-8a2c-94346d35f14f&serverMode=UNKNOWN&hash=e02ea6746a05b4fd4a765fd65cb8a5c6&time=1499617306527"
-                $ setRequestMethod "POST"
-                $ defaultRequest                
---"fullname=reply1988&email=thanhdo89se%40gmail.com&phone=0982393901&cash=17000&idcard=241096330&IP=172.31.16.101&result=1"
-getUid :: ByteString -> ByteString
-getUid u = BS.append (BS.append "uid=" u) "&token="
+-- Login Packet Info == 0x4d : 0x00 the length of packet (2bytes + 2bytes + 73bytes)
+loginPacketInfo :: C.ByteString
+loginPacketInfo = C.append "4d" flagByte
+-- Login Index Info == 0x04 : 0xff (constant)
+loginIndex      ::  C.ByteString
+loginIndex      = C.append "01" indexfByte
+-- Login Data Info == "Login Data length" + flagByte
+loginDataInfo   :: C.ByteString
+loginDataInfo   = C.append "49" flagByte
 
-getLoginRqBody :: String -> ByteString -> ByteString
-getLoginRqBody u b = BS.append (BS.append (BS.append "uid=" (C.pack u)) "&token=") (BS.append "&os=and&version=75896" b)
+loginData       :: C.ByteString
+loginData = C.append (encode "LOGIN 0.0.1 10 1 11111 123 1499788083 de324200440393cacf54e564a253e230 0") flagByte
 
-loginVerifyRq   = setRequestPath loginVerifyURI
-                $ setRequestHost apiHost
-                -- $ setRequestBodyLBS "uid=11111&token=9929ea82-151f-492d-8a2c-94346d35f14f&os=and&version=75896"
-                $ setRequestMethod "POST"
-                $ setRequestHeader "Content-Type" ["application/x-www-form-urlencoded"]
-                $ defaultRequest
-main = do
-    uid <- getLine
-    cResponse <- httpLBS checkUserRq
-    response <- httpJSON (setRequestBodyLBS (getLoginRqBody uid $ getSession (getResponseBody cResponse)) $ loginVerifyRq)
-    -- putStrLn $ getResponseHeaders response
-    putStrLn $ getResponseBody response
+--current time
+-- cTime :: IO Integer
+cTime = getSystemTime  
