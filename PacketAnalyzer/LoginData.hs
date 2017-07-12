@@ -5,10 +5,8 @@ module LoginData where
 
 import qualified Data.ByteString.Lazy.Char8 as C
 import Data.ByteString.Base16.Lazy
-import Data.Time.Clock
 import Data.Time.Clock.POSIX
-import Data.Time.Clock.System
-import System.Locale
+import Data.Time.Format
 
 
 
@@ -39,6 +37,11 @@ loginDataInfo   = C.append "49" flagByte
 loginData       :: C.ByteString
 loginData = C.append (encode "LOGIN 0.0.1 10 1 11111 123 1499788083 de324200440393cacf54e564a253e230 0") flagByte
 
---current time
--- cTime :: IO Integer
-cTime = getSystemTime  
+-- current time
+cTime :: IO Integer
+cTime = fmap round getPOSIXTime
+
+-- fake time at 10:50PM
+fTime :: C.ByteString
+fTime = "1499874321"
+
