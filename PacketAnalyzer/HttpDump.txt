@@ -1,9 +1,4 @@
 
-        104.28.16.37 m-pay.kimdungqq.com
-        210.245.26.186 api.kimdungqq.com
-        210.245.26.188:8001 kd1, 8002:tcp
-        
-
 POST loginVerify
 P\C9EH.@P4Q@~PlPOST /jinyong/vega/loginVerify HTTP/1.1
 Content-Length: 73

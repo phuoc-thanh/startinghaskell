@@ -2,20 +2,19 @@
 
 
 
-module Login where
+module LoginData where
 
 import System.IO
 import Data.List
 import Data.List.Split
 import Data.ByteString.Lazy (ByteString)
--- import qualified Data.ByteString as B
-import qualified Data.ByteString.Lazy as BS
+import Data.ByteString.Base16.Lazy
+import Data.Aeson           (Value)
+import Network.HTTP.Simple
 
-import           Data.Aeson            (Value)
-import qualified Data.ByteString.Lazy.Char8 as S8
-import qualified Data.Yaml             as Yaml
-import           Network.HTTP.Simple
-
+import qualified Data.ByteString.Lazy       as BS
+import qualified Data.ByteString.Lazy.Char8 as C
+import qualified Data.Yaml                  as Yaml
 
 loginVerifyURI = "/jinyong/vega/loginVerify"
 checkUserURI = "/payclient.ashx?op=CheckUser"
@@ -47,7 +46,7 @@ getUid :: ByteString -> ByteString
 getUid u = BS.append (BS.append "uid=" u) "&token="
 
 getLoginRqBody :: String -> ByteString -> ByteString
-getLoginRqBody u b = BS.append (BS.append (BS.append "uid=" (S8.pack u)) "&token=") (BS.append "&os=and&version=75896" b)
+getLoginRqBody u b = BS.append (BS.append (BS.append "uid=" (C.pack u)) "&token=") (BS.append "&os=and&version=75896" b)
 
 loginVerifyRq   = setRequestPath loginVerifyURI
                 $ setRequestHost apiHost
