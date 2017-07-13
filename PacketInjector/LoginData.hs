@@ -21,7 +21,9 @@ indexfByte = "ff"
 -- login data  = 73 bytes (72 bytes data + 1 flag byte) contains the string:
 --      "LOGIN 0.0.1 10 1 11111 123 1499788083 de324200440393cacf54e564a253e230 0"
 -- enter world = 16 bytes (15 bytes data + 1 flag byte) contains the string:
---      "ENTER 11111 130"
+--      "ENTER 11111 130" -> reply1988
+--      "ENTER 11107 2960" -> reply1988
+
 
 -- Login Packet Info == 0x4d : 0x00 the length of packet (2bytes + 2bytes + 73bytes)
 loginPacketInfo :: C.ByteString
@@ -61,6 +63,12 @@ d123String = " 123 "
 d130String :: C.ByteString
 d130String = " 130"
 
+d2960String :: C.ByteString
+d2960String = " 2960"
+
+d2968String :: C.ByteString
+d2968String = " 2968"
+
 getUid :: C.ByteString -> C.ByteString
 getUid = head . C.split '\"' . C.drop 22
 
@@ -71,7 +79,7 @@ getTime :: C.ByteString -> C.ByteString
 getTime = head . C.split ',' . C.drop 92
 
 getLoginData :: C.ByteString -> C.ByteString
-getLoginData d = C.append (serialLoginBytes)
+getLoginData d = C.append serialLoginBytes
                $ C.append loginString
                $ C.append (getUid d)
                $ C.append d123String
@@ -82,9 +90,10 @@ getLoginData d = C.append (serialLoginBytes)
                $ fst $ decode flagByte
 
 enterWorld :: C.ByteString -> C.ByteString
-enterWorld d = C.append (serialEnterBytes)   
+enterWorld d = C.append serialEnterBytes
              $ C.append enterWString
              $ C.append (getUid d)
-             $ C.append d130String
+            --  $ C.append d130String
+             $ C.append d2968String
              $ fst $ decode flagByte    
 
