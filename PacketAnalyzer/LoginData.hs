@@ -43,8 +43,11 @@ joinWIndex      = C.append "02" indexfByte
 joinWDataInfo   :: C.ByteString
 joinWDataInfo   = C.append "10" flagByte
 
-serialBytes :: C.ByteString -> C.ByteString
-serialBytes = fst . decode . C.append loginPacketInfo . C.append loginIndex
+serialLoginBytes :: C.ByteString
+serialLoginBytes = fst . decode . C.append loginPacketInfo $ C.append loginIndex loginDataInfo
+
+serialEnterBytes :: C.ByteString
+serialEnterBytes = fst . decode . C.append joinWInfo $ C.append joinWIndex joinWDataInfo
 
 loginString :: C.ByteString
 loginString = "LOGIN 0.0.1 10 1 "
@@ -68,7 +71,7 @@ getTime :: C.ByteString -> C.ByteString
 getTime = head . C.split ',' . C.drop 92
 
 getLoginData :: C.ByteString -> C.ByteString
-getLoginData d = C.append (serialBytes loginDataInfo)
+getLoginData d = C.append (serialLoginBytes)
                $ C.append loginString
                $ C.append (getUid d)
                $ C.append d123String
@@ -79,7 +82,7 @@ getLoginData d = C.append (serialBytes loginDataInfo)
                $ fst $ decode flagByte
 
 enterWorld :: C.ByteString -> C.ByteString
-enterWorld d = C.append (serialBytes joinWDataInfo)   
+enterWorld d = C.append (serialEnterBytes)   
              $ C.append enterWString
              $ C.append (getUid d)
              $ C.append d130String
