@@ -64,11 +64,14 @@ getName = head . C.split '/'
 getPassword :: C.ByteString -> C.ByteString
 getPassword = last . C.split '/'
 
-main = do
+getServerData :: C.ByteString -> C.ByteString
+getServerData = C.drop 9 . head . C.split '}'
+
+loginVerify = do
     usernamePassword <- getLine
     cResponse <- httpLBS $ checkUserRq (getName $ C.pack usernamePassword) (getPassword $ C.pack usernamePassword)
     let uid = C.append "uid=" $ getId (getResponseBody cResponse)
         session = getSession (getResponseBody cResponse)
     response <- httpLBS (setRequestBodyLBS (getLoginRqBody uid session) $ loginVerifyRq)
     -- putStrLn $ getResponseHeaders response
-    C.putStrLn $ getResponseBody response
+    return $ getServerData $ getResponseBody response

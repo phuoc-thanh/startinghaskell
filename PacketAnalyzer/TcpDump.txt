@@ -1,7 +1,4 @@
 
-MILOGIN 0.0.1 10 1 11111 123 1499664017 ee7152cb9a27a8be4b81c6ebdea208ea 0
-MILOGIN 0.0.1 10 1 11111 123 1499693132 225c510eaf469895ef53046a2f9e6457 0
-
 14:00:02:ff:10:00:45:4e:54:45:52:20:31:31:31:31:31:20:31:33:30:00
 ENTER 11111 130
 
@@ -13,8 +10,4 @@ ENTER 11111 130
 length 31 = 1f, real data length 27 = 1b
 1f:00:1f:ff:1b:00:63:72:6f:73:73:73:65:72:76:65:72:77:61:72:20:75:70:64:61:74:65:70:6f:77:65:72:00
                   c  r  o  s  s  s  e  r  v  e  r  w  a  r     u  p  d  a  t  e  p  o  w  e  r
-
- {"data":{"acc":"11111","uid":"11111","opname":"10","defaultsid":"1","displayNovice":1,"create_time":1499788083,"key":"de324200440393cacf54e564a253e230"},"serv_mes":[{"uid":"1","sname":"kd-01","ip":"210.245.26.188","port":"8001","isopen":1,"update_time":"\u4eca\u65e511\u70b9"},{"uid":"2","sname":"kd-02","ip":"210.245.26.188","port":"8002","isopen":1,"update_time":"\u4eca\u65e511\u70b9"}],"error_code":0,"pay_callback_url":"http:\/\/m-pay.kimdungqq.com\/jinyong\/vega\/payApi"}                  
-
- 4d0001ff4900.4c4f47494e20302e302e312031302031203131313131203132332031343939373838303833206465333234323030343430333933636163663534653536346132353365323330203000
-              LOGIN 0.0.1 10 1 11111 123 1499788083 de324200440393cacf54e564a253e230 0
+              

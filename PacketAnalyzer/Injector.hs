@@ -5,18 +5,16 @@
 module Injector where
 
 import GameData  
--- import Network.Socket hiding (recv)
+import LoginData
+import HttpRq
+import Network.Socket hiding (send, close)
 -- import Network.Socket.ByteString (recv, sendAll)
 import qualified Data.ByteString.Lazy.Char8 as C
-import Data.HexString
 import Data.Connection
 import Data.Maybe
-import Data.Time.Clock.POSIX
-
+import Data.HexString
 import qualified System.IO.Streams.TCP as TCP
--- import           System.IO.Streams (InputStream, OutputStream)
 import qualified System.IO.Streams as Streams
-
 
 --tcpPacket Base length: 54
 
@@ -24,36 +22,28 @@ import qualified System.IO.Streams as Streams
 kd01Host = "210.245.26.188"
 kd01Port = 8001
 
-hexLogin = "4d0001ff49004c4f47494e20302e302e312031302031203131313131203132332031343939373838303833206465333234323030343430333933636163663534653536346132353365323330203000"
-
-hexEnter = "140002ff1000454e5445522031313131312031333000"
-
 hexNetTime =  "140003ff10006f6e6c696e6574696d6520696e666f00"
 
---current time
-cTime :: IO Integer
-cTime = fmap round getPOSIXTime
+hexLogin :: HexString
+hexLogin = hexString "4d0001ff49004c4f47494e20302e302e312031302031203131313131203132332031343939393334343735203864646531343435663266646335393063636163386636643263333630343637203000"
 
+hexEnter :: HexString
+hexEnter = hexString "140002ff1000454e5445522031313131312031333000"
+                      
 
--- simpleTCPSend :: IO ()
--- simpleTCPSend = withSocketsDo $
---     do addrinfos <- getAddrInfo Nothing (Just "210.245.26.188") (Just "8001")
---        let serveraddr = head addrinfos
---        putStrLn $ show serveraddr
---        sock <- socket (addrFamily serveraddr) Stream defaultProtocol
---        setSocketOption sock KeepAlive 1
---        connect sock (addrAddress serveraddr)
---        sendAll sock $ toBytes $ hexB
---        msg <- recv sock 1024
---        close sock
---        putStrLn $ show $ fromBytes msg 
---        C.putStrLn "Received "
---        C.putStrLn $ msg
+injectWorld :: IO ()
+injectWorld = do conn <- TCP.connect kd01Host kd01Port
+                 send conn $ C.fromStrict $ toBytes hexEnter
+                 res <- Streams.read (source conn)
+                 C.putStrLn $ C.fromStrict (fromJust res)
+                 close conn
 
-main :: IO ()
-main = do conn <- TCP.connect kd01Host kd01Port
-          -- send conn getGameData
-          send conn $ C.pack hexLogin
-          res <- Streams.read (source conn)
-          C.putStrLn $ C.fromStrict (fromJust res)
-        --   close conn
+injectLogin :: IO ()
+injectLogin = do res <- loginVerify
+                 sock <- TCP.connectSocket kd01Host kd01Port
+                 setSocketOption (fst sock) KeepAlive 1
+                 conn <- TCP.socketToConnection 1024 sock
+                 send conn $ getLoginData res
+                 send conn $ enterWorld res
+                 msg <- Streams.read (source conn)
+                 C.putStrLn $ C.fromStrict (fromJust msg)
