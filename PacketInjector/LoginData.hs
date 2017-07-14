@@ -5,7 +5,9 @@ module LoginData where
 
 import qualified Data.ByteString.Lazy.Char8 as C
 import Data.ByteString.Base16.Lazy
-
+import Data.List.Split
+import Numeric
+import Data.Char (intToDigit)
 
 -- 0x00
 flagByte :: C.ByteString
@@ -13,6 +15,26 @@ flagByte = "00"
 -- 0xff
 indexfByte :: C.ByteString
 indexfByte = "ff"
+
+--length at byte05
+
+-- numBytes revert byte8+9
+-- 02 00 00 00 1d 00 01 82 00 00 00 02 00 00 00 32
+-- 00 00 00 01 00 00 00 0a 00 52 65 70 6c 79 31 39
+-- 38 38 00
+
+-- 02 00 00 00 20 00 01 06 01 00 00 02 00 00 00 1b
+-- 00 00 00 01 00 00 00 0d 00 43 e1 ba a9 75 23 21
+-- 54 e1 ba b7 63 00
+
+--serv2 revert byte8-9-10
+-- 02 00 00 00 1b 00 01 89 86 1e 00 02 00 00 00 0a
+-- 00 00 00 01 00 00 00 08 00 4b 6f 6d 70 61 6e 79
+-- 00
+
+-- 02 00 00 00 1b 00 01 90 0b 00 00 02 00 00 00 03
+-- 00 00 00 01 00 00 00 08 00 54 68 6f 69 48 6f 61
+-- 00
 
 -- Packet 01-02 structure
 -- packet info = 2 bytes (1 byte info + 1 flag byte) represents the length of data packet
@@ -60,14 +82,8 @@ enterWString = "ENTER "
 d123String :: C.ByteString
 d123String = " 123 "
 
-d130String :: C.ByteString
-d130String = " 130"
-
-d2960String :: C.ByteString
-d2960String = " 2960"
-
-d2968String :: C.ByteString
-d2968String = " 2968"
+getChNumber :: C.ByteString -> Integer
+getChNumber = read . concat . ("0x":) . reverse . chunksOf 2 . C.unpack . C.take 8 . C.drop 14
 
 getUid :: C.ByteString -> C.ByteString
 getUid = head . C.split '\"' . C.drop 22
@@ -89,11 +105,11 @@ getLoginData d = C.append serialLoginBytes
                $ C.append " 0" 
                $ fst $ decode flagByte
 
-enterWorld :: C.ByteString -> C.ByteString
-enterWorld d = C.append serialEnterBytes
-             $ C.append enterWString
-             $ C.append (getUid d)
-            --  $ C.append d130String
-             $ C.append d2968String
-             $ fst $ decode flagByte    
+enterWorld :: C.ByteString -> C.ByteString -> C.ByteString
+enterWorld d m = C.append serialEnterBytes
+               $ C.append enterWString
+               $ C.append (getUid d)
+               $ C.append " "
+               $ C.append (C.pack . show . getChNumber $ encode m)
+               $ fst $ decode flagByte    
 

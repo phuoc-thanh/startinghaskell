@@ -16,6 +16,9 @@ indexfByte = "ff"
 
 --hex stream : 180006ff1400636f707920656e74657220433031423031203100
 --hex stream : 0f0007ff0b00636f707920626c6f636b00
+--hex stream : 130009ff0f006564656e5472656520676574203100 	edenTree get 1
+--             090021110000001a0400000b00b501031200000096000000
+            -- 09002108000000b1b40000
 
 -- Packet 01-02 structure
 -- packet info = 2 bytes (1 byte info + 1 flag byte) represents the length of data packet
@@ -27,6 +30,11 @@ indexfByte = "ff"
 --      "ENTER 11111 130" -> reply1988
 --      "ENTER 11107 2960" -> reply1988
 
+gete0 :: C.ByteString
+gete0 = fst $ decode "130007ff0f00"
+
+getEdenTree0 :: C.ByteString
+getEdenTree0 = C.append gete0 "edenTree get 1\NUL"
 
 -- Chap1b1 Packet Info == 0x18 : 0x00 the length of packet (2bytes + 2bytes + 73bytes)
 chap1b1Info :: C.ByteString

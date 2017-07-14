@@ -13,32 +13,26 @@ import Network.Socket hiding (send, close)
 import qualified Data.ByteString.Lazy.Char8 as C
 import Data.Connection
 import Data.Maybe
-import Data.HexString
 import qualified System.IO.Streams.TCP as TCP
 import qualified System.IO.Streams as Streams
 import Control.Concurrent
+import Data.ByteString.Base16.Lazy
+
 
 --tcpPacket Base length: 54
 
 -- Server Info
 kd01Host = "210.245.26.188"
 kd01Port = 8001
-
-hexNetTime =  "140003ff10006f6e6c696e6574696d6520696e666f00"
                       
-
 injectWorld :: IO ()
 injectWorld = do res <- loginVerify
                  conn <- TCP.connect kd01Host kd01Port
                  send conn $ getLoginData res
                  msg <- Streams.read (source conn)
-                 C.putStrLn $ C.fromStrict (fromJust msg)
-                 forkIO $ send conn $ enterWorld res
-                 msg2 <- Streams.read (source conn)
-                 C.putStrLn "succesful"
-                 forkIO $ send conn $ enterChap01B01
+                 forkIO . send conn . enterWorld res . C.fromStrict $ fromJust msg
+                 Streams.read (source conn)
+                 C.putStrLn "enter world !"
+                 forkIO . send conn $ getEdenTree0
                  msg3 <- Streams.read (source conn)
-                 C.putStrLn "succesful"
-                 forkIO $ send conn $ copyBlock
-                 msg4 <- Streams.read (source conn)
-                 C.putStrLn "succesful"
+                 C.putStrLn . fst . decode . C.fromStrict $ fromJust msg3
