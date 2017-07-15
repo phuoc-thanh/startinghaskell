@@ -24,15 +24,17 @@ import Data.ByteString.Base16.Lazy
 -- Server Info
 kd01Host = "210.245.26.188"
 kd01Port = 8001
+kdt116Host = "125.212.242.101"
+kdt116Port = 8006
                       
 injectWorld :: IO ()
 injectWorld = do res <- loginVerify
-                 conn <- TCP.connect kd01Host kd01Port
+                 conn <- TCP.connect kdt116Host kdt116Port
                  send conn $ getLoginData res
                  msg <- Streams.read (source conn)
                  forkIO . send conn . enterWorld res . C.fromStrict $ fromJust msg
                  Streams.read (source conn)
                  C.putStrLn "enter world !"
-                 forkIO . send conn $ getEdenTree0
+                 forkIO . send conn $ bet100
                  msg3 <- Streams.read (source conn)
-                 C.putStrLn . fst . decode . C.fromStrict $ fromJust msg3
+                 C.putStrLn . "bet 100"

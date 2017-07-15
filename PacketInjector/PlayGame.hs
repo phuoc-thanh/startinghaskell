@@ -14,11 +14,6 @@ flagByte = "00"
 indexfByte :: C.ByteString
 indexfByte = "ff"
 
---hex stream : 180006ff1400636f707920656e74657220433031423031203100
---hex stream : 0f0007ff0b00636f707920626c6f636b00
---hex stream : 130009ff0f006564656e5472656520676574203100 	edenTree get 1
---             090021110000001a0400000b00b501031200000096000000
-            -- 09002108000000b1b40000
 
 -- Packet 01-02 structure
 -- packet info = 2 bytes (1 byte info + 1 flag byte) represents the length of data packet
@@ -29,12 +24,20 @@ indexfByte = "ff"
 -- enter world = 16 bytes (15 bytes data + 1 flag byte) contains the string:
 --      "ENTER 11111 130" -> reply1988
 --      "ENTER 11107 2960" -> reply1988
+--280029ff240063726f73737365727665727761722062657474696e672037313030303034372031303000
+-- ()$crossserverwar betting 71000047 100
+
+bet100h :: C.ByteString
+bet100h = fst $ decode "280003ff2400"
+
+bet100 :: C.ByteString
+bet100 = C.append bet100h "crossserverwar betting 71000047 100\NUL"
 
 gete0 :: C.ByteString
-gete0 = fst $ decode "130007ff0f00"
+gete0 = fst $ decode "130003ff0f00"
 
 getEdenTree0 :: C.ByteString
-getEdenTree0 = C.append gete0 "edenTree get 1\NUL"
+getEdenTree0 = C.append gete0 "edenTree get 0\NUL"
 
 -- Chap1b1 Packet Info == 0x18 : 0x00 the length of packet (2bytes + 2bytes + 73bytes)
 chap1b1Info :: C.ByteString

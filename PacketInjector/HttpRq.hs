@@ -19,10 +19,15 @@ checkUserURI = "/payclient.ashx?op=CheckUser"
 getUserURI = "/payclient.ashx?op=GetUser"
 
 -- 210.245.26.186
-apiHost = "api.kimdungqq.com"
+-- apiHost = "api.kimdungqq.com"
+
+-- 123.31.25.80 KDT
+apiHost = "api.kd.gaba.vn"
 -- 104.28.17.37
 -- 104.28.16.37
-payHost = "m-pay.kimdungqq.com"
+-- payHost = "m-pay.kimdungqq.com"
+-- 123.31.25.71 KDT
+payHost = "m-pay.gaba.vn"
 
 checkUserRq u p = setRequestPath checkUserURI
                 $ setRequestHost payHost
@@ -37,17 +42,12 @@ userRqBody u p   = C.append "partnerId=0&userName="
                  $ C.append p "&refcode=0&gameId=46"
 
 getSession :: ByteString -> ByteString
-getSession = fst . BS.splitAt 36 . snd . BS.splitAt 49
+-- getSession = fst . BS.splitAt 36 . snd . BS.splitAt 49
+-- KDT
+getSession = fst . BS.splitAt 36 . snd . BS.splitAt 54
 
 getId :: C.ByteString -> C.ByteString
 getId = last . C.split '=' . head . tail . tail . C.split '&'
-
-getUserRq       = setRequestPath getUserURI
-                $ setRequestHost payHost
-                $ setRequestBodyLBS "session=9929ea82-151f-492d-8a2c-94346d35f14f&serverMode=UNKNOWN&hash=e02ea6746a05b4fd4a765fd65cb8a5c6&time=1499617306527"
-                $ setRequestMethod "POST"
-                $ defaultRequest                
---"fullname=reply1988&email=thanhdo89se%40gmail.com&phone=0982393901&cash=17000&idcard=241096330&IP=172.31.16.101&result=1"
 
 getLoginRqBody :: ByteString -> ByteString -> ByteString
 getLoginRqBody u b = BS.append (BS.append u "&token=") (BS.append "&os=and&version=75896" b)
@@ -73,5 +73,5 @@ loginVerify = do
     let uid = C.append "uid=" $ getId (getResponseBody cResponse)
         session = getSession (getResponseBody cResponse)
     response <- httpLBS (setRequestBodyLBS (getLoginRqBody uid session) $ loginVerifyRq)
-    -- putStrLn $ getResponseHeaders response
     return $ getServerData $ getResponseBody response
+    -- return cResponse

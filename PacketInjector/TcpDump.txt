@@ -10,4 +10,3 @@ ENTER 11111 130
 length 31 = 1f, real data length 27 = 1b
 1f:00:1f:ff:1b:00:63:72:6f:73:73:73:65:72:76:65:72:77:61:72:20:75:70:64:61:74:65:70:6f:77:65:72:00
                   c  r  o  s  s  s  e  r  v  e  r  w  a  r     u  p  d  a  t  e  p  o  w  e  r
-              
