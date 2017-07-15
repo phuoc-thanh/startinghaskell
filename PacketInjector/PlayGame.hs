@@ -25,13 +25,22 @@ indexfByte = "ff"
 --      "ENTER 11111 130" -> reply1988
 --      "ENTER 11107 2960" -> reply1988
 --280029ff240063726f73737365727665727761722062657474696e672037313030303034372031303000
+--29000dff250063726f73737365727665727761722062657474696e67203731303030303437203130303000
 -- ()$crossserverwar betting 71000047 100
+--  )%crossserverwar betting 71000047 1000
+--290008ff250063726f73737365727665727761722062657474696e67203130393030303037392031303000
 
 bet100h :: C.ByteString
-bet100h = fst $ decode "280003ff2400"
+bet100h = fst $ decode "290003ff2500"
+
+bet1000h :: C.ByteString
+bet1000h = fst $ decode "2a0003ff2600"
 
 bet100 :: C.ByteString
-bet100 = C.append bet100h "crossserverwar betting 71000047 100\NUL"
+bet100 = C.append bet100h "crossserverwar betting 109000079 100\NUL"
+
+bet1000 :: C.ByteString
+bet1000 = C.append bet1000h "crossserverwar betting 109000079 1000\NUL"
 
 gete0 :: C.ByteString
 gete0 = fst $ decode "130003ff0f00"

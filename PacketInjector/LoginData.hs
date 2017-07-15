@@ -23,13 +23,16 @@ indexfByte = "ff"
 -- enter world = 16 bytes (15 bytes data + 1 flag byte) contains the string:
 --      "ENTER 11111 130" -> reply1988
 --      "ENTER 11107 2960" -> reply1988
+--1e0002ff1a00454e544552203132353536333535373720353930303331373200
+-- 020000001d0001245184030400000032000000060000000a004b69c3aa6e4c6f616e00
+--ENTER 1255635577 59003172
 
 
 -- Login Packet Info == 0x4d : 0x00 the length of packet (2bytes + 2bytes + 73bytes)
 loginPacketInfo :: C.ByteString
 -- loginPacketInfo = C.append "4d" flagByte
 -- KDT
-loginPacketInfo = C.append "54" flagByte
+loginPacketInfo = C.append "53" flagByte
 
 -- Login Index Info == 0x04 : 0xff (constant)
 loginIndex      ::  C.ByteString
@@ -38,13 +41,13 @@ loginIndex      = C.append "01" indexfByte
 loginDataInfo   :: C.ByteString
 -- loginDataInfo   = C.append "49" flagByte
 -- kdt
-loginDataInfo   = C.append "50" flagByte
+loginDataInfo   = C.append "4f" flagByte
 
 -- Enter World Info == 0x14 : 0x00 the length of packet (2bytes + 2bytes + 16bytes)
 joinWInfo :: C.ByteString
 -- joinWInfo = C.append "14" flagByte
 -- kdt
-joinWInfo = C.append "1f" flagByte
+joinWInfo = C.append "1e" flagByte
 -- Login Index Info == 0x02 : 0xff (constant)
 joinWIndex      ::  C.ByteString
 joinWIndex      = C.append "02" indexfByte
@@ -52,7 +55,7 @@ joinWIndex      = C.append "02" indexfByte
 joinWDataInfo   :: C.ByteString
 -- joinWDataInfo   = C.append "10" flagByte
 -- kdt
-joinWDataInfo   = C.append "1b" flagByte
+joinWDataInfo   = C.append "1a" flagByte
 
 serialLoginBytes :: C.ByteString
 serialLoginBytes = fst . decode . C.append loginPacketInfo $ C.append loginIndex loginDataInfo
@@ -62,8 +65,8 @@ serialEnterBytes = fst . decode . C.append joinWInfo $ C.append joinWIndex joinW
 
 loginString :: C.ByteString
 -- loginString = "LOGIN 0.0.1 10 1 "
--- kdt 116
-loginString = "LOGIN 0.0.1 10 116 "
+-- kdt 55
+loginString = "LOGIN 0.0.1 10 55 "
 
 enterWString :: C.ByteString
 enterWString = "ENTER "
@@ -81,13 +84,13 @@ getUid = head . C.split '\"' . C.drop 27
 
 getKey :: C.ByteString -> C.ByteString
 -- getKey = head . C.split '\"' . C.drop 110
--- KDT
-getKey = head . C.split '\"' . C.drop 122
+-- KDT --s3num -> 122
+getKey = head . C.split '\"' . C.drop 121
 
 getTime :: C.ByteString -> C.ByteString
 -- getTime = head . C.split ',' . C.drop 92
--- KDT
-getTime = head . C.split ',' . C.drop 104
+-- KDT --s3num -> 104
+getTime = head . C.split ',' . C.drop 103
 
 getLoginData :: C.ByteString -> C.ByteString
 getLoginData d = C.append serialLoginBytes
