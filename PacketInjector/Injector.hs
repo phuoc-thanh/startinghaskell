@@ -19,21 +19,27 @@ import Control.Concurrent
 import Data.ByteString.Base16.Lazy
 
 
---tcpPacket Base length: 54
-
 -- Server Info
 kd01Host = "210.245.26.188"
 kd01Port = 8001
-kdt116Host = "125.212.242.101"
-kdt116Port = 8006
+kdt28Host = "125.212.242.98"
+kdt28Port = 8003
+--kdt55,kdt 72
 kdt55Host = "123.31.25.77"
 kdt55Port = 8001
-                
--- sendNTimes :: Integer -> Connection  -> IO TCP.TCPConnection
+kdt72Port = 8007
+kdt153Host = "123.31.25.73"
+kdt153Port = 8065
+
+sendNTimes :: Integer -> Connection (Socket, SockAddr) -> IO ()
 sendNTimes 1 c = send c $ bet100
-sendNTimes n c = do
-                send c $ bet100
-                sendNTimes (n - 1) c
+sendNTimes n c = do send c $ bet100
+                    sendNTimes (n - 1) c
+                 
+rankRewards :: Integer -> Connection (Socket, SockAddr) -> IO ()
+rankRewards 1 c = send c $ rankReward
+rankRewards n c = do send c $ rankReward
+                     rankRewards (n - 1) c                 
 
 injectWorld :: IO ()
 injectWorld = do res <- loginVerify
@@ -42,7 +48,7 @@ injectWorld = do res <- loginVerify
                  msg <- Streams.read (source conn)
                  forkIO . send conn . enterWorld res . C.fromStrict $ fromJust msg
                  Streams.read (source conn)
-                 C.putStrLn "enter world !"
-                 forkIO $ sendNTimes 9 conn
-                 msg3 <- Streams.read (source conn)
-                 C.putStrLn "bet 1000"
+                 C.putStrLn "enter world!"
+                --  forkIO $ rankRewards 99999 conn
+                --  msg3 <- Streams.read (source conn)
+                --  C.putStrLn "bet 1000"
