@@ -8,31 +8,26 @@ import qualified Data.ByteString.Lazy.Char8 as C
 import Data.ByteString.Base16.Lazy
 
 
-bet100h :: C.ByteString
--- bet100h = fst $ decode "270004ff2300"
-bet100h = fst $ decode "290003ff2500"
-
 rankReward :: C.ByteString
 rankReward = C.append (hexSerialize $ C.length s) s
-             where s = "rankList reward 1\NUL"
+                where s = "rankList reward 8\NUL"
 
-bet1000h :: C.ByteString
-bet1000h = fst $ decode "280003ff2400"
+store82 :: C.ByteString
+store82 = C.append (hexSerialize $ C.length s) s
+             where s = "store 8 2\NUL"
+            --  
+-- just for test
+arenaReward :: C.ByteString
+arenaReward = C.append (hexSerialize $ C.length s) s
+                where s = "teamHunt 10 2\NUL"                
 
 bet100 :: C.ByteString
-bet100 = C.append bet100h "crossserverwar betting 109000079 100\NUL"
+bet100 = C.append (hexSerialize $ C.length s) s
+                where s = "crossserverwar betting 109000079 100\NUL"
 
 bet1000 :: C.ByteString
-bet1000 = C.append bet1000h "crossserverwar betting 6000276 500\NUL"
-
-gete0 :: C.ByteString
-gete0 = fst $ decode "130003ff0f00"
-
-getEdenTree0 :: C.ByteString
-getEdenTree0 = C.append gete0 "edenTree get 0\NUL"
-
-chap1b1h :: C.ByteString
-chap1b1h = fst $ decode "180003ff1400"
+bet1000 = C.append (hexSerialize $ C.length s) s
+                where s = "crossserverwar betting 109000079 1000\NUL"
 
 chap1b1 :: C.ByteString
 chap1b1 = C.append chap1b1h "copy enter C01B01 1\NUL"

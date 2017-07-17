@@ -18,15 +18,15 @@ checkUserURI = "/payclient.ashx?op=CheckUser"
 getUserURI = "/payclient.ashx?op=GetUser"
 
 -- 210.245.26.186
--- apiHost = "api.kimdungqq.com"
+apiHost = "api.kimdungqq.com"
 
 -- 123.31.25.80 KDT
-apiHost = "api.kd.gaba.vn"
+-- apiHost = "api.kd.gaba.vn"
 -- 104.28.17.37
 -- 104.28.16.37
--- payHost = "m-pay.kimdungqq.com"
+payHost = "m-pay.kimdungqq.com"
 -- 123.31.25.71 KDT
-payHost = "m-pay.gaba.vn"
+-- payHost = "m-pay.gaba.vn"
 
 checkUserRq u p = setRequestPath checkUserURI
                 $ setRequestHost payHost
@@ -67,7 +67,7 @@ getUserData :: FromJSON a => C.ByteString -> Maybe a
 getUserData s = Parser.decode $ C.append (C.drop 9 $ head $ C.split '}' s) "}"
 
 
-loginVerify :: String -> String -> IO KDUser
+-- loginVerify :: String -> String -> IO KDUser
 loginVerify u p = do
     cResponse <- httpLBS $ checkUserRq (getName $ C.pack u) (getPassword $ C.pack p)
     let uidString = C.append "uid=" $ getId (getResponseBody cResponse)

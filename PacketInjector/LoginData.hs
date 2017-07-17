@@ -32,11 +32,11 @@ getLoginData d = C.append (hexLoginSerialize $ C.length loginString) loginString
                                    $ C.append " "
                                    $ C.append (C.pack $ key d) " 0\NUL"
 
-enterWorld :: KDUser -> C.ByteString -> C.ByteString
-enterWorld d m = C.append (hexEnterSerialize $ C.length enterString) enterString
-                 where enterString = C.append enterPrefix
-                                   $ C.append (C.pack $ uid d)
-                                   $ C.append " "
-                                   $ C.append (C.pack . show . getChNumber $ encode m) "\NUL"
+enterW :: KDUser -> C.ByteString -> C.ByteString
+enterW d m = C.append (hexEnterSerialize $ C.length enterString) enterString
+             where enterString = C.append enterPrefix
+                               $ C.append (C.pack $ uid d)
+                               $ C.append " "
+                               $ C.append (C.pack . show . getChNumber $ encode m) "\NUL"
                   
 
