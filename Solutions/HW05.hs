@@ -4,7 +4,7 @@ module HW05 where
 
 import Data.Bits
 import Data.ByteString.Lazy (ByteString)
-import Data.Map.Strict (Map)
+import Data.Map.Lazy (Map)
 import System.Environment (getArgs)
 import Data.Function
 import Data.List

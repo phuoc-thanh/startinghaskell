@@ -7,7 +7,9 @@ module HttpRq where
 import System.IO
 import Data.ByteString.Lazy (ByteString)
 import Data.ByteString.Base16.Lazy
-import Data.Aeson           (Value)
+import Data.Aeson
+import Data.Maybe
+import Parser
 import Network.HTTP.Simple
 
 import qualified Data.ByteString.Lazy       as BS
@@ -64,14 +66,15 @@ getName = head . C.split '/'
 getPassword :: C.ByteString -> C.ByteString
 getPassword = last . C.split '/'
 
-getServerData :: C.ByteString -> C.ByteString
-getServerData = C.drop 9 . head . C.split '}'
+getUserData :: FromJSON a => C.ByteString -> Maybe a
+getUserData s = Parser.decode $ C.append (C.drop 9 $ head $ C.split '}' s) "}"
 
+loginVerify :: IO KDUser
 loginVerify = do
     usernamePassword <- getLine
     cResponse <- httpLBS $ checkUserRq (getName $ C.pack usernamePassword) (getPassword $ C.pack usernamePassword)
-    let uid = C.append "uid=" $ getId (getResponseBody cResponse)
+    let uidString = C.append "uid=" $ getId (getResponseBody cResponse)
         session = getSession (getResponseBody cResponse)
-    response <- httpLBS (setRequestBodyLBS (getLoginRqBody uid session) $ loginVerifyRq)
-    return $ getServerData $ getResponseBody response
+    response <- httpLBS (setRequestBodyLBS (getLoginRqBody uidString session) $ loginVerifyRq)
+    return $ fromJust $ getUserData $ getResponseBody response
     -- return cResponse
