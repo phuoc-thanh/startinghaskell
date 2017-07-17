@@ -21,16 +21,17 @@ import qualified System.IO.Streams as Streams
 import Control.Concurrent
 
 
-parseFile :: FromJSON a => FilePath -> IO (Maybe a)
-parseFile file = do
-    contents <- BS.readFile file
-    return $ decode contents
-
 getServerInfo :: Int -> IO (String, Integer)
 getServerInfo i = do
     serverinfos <- parseFile "ServerInfo.json" :: IO (Maybe [KDServer])
     let server = (!!) (fromJust $ serverinfos) (i - 1)
     return $ (ip server, port server)
+
+buffUsers :: Int -> IO (BuffUser)
+buffUsers i = do
+    buffUsers <- parseFile "BuffUsers.json" :: IO (Maybe [BuffUser])
+    let user = (!!) (fromJust $ buffUsers) (i - 1)
+    return $ user
 
 sendNTimes :: Integer -> Connection (Socket, SockAddr) -> IO ()
 sendNTimes 1 c = send c $ bet100
@@ -43,7 +44,8 @@ rankRewards n c = do send c $ rankReward
                      rankRewards (n - 1) c                 
 
 injectWorld :: IO ()
-injectWorld = do res <- loginVerify
+injectWorld = do buffUser <- buffUsers 2
+                 res <- loginVerify (uname $ buffUser) (pass $ buffUser)
                  uServer <- getServerInfo (read $ defaultsid res)
                  conn <- TCP.connect (fst uServer) (fromInteger $ snd uServer)
                  send conn $ getLoginData res

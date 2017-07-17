@@ -17,7 +17,7 @@ enterPrefix = "ENTER "
 
 d123String :: C.ByteString
 d123String = " 123 "
--- KDUser {acc = "232012", uid = "232012", opname = "10", defaultsid = "28", displayNovice = 1, create_time = 1500275785, key = "66ed8b606d2204985a30ba30b59a773b"}
+
 getChNumber :: C.ByteString -> Integer
 getChNumber = read . concat . ("0x":) . reverse . chunksOf 2 . C.unpack . C.take 8 . C.drop 14
 

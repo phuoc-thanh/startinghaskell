@@ -2,8 +2,10 @@
 
 module Parser ( encode
               , decode
+              , parseFile
               , KDServer(..)
               , KDUser(..)
+              , BuffUser(..)
               , FromJSON(..)
               , ToJSON(..)
               ) where
@@ -11,63 +13,75 @@ module Parser ( encode
 import Data.Aeson
 import Data.Monoid
 import Control.Applicative
+import qualified Data.ByteString.Lazy       as BS
 
--- type SId = String
+
+parseFile :: FromJSON a => FilePath -> IO (Maybe a)
+parseFile file = do
+    contents <- BS.readFile file
+    return $ decode contents
 
 data KDServer = KDServer { sid   :: String,
-                           sname   :: String,
-                           ip :: String,
-                           port :: Integer,
-                           isopen :: Integer,
-                           update_time :: String
-                         }
+                           sname :: String,
+                           ip    :: String,
+                           port  :: Integer }
                    deriving (Show, Eq)
-data KDUser = KDUser { acc   :: String,
-                           uid   :: String,
-                           opname :: String,
-                           defaultsid :: String,
-                           displayNovice :: Integer,
-                           create_time :: Integer,
-                           key :: String
-                         }
+data KDUser = KDUser { acc           :: String,
+                       uid           :: String,
+                       opname        :: String,
+                       defaultsid    :: String,
+                       displayNovice :: Integer,
+                       create_time   :: Integer,
+                       key           :: String }
                    deriving (Show, Eq)
 
+data BuffUser = BuffUser { uname    :: String,
+                           pass     :: String,
+                           serverId :: Integer }         
+                    deriving (Show, Eq)          
+
 instance FromJSON KDServer where
-    parseJSON (Object v) = KDServer   <$>
-                           v .: "uid"   <*>
-                           v .: "sname"     <*>
-                           v .: "ip" <*>
-                           v .: "port" <*>
-                           v .: "isopen" <*>
-                           v .: "update_time"
+    parseJSON (Object v) = KDServer     <$>
+                           v .: "sid"   <*>
+                           v .: "sname" <*>
+                           v .: "ip"    <*>
+                           v .: "port"
     parseJSON _ = mempty
 
 instance ToJSON KDServer where
-    toJSON KDServer{..} = object [ "uid"   .= sid
-                                    , "sname"     .= sname
-                                    , "port" .= port
-                                    , "ip" .= ip
-                                    , "isopen"    .= isopen
-                                    , "update_time" .= update_time
-                                    ]
+    toJSON KDServer{..} = object [ "sid"   .= sid,
+                                   "sname" .= sname,
+                                   "port"  .= port,
+                                   "ip"    .= ip ]
 
 instance FromJSON KDUser where
-    parseJSON (Object u) = KDUser   <$>
-                           u .: "acc" <*>
-                           u .: "uid"   <*>
-                           u .: "opname"     <*>
-                           u .: "defaultsid" <*>
+    parseJSON (Object u) = KDUser               <$>
+                           u .: "acc"           <*>
+                           u .: "uid"           <*>
+                           u .: "opname"        <*>
+                           u .: "defaultsid"    <*>
                            u .: "displayNovice" <*>
-                           u .: "create_time" <*>
+                           u .: "create_time"   <*>
                            u .: "key"
     parseJSON _ = mempty
 
 instance ToJSON KDUser where
-    toJSON KDUser{..} = object [ "acc" .= acc
-                                    , "uid"   .= uid
-                                    , "opname"     .= opname
-                                    , "defaultsid" .= defaultsid
-                                    , "displayNovice" .= displayNovice
-                                    , "create_time"    .= create_time
-                                    , "key" .= key
-                                    ]
+    toJSON KDUser{..} = object [ "acc"           .= acc,
+                                 "uid"           .= uid,
+                                 "opname"        .= opname,
+                                 "defaultsid"    .= defaultsid,
+                                 "displayNovice" .= displayNovice,
+                                 "create_time"   .= create_time,
+                                 "key"           .= key ]
+
+instance FromJSON BuffUser where
+    parseJSON (Object v) = BuffUser     <$>
+                           v .: "uname" <*>
+                           v .: "pass"  <*>
+                           v .: "serverId"
+    parseJSON _ = mempty
+
+instance ToJSON BuffUser where
+    toJSON BuffUser{..} = object [ "uname"    .= uname,
+                                   "pass"     .= pass,
+                                   "serverId" .= serverId ]                                 

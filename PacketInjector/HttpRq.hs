@@ -4,9 +4,7 @@
 
 module HttpRq where
 
-import System.IO
 import Data.ByteString.Lazy (ByteString)
-import Data.ByteString.Base16.Lazy
 import Data.Aeson
 import Data.Maybe
 import Parser
@@ -14,7 +12,6 @@ import Network.HTTP.Simple
 
 import qualified Data.ByteString.Lazy       as BS
 import qualified Data.ByteString.Lazy.Char8 as C
-import qualified Data.Yaml                  as Yaml
 
 loginVerifyURI = "/jinyong/vega/loginVerify"
 checkUserURI = "/payclient.ashx?op=CheckUser"
@@ -36,7 +33,7 @@ checkUserRq u p = setRequestPath checkUserURI
                 $ setRequestBodyLBS (userRqBody u p)
                 $ setRequestMethod "POST"
                 $ defaultRequest
---"result=1&fullName=reply1988&userId=11111&session=9929ea82-151f-492d-8a2c-94346d35f14f&IP=172.31.16.101"
+
 userRqBody :: ByteString -> ByteString -> ByteString
 userRqBody u p   = C.append "partnerId=0&userName="
                  $ C.append u 
@@ -69,10 +66,10 @@ getPassword = last . C.split '/'
 getUserData :: FromJSON a => C.ByteString -> Maybe a
 getUserData s = Parser.decode $ C.append (C.drop 9 $ head $ C.split '}' s) "}"
 
-loginVerify :: IO KDUser
-loginVerify = do
-    usernamePassword <- getLine
-    cResponse <- httpLBS $ checkUserRq (getName $ C.pack usernamePassword) (getPassword $ C.pack usernamePassword)
+
+loginVerify :: String -> String -> IO KDUser
+loginVerify u p = do
+    cResponse <- httpLBS $ checkUserRq (getName $ C.pack u) (getPassword $ C.pack p)
     let uidString = C.append "uid=" $ getId (getResponseBody cResponse)
         session = getSession (getResponseBody cResponse)
     response <- httpLBS (setRequestBodyLBS (getLoginRqBody uidString session) $ loginVerifyRq)
