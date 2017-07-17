@@ -20,28 +20,17 @@ import qualified System.IO.Streams.TCP as TCP
 import qualified System.IO.Streams as Streams
 import Control.Concurrent
 
--- Server Info
-kd01Host = "210.245.26.188"
-kd01Port = 8001
-kdt28Host = "125.212.242.98"
-kdt28Port = 8003
---kdt55,kdt 72
-kdt55Host = "123.31.25.77"
-kdt55Port = 8001
-kdt72Port = 8007
-kdt153Host = "123.31.25.73"
-kdt153Port = 8065
 
 parseFile :: FromJSON a => FilePath -> IO (Maybe a)
 parseFile file = do
     contents <- BS.readFile file
     return $ decode contents
 
-
-getServerInfo :: Int -> IO KDServer
+getServerInfo :: Int -> IO (String, Integer)
 getServerInfo i = do
     serverinfos <- parseFile "ServerInfo.json" :: IO (Maybe [KDServer])
-    return $ (!!) (fromJust $ serverinfos) (i - 1)
+    let server = (!!) (fromJust $ serverinfos) (i - 1)
+    return $ (ip server, port server)
 
 sendNTimes :: Integer -> Connection (Socket, SockAddr) -> IO ()
 sendNTimes 1 c = send c $ bet100
@@ -55,7 +44,8 @@ rankRewards n c = do send c $ rankReward
 
 injectWorld :: IO ()
 injectWorld = do res <- loginVerify
-                 conn <- TCP.connect "123.31.25.77" 8001
+                 uServer <- getServerInfo (read $ defaultsid res)
+                 conn <- TCP.connect (fst uServer) (fromInteger $ snd uServer)
                  send conn $ getLoginData res
                  msg <- Streams.read (source conn)
                  send conn . enterWorld res . C.fromStrict $ fromJust msg

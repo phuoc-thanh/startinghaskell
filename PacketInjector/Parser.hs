@@ -17,7 +17,7 @@ import Control.Applicative
 data KDServer = KDServer { sid   :: String,
                            sname   :: String,
                            ip :: String,
-                           port :: String,
+                           port :: Integer,
                            isopen :: Integer,
                            update_time :: String
                          }
@@ -34,7 +34,7 @@ data KDUser = KDUser { acc   :: String,
 
 instance FromJSON KDServer where
     parseJSON (Object v) = KDServer   <$>
-                           v .: "sid"   <*>
+                           v .: "uid"   <*>
                            v .: "sname"     <*>
                            v .: "ip" <*>
                            v .: "port" <*>
@@ -43,7 +43,7 @@ instance FromJSON KDServer where
     parseJSON _ = mempty
 
 instance ToJSON KDServer where
-    toJSON KDServer{..} = object [ "sid"   .= sid
+    toJSON KDServer{..} = object [ "uid"   .= sid
                                     , "sname"     .= sname
                                     , "port" .= port
                                     , "ip" .= ip

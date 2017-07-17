@@ -25,9 +25,6 @@ bet100 = C.append bet100h "crossserverwar betting 109000079 100\NUL"
 bet1000 :: C.ByteString
 bet1000 = C.append bet1000h "crossserverwar betting 6000276 500\NUL"
 
-arenaRewardh = fst $ decode "110003ff0d00"
-arenaReward = C.append arenaRewardh "arena reward\NUL"
-
 gete0 :: C.ByteString
 gete0 = fst $ decode "130003ff0f00"
 
