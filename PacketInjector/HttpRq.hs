@@ -4,30 +4,25 @@
 
 module HttpRq where
 
-import Data.ByteString.Lazy (ByteString)
-import Data.Aeson
 import Data.Maybe
+import Data.ByteString.Lazy (ByteString)
+import qualified Data.ByteString.Lazy.Char8 as C
+
 import Parser
 import Network.HTTP.Simple
 
-import qualified Data.ByteString.Lazy       as BS
-import qualified Data.ByteString.Lazy.Char8 as C
 
 loginVerifyURI = "/jinyong/vega/loginVerify"
 checkUserURI = "/payclient.ashx?op=CheckUser"
 getUserURI = "/payclient.ashx?op=GetUser"
 
--- 210.245.26.186
-apiHost = "api.kimdungqq.com"
+-- apiHost = "api.kimdungqq.com"
+apiHost = "api.kd.gaba.vn"
 
--- 123.31.25.80 KDT
--- apiHost = "api.kd.gaba.vn"
--- 104.28.17.37
--- 104.28.16.37
-payHost = "m-pay.kimdungqq.com"
--- 123.31.25.71 KDT
--- payHost = "m-pay.gaba.vn"
+-- payHost = "m-pay.kimdungqq.com"
+payHost = "m-pay.gaba.vn"
 
+checkUserRq :: ByteString -> ByteString -> Request
 checkUserRq u p = setRequestPath checkUserURI
                 $ setRequestHost payHost
                 $ setRequestBodyLBS (userRqBody u p)
@@ -40,38 +35,24 @@ userRqBody u p   = C.append "partnerId=0&userName="
                  $ C.append "&deviceId=d80f998b16396187&serverMode=UNKNOWN&password="
                  $ C.append p "&refcode=0&gameId=46"
 
-getSession :: ByteString -> ByteString
--- getSession = fst . BS.splitAt 36 . snd . BS.splitAt 49
--- KDT
-getSession = fst . BS.splitAt 36 . snd . BS.splitAt 54
+loginRqBody :: ByteString -> ByteString
+loginRqBody s = C.append "uid=" . C.append userId . C.append "&token=" $ C.append session "&os=and&version=75896"
+    where session = C.drop 8 $ (!!) (C.split '&' s) 3
+          userId     = C.drop 7 $ (!!) (C.split '&' s) 2
 
-getId :: C.ByteString -> C.ByteString
-getId = last . C.split '=' . head . tail . tail . C.split '&'
-
-getLoginRqBody :: ByteString -> ByteString -> ByteString
-getLoginRqBody u b = BS.append (BS.append u "&token=") (BS.append "&os=and&version=75896" b)
-
-loginVerifyRq   = setRequestPath loginVerifyURI
+loginVerifyRq :: ByteString -> Request       
+loginVerifyRq s = setRequestPath loginVerifyURI
                 $ setRequestHost apiHost
+                $ setRequestBodyLBS (loginRqBody s)
                 $ setRequestMethod "POST"
                 $ setRequestHeader "Content-Type" ["application/x-www-form-urlencoded"]
                 $ defaultRequest
 
-getName :: C.ByteString -> C.ByteString
-getName = head . C.split '/'
+getUserData :: FromJSON a => ByteString -> Maybe a
+getUserData s = decode $ C.append (C.drop 9 $ head $ C.split '}' s) "}"
 
-getPassword :: C.ByteString -> C.ByteString
-getPassword = last . C.split '/'
-
-getUserData :: FromJSON a => C.ByteString -> Maybe a
-getUserData s = Parser.decode $ C.append (C.drop 9 $ head $ C.split '}' s) "}"
-
-
--- loginVerify :: String -> String -> IO KDUser
+loginVerify :: ByteString -> ByteString -> IO KDUser
 loginVerify u p = do
-    cResponse <- httpLBS $ checkUserRq (getName $ C.pack u) (getPassword $ C.pack p)
-    let uidString = C.append "uid=" $ getId (getResponseBody cResponse)
-        session = getSession (getResponseBody cResponse)
-    response <- httpLBS (setRequestBodyLBS (getLoginRqBody uidString session) $ loginVerifyRq)
+    cResponse <- httpLBS $ checkUserRq u p
+    response <- httpLBS $ loginVerifyRq (getResponseBody cResponse)
     return $ fromJust $ getUserData $ getResponseBody response
-    -- return cResponse
