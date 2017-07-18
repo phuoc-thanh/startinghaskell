@@ -31,7 +31,9 @@ data KDUser = KDUser { acc           :: String,
                        defaultsid    :: String,
                        displayNovice :: Integer,
                        create_time   :: Integer,
-                       key           :: String }
+                       key           :: String,
+                       chNumber      :: String,
+                       amount        :: String }
                    deriving (Show, Eq)
 
 
@@ -57,7 +59,9 @@ instance FromJSON KDUser where
                            u .: "defaultsid"    <*>
                            u .: "displayNovice" <*>
                            u .: "create_time"   <*>
-                           u .: "key"
+                           u .: "key"           <*>
+                           u .: "chNumber"      <*>
+                           u .: "amount"
     parseJSON _ = mempty
 
 instance ToJSON KDUser where
@@ -67,4 +71,6 @@ instance ToJSON KDUser where
                                  "defaultsid"    .= defaultsid,
                                  "displayNovice" .= displayNovice,
                                  "create_time"   .= create_time,
-                                 "key"           .= key ]
+                                 "key"           .= key,
+                                 "chNumber"      .= chNumber,
+                                 "amount"        .= amount ]

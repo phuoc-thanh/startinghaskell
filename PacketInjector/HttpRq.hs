@@ -49,7 +49,7 @@ loginVerifyRq s = setRequestPath loginVerifyURI
                 $ defaultRequest
 
 getUserData :: FromJSON a => ByteString -> Maybe a
-getUserData s = decode $ C.append (C.drop 9 $ head $ C.split '}' s) "}"
+getUserData s = decode $ C.append (C.drop 9 $ head $ C.split '}' s) ",\"chNumber\" : \"unknow\",\"amount\" : \"100\"}"
 
 loginVerify :: ByteString -> ByteString -> IO KDUser
 loginVerify u p = do
