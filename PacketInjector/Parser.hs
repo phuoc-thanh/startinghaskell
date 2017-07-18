@@ -5,7 +5,6 @@ module Parser ( encode
               , parseFile
               , KDServer(..)
               , KDUser(..)
-              , BuffUser(..)
               , FromJSON(..)
               , ToJSON(..)
               ) where
@@ -35,10 +34,6 @@ data KDUser = KDUser { acc           :: String,
                        key           :: String }
                    deriving (Show, Eq)
 
-data BuffUser = BuffUser { uname    :: String,
-                           pass     :: String,
-                           serverId :: Integer }         
-                    deriving (Show, Eq)          
 
 instance FromJSON KDServer where
     parseJSON (Object v) = KDServer     <$>
@@ -73,15 +68,3 @@ instance ToJSON KDUser where
                                  "displayNovice" .= displayNovice,
                                  "create_time"   .= create_time,
                                  "key"           .= key ]
-
-instance FromJSON BuffUser where
-    parseJSON (Object v) = BuffUser     <$>
-                           v .: "uname" <*>
-                           v .: "pass"  <*>
-                           v .: "serverId"
-    parseJSON _ = mempty
-
-instance ToJSON BuffUser where
-    toJSON BuffUser{..} = object [ "uname"    .= uname,
-                                   "pass"     .= pass,
-                                   "serverId" .= serverId ]                                 

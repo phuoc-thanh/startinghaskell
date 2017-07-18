@@ -1,24 +1,22 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-
-
 module Injector where
 import GameData  
 import LoginData
 import HttpRq
 import PlayGame
-import Parser
+import Parser hiding (encode)
 import Network.Socket hiding (send, close)
 import qualified Data.ByteString.Lazy.Char8 as C
 import Data.ByteString.Lazy (ByteString)
 import Data.Connection
 import Data.Maybe
-import Data.Aeson
+import Data.Aeson hiding (encode)
 import qualified System.IO.Streams.TCP as TCP
 import qualified System.IO.Streams as Streams
 import Control.Concurrent
 import Control.Monad
-
+import Data.ByteString.Base16.Lazy
 
 getServerInfo :: Int -> IO (String, Integer)
 getServerInfo i = do
@@ -26,9 +24,9 @@ getServerInfo i = do
     let server = (!!) (fromJust $ serverinfos) (i - 1)
     return $ (ip server, port server)
 
--- buffUsers :: IO ([BuffUser])
+-- buffUsers :: IO ([KDUser])
 buffUsers i = do
-    buffUsers <- parseFile "BuffUsers.json" :: IO (Maybe [BuffUser])
+    buffUsers <- parseFile "BuffUsers.json" :: IO (Maybe [KDUser])
     let user = (!!) (fromJust $ buffUsers) (i - 1)
     return user
 
@@ -37,17 +35,27 @@ sendNTimes 1 c s = send c s
 sendNTimes n c s = do send c s
                       sendNTimes (n - 1) c s 
                                
-joinWorld :: ByteString -> ByteString -> IO TCP.TCPConnection
-joinWorld u p = do res <- loginVerify u p
+fullJoin :: ByteString -> ByteString -> IO TCP.TCPConnection
+fullJoin u p = do  res <- loginVerify u p
                    uServer <- getServerInfo (read $ defaultsid res)
                    conn <- TCP.connect (fst uServer) (fromInteger $ snd uServer)
-                   send conn $ getLoginData res
+                   send conn $ loginData res
                    msg <- Streams.read (source conn)
-                   send conn . enterW res . C.fromStrict $ fromJust msg
+                   send conn $ enterW (C.pack $ uid res) (getChNumber . encode . C.fromStrict $ fromJust msg)
                    C.putStrLn $ C.append u " has joined the KD world!"
                    return conn
+
+joinWorld :: Int -> IO TCP.TCPConnection
+joinWorld idx = do  user <- buffUsers idx 
+                    uServer <- getServerInfo (read $ defaultsid user)
+                    conn <- TCP.connect (fst uServer) (fromInteger $ snd uServer)
+                    send conn $ loginData user
+                    msg <- Streams.read (source conn)
+                    send conn $ enterW (C.pack $ uid user) (getChNumber . encode . C.fromStrict $ fromJust msg)
+                    C.putStrLn $ C.append (C.pack $ acc user) " has joined the KD world!"
+                    return conn
                     
-getReward u p = do conn <- joinWorld u p
+getReward u p = do conn <- joinWorld 0
                    sendNTimes 9999 conn rankReward
                    close conn
  

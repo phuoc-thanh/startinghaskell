@@ -4,7 +4,6 @@
 module LoginData where
 
 import qualified Data.ByteString.Lazy.Char8 as C
-import Data.ByteString.Base16.Lazy
 import Data.List.Split
 import Serialize
 import Parser hiding (encode, decode)
@@ -21,22 +20,23 @@ d123String = " 123 "
 getChNumber :: C.ByteString -> Integer
 getChNumber = read . concat . ("0x":) . reverse . chunksOf 2 . C.unpack . C.take 8 . C.drop 14
 
-getLoginData :: KDUser -> C.ByteString
-getLoginData d = C.append (hexLoginSerialize $ C.length loginString) loginString
+loginData :: KDUser -> C.ByteString
+loginData u = C.append (hexLoginSerialize $ C.length loginString) loginString
                  where loginString = C.append loginPrefix
-                                   $ C.append (C.pack $ defaultsid d)
+                                   $ C.append (C.pack $ defaultsid u)
                                    $ C.append " "
-                                   $ C.append (C.pack $ uid d)
+                                   $ C.append (C.pack $ uid u)
                                    $ C.append d123String
-                                   $ C.append (C.pack $ show $ create_time d)
+                                   $ C.append (C.pack $ show $ create_time u)
                                    $ C.append " "
-                                   $ C.append (C.pack $ key d) " 0\NUL"
+                                   $ C.append (C.pack $ key u) " 0\NUL"
 
-enterW :: KDUser -> C.ByteString -> C.ByteString
-enterW d m = C.append (hexEnterSerialize $ C.length enterString) enterString
-             where enterString = C.append enterPrefix
-                               $ C.append (C.pack $ uid d)
-                               $ C.append " "
-                               $ C.append (C.pack . show . getChNumber $ encode m) "\NUL"
+enterW :: C.ByteString -> Integer -> C.ByteString
+enterW idx cN = C.append (hexEnterSerialize $ C.length enterString) enterString
+                    where enterString = C.append enterPrefix
+                                        $ C.append idx
+                                        $ C.append " "
+                                        $ C.append (C.pack $ show cN) "\NUL"
+                     
                   
 
