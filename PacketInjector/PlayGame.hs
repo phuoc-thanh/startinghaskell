@@ -12,7 +12,7 @@ rankReward = C.append (hexSerialize $ C.length s) s
 
 store82 :: C.ByteString
 store82 = C.append (hexSerialize $ C.length s) s
-             where s = "crossserverwar getgamereward 51\NUL"
+             where s = "store 8 2\NUL"
 
 bet100 :: C.ByteString
 bet100 = C.append (hexSerialize $ C.length s) s

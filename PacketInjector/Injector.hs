@@ -10,6 +10,7 @@ import Network.Socket hiding (send, close)
 import qualified Data.ByteString.Lazy.Char8 as C
 import Data.Connection
 import Data.Maybe
+import Control.Monad
 import qualified System.IO.Streams.TCP as TCP
 import qualified System.IO.Streams as Streams
 import Control.Concurrent
@@ -21,19 +22,23 @@ getServerInfo i = do
     let server = (!!) (fromJust $ serverinfos) (i - 1)
     return $ server
 
--- buffUsers :: IO ([KDUser])
-buffUsers i = do
+buffUsers :: IO ([KDUser])
+buffUsers = do
     buffUsers <- parseFile "BuffUsers.json" :: IO (Maybe [KDUser])
-    let user = (!!) (fromJust $ buffUsers) (i - 1)
-    return user
+    return $ fromJust buffUsers
+    
+getUser :: String -> IO KDUser    
+getUser uname = do
+    users <- parseFile "BuffUsers.json" :: IO (Maybe [KDUser])
+    return $ head $ filter (\u -> (acc u) == uname) (fromJust $ users)    
 
 sendNTimes :: Integer -> Connection (Socket, SockAddr) -> C.ByteString -> IO ()
 sendNTimes 1 c s = send c s
 sendNTimes n c s = do send c s
                       sendNTimes (n - 1) c s 
                                
-login :: C.ByteString -> C.ByteString -> IO ()
-login u p = do res <- loginVerify u p
+login :: String -> String -> IO ()
+login u p = do res <- loginVerify (C.pack u) (C.pack p)
                C.putStrLn $ C.pack $ show $ res
                uServer <- getServerInfo (read $ defaultsid res)
                conn <- TCP.connect (ip uServer) (fromInteger $ port uServer)
@@ -42,22 +47,30 @@ login u p = do res <- loginVerify u p
                C.putStrLn $ C.append "chNumber:" $ C.pack $ show (getChNumber . encode . C.fromStrict $ fromJust msg)
                close conn
 
-joinWorld :: Int -> IO TCP.TCPConnection
-joinWorld idx = do  user <- buffUsers idx 
-                    uServer <- getServerInfo (read $ defaultsid user)
+joinWorld :: KDUser -> IO TCP.TCPConnection
+joinWorld user = do uServer <- getServerInfo (read $ defaultsid $ user)
                     conn <- TCP.connect (ip uServer) (fromInteger $ port uServer)
                     send conn $ loginData user
                     msg <- Streams.read (source conn)
                     send conn $ enterW (C.pack $ uid user) (C.pack $ chNumber user)
                     C.putStrLn $ C.append (C.pack $ acc user) " has joined the KD world!"
                     return conn
-                    
-getReward = do conn <- joinWorld 3
-               sendNTimes 10 conn store82
-               close conn
- 
--- main = do
---   hSetBuffering stdout NoBuffering            -- 1
---   forkIO (replicateM_ 10000 (putChar 'A'))   -- 2
---   forkIO (replicateM_ 10000 (putChar '9'))   -- 2
---   replicateM_ 10000 (putChar 'B')            -- 3         
+
+rankR :: String -> Integer -> IO ()                    
+rankR uname n = do user <- getUser uname
+                   conn <- joinWorld user
+                   sendNTimes n conn rankReward
+                   close conn                    
+
+sendP :: String -> Integer -> IO ()                   
+sendP uname n = do user <- getUser uname
+                   conn <- joinWorld user
+                   sendNTimes n conn store82
+                   close conn
+
+-- buff :: IO ThreadId()                  
+buff n =  do bUsers <- buffUsers
+             forM_ bUsers $ \u -> do
+                forkIO $ sendP (acc u) n
+            --  return $ C.putStrLn "Done !"
+       

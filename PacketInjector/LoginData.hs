@@ -34,8 +34,8 @@ loginData u = C.append (hexLoginSerialize $ C.length loginString) loginString
 enterW :: C.ByteString -> C.ByteString -> C.ByteString
 enterW idx cN = C.append (hexEnterSerialize $ C.length enterString) enterString
                     where enterString = C.append enterPrefix
-                                        $ C.append idx
-                                        $ C.append " "
-                                        $ C.append cN "\NUL"
+                                      $ C.append idx
+                                      $ C.append " "
+                                      $ C.append cN "\NUL"
                      
 
