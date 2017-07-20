@@ -1,20 +1,19 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Injector where
-import GameData  
-import LoginData
+import Authenticator
 import HttpRq
-import PlayGame
+import PacketGenerator
 import Parser hiding (encode)
 import Network.Socket hiding (send, close)
-import qualified Data.ByteString.Lazy.Char8 as C
+import Data.ByteString.Base16.Lazy
 import Data.Connection
 import Data.Maybe
 import Control.Monad
+import qualified Data.ByteString.Lazy.Char8 as C
 import qualified System.IO.Streams.TCP as TCP
 import qualified System.IO.Streams as Streams
 import Control.Concurrent
-import Data.ByteString.Base16.Lazy
 
 getServerInfo :: Int -> IO KDServer
 getServerInfo i = do
@@ -65,12 +64,16 @@ rankR uname n = do user <- getUser uname
 sendP :: String -> Integer -> IO ()                   
 sendP uname n = do user <- getUser uname
                    conn <- joinWorld user
-                   sendNTimes n conn store82
+                   sendNTimes n conn tPacket
                    close conn
 
--- buff :: IO ThreadId()                  
-buff n =  do bUsers <- buffUsers
-             forM_ bUsers $ \u -> do
-                forkIO $ sendP (acc u) n
+-- idx: the betting id of character in a cross server war.                   
+buff :: String -> IO ()                  
+buff idx = do bUsers <- buffUsers
+              forM_ bUsers $ \u -> do
+                forkIO $ do
+                    conn <- joinWorld u
+                    sendNTimes (amount u) conn (bet100 $ C.pack idx)
+                    close conn
             --  return $ C.putStrLn "Done !"
        

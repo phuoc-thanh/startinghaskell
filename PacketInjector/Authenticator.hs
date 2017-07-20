@@ -1,11 +1,11 @@
 {-# OPTIONS_GHC -Wall #-}
 {-# LANGUAGE ScopedTypeVariables , OverloadedStrings #-}
 
-module LoginData where
+module Authenticator where
 
 import qualified Data.ByteString.Lazy.Char8 as C
 import Data.List.Split
-import Serialize
+import Serializer
 import Parser hiding (encode, decode)
 
 loginPrefix :: C.ByteString

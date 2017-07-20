@@ -33,7 +33,7 @@ data KDUser = KDUser { acc           :: String,
                        create_time   :: Integer,
                        key           :: String,
                        chNumber      :: String,
-                       amount        :: String }
+                       amount        :: Integer }
                    deriving (Show, Eq)
 
 

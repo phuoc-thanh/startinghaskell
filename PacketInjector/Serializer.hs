@@ -1,7 +1,7 @@
 {-# OPTIONS_GHC -Wall #-}
 {-# LANGUAGE  OverloadedStrings #-}
 
-module Serialize where
+module Serializer where
 
 import qualified Data.ByteString.Lazy.Char8 as C
 import Data.ByteString.Base16.Lazy

@@ -8,7 +8,7 @@
         "create_time": 1500461639,
         "key": "f05f99bc5ae8ee3fee867d9ca04710bd",
         "chNumber": "59003159",
-        "amount": "100"
+        "amount": 1
     },
     {
         "acc": "ntk11",
@@ -19,7 +19,7 @@
         "create_time": 1500461678,
         "key": "288b2d32b78a21765aeae5f4bf01dd43",
         "chNumber": "59003172",
-        "amount": "100"
+        "amount": 1
     },
     {
         "acc": "reply1989",
@@ -30,6 +30,6 @@
         "create_time": 1500390737,
         "key": "f11c33e207d02526bc2539c00c3e2bb4",
         "chNumber": "116000075",
-        "amount": "100"
+        "amount": 1
     }
 ]

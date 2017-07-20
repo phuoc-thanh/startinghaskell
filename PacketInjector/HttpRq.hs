@@ -38,7 +38,7 @@ userRqBody u p   = C.append "partnerId=0&userName="
 loginRqBody :: ByteString -> ByteString
 loginRqBody s = C.append "uid=" . C.append userId . C.append "&token=" $ C.append session "&os=and&version=75896"
     where session = C.drop 8 $ (!!) (C.split '&' s) 3
-          userId     = C.drop 7 $ (!!) (C.split '&' s) 2
+          userId  = C.drop 7 $ (!!) (C.split '&' s) 2
 
 loginVerifyRq :: ByteString -> Request       
 loginVerifyRq s = setRequestPath loginVerifyURI
@@ -49,7 +49,7 @@ loginVerifyRq s = setRequestPath loginVerifyURI
                 $ defaultRequest
 
 getUserData :: FromJSON a => ByteString -> Maybe a
-getUserData s = decode $ C.append (C.drop 9 $ head $ C.split '}' s) ",\"chNumber\" : \"unknow\",\"amount\" : \"100\"}"
+getUserData s = decode $ C.append (C.drop 9 $ head $ C.split '}' s) ",\"chNumber\" : \"unknow\",\"amount\" : 1}"
 
 loginVerify :: ByteString -> ByteString -> IO KDUser
 loginVerify u p = do
