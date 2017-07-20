@@ -9,7 +9,7 @@ import Serializer
 import Parser hiding (encode, decode)
 
 loginPrefix :: C.ByteString
-loginPrefix = "LOGIN 0.0.1 10 "
+loginPrefix = "LOGIN 0.0.1"
 
 enterPrefix :: C.ByteString
 enterPrefix = "ENTER "
@@ -23,6 +23,9 @@ getChNumber = read . concat . ("0x":) . reverse . chunksOf 2 . C.unpack . C.take
 loginData :: KDUser -> C.ByteString
 loginData u = C.append (hexLoginSerialize $ C.length loginString) loginString
                  where loginString = C.append loginPrefix
+                                   $ C.append " "
+                                   $ C.append (C.pack $ opname u)
+                                   $ C.append " "
                                    $ C.append (C.pack $ defaultsid u)
                                    $ C.append " "
                                    $ C.append (C.pack $ uid u)

@@ -15,11 +15,10 @@ import qualified System.IO.Streams.TCP as TCP
 import qualified System.IO.Streams as Streams
 import Control.Concurrent
 
-getServerInfo :: Int -> IO KDServer
+getServerInfo :: String -> IO KDServer
 getServerInfo i = do
     serverinfos <- parseFile "ServerInfo.json" :: IO (Maybe [KDServer])
-    let server = (!!) (fromJust $ serverinfos) (i - 1)
-    return $ server
+    return $ head $ filter (\s -> (sid s) == i) (fromJust $ serverinfos)
 
 buffUsers :: IO ([KDUser])
 buffUsers = do
@@ -39,7 +38,7 @@ sendNTimes n c s = do send c s
 login :: String -> String -> IO ()
 login u p = do res <- loginVerify (C.pack u) (C.pack p)
                C.putStrLn $ C.pack $ show $ res
-               uServer <- getServerInfo (read $ defaultsid res)
+               uServer <- getServerInfo (defaultsid res)
                conn <- TCP.connect (ip uServer) (fromInteger $ port uServer)
                send conn $ loginData res
                msg <- Streams.read (source conn)
@@ -47,7 +46,7 @@ login u p = do res <- loginVerify (C.pack u) (C.pack p)
                close conn
 
 joinWorld :: KDUser -> IO TCP.TCPConnection
-joinWorld user = do uServer <- getServerInfo (read $ defaultsid $ user)
+joinWorld user = do uServer <- getServerInfo (defaultsid $ user)
                     conn <- TCP.connect (ip uServer) (fromInteger $ port uServer)
                     send conn $ loginData user
                     msg <- Streams.read (source conn)
@@ -55,7 +54,7 @@ joinWorld user = do uServer <- getServerInfo (read $ defaultsid $ user)
                     C.putStrLn $ C.append (C.pack $ acc user) " has joined the KD world!"
                     return conn
 
-rankR :: String -> Integer -> IO ()                    
+rankR :: String -> Integer -> IO ()
 rankR uname n = do user <- getUser uname
                    conn <- joinWorld user
                    sendNTimes n conn rankReward

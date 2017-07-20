@@ -8,7 +8,7 @@ import qualified Data.ByteString.Lazy.Char8 as C
 
 rankReward :: C.ByteString
 rankReward = C.append (hexSerialize $ C.length s) s
-                where s = "rankList reward 8\NUL"
+                where s = "rankList reward 1\NUL"
 
 tPacket :: C.ByteString
 tPacket = C.append (hexSerialize $ C.length s) s

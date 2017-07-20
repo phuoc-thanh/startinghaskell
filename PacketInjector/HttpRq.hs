@@ -11,11 +11,14 @@ import qualified Data.ByteString.Lazy.Char8 as C
 import Parser
 import Network.HTTP.Simple
 
+-- loginVerifyURI = "/sgwww/vega/loginVerify"
+
 
 loginVerifyURI = "/jinyong/vega/loginVerify"
 checkUserURI = "/payclient.ashx?op=CheckUser"
 getUserURI = "/payclient.ashx?op=GetUser"
 
+-- apiHost = "api.alv.gaba.vn"
 -- apiHost = "api.kimdungqq.com"
 apiHost = "api.kd.gaba.vn"
 
