@@ -73,6 +73,6 @@ buff idx = do bUsers <- buffUsers
                 forkIO $ do
                     conn <- joinWorld u
                     sendNTimes (amount u) conn (bet100 $ C.pack idx)
-                    close conn
+                    -- close conn
             --  return $ C.putStrLn "Done !"
        
