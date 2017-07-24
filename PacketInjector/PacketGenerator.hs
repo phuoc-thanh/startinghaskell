@@ -8,7 +8,22 @@ import qualified Data.ByteString.Lazy.Char8 as C
 
 rankReward :: C.ByteString
 rankReward = C.append (hexSerialize $ C.length s) s
-                where s = "rankList reward 1\NUL"
+                where s = "rankList reward 3\NUL"
+
+armyReward :: C.ByteString 
+armyReward = C.append (hexSerialize $ C.length s) s
+                where s = "army armyFoundation_award\NUL"
+
+                --
+armyMisAward :: C.ByteString -> C.ByteString
+armyMisAward n = C.append (hexSerialize $ C.length s) s
+                    where s = C.append "army misaward "
+                            $ C.append n "\NUL"
+
+armyMisAccept :: C.ByteString -> C.ByteString
+armyMisAccept n = C.append (hexSerialize $ C.length s) s
+                    where s = C.append "army misaccept "
+                            $ C.append n "\NUL"
 
 tPacket :: C.ByteString
 tPacket = C.append (hexSerialize $ C.length s) s

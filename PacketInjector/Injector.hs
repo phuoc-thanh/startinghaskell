@@ -76,3 +76,29 @@ buff idx = do bUsers <- buffUsers
                     -- close conn
             --  return $ C.putStrLn "Done !"
        
+armyRewards :: IO ()                  
+armyRewards = do bUsers <- buffUsers
+                 forM_ bUsers $ \u -> do
+                    forkIO $ do
+                        conn <- joinWorld u
+                        send conn armyReward
+
+armyMisAwards :: IO ()                  
+armyMisAwards = do bUsers <- buffUsers
+                   forM_ bUsers $ \u -> do
+                      forkIO $ do
+                        conn <- joinWorld u
+                        send conn (armyMisAward "1")
+                        send conn (armyMisAward "2")
+                        send conn (armyMisAward "3")
+                        send conn (armyMisAward "4")
+
+armyMisAccepts :: IO ()                  
+armyMisAccepts = do bUsers <- buffUsers
+                    forM_ bUsers $ \u -> do
+                       forkIO $ do
+                         conn <- joinWorld u
+                         send conn (armyMisAccept "1")
+                         send conn (armyMisAccept "2")
+                         send conn (armyMisAccept "3")
+                         send conn (armyMisAccept "4")                        
