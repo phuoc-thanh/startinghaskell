@@ -17,17 +17,17 @@ import Control.Concurrent
 
 getServerInfo :: String -> IO KDServer
 getServerInfo i = do
-    serverinfos <- parseFile "ServerInfo.json" :: IO (Maybe [KDServer])
+    serverinfos <- parseFile "ServerInfoQQ.json" :: IO (Maybe [KDServer])
     return $ head $ filter (\s -> (sid s) == i) (fromJust $ serverinfos)
 
 buffUsers :: IO ([KDUser])
 buffUsers = do
-    buffUsers <- parseFile "BuffUsers.json" :: IO (Maybe [KDUser])
+    buffUsers <- parseFile "Users.json" :: IO (Maybe [KDUser])
     return $ fromJust buffUsers
     
 getUser :: String -> IO KDUser    
 getUser uname = do
-    users <- parseFile "BuffUsers.json" :: IO (Maybe [KDUser])
+    users <- parseFile "Users.json" :: IO (Maybe [KDUser])
     return $ head $ filter (\u -> (acc u) == uname) (fromJust $ users)    
 
 sendNTimes :: Integer -> Connection (Socket, SockAddr) -> C.ByteString -> IO ()
@@ -43,6 +43,7 @@ login u p = do res <- loginVerify (C.pack u) (C.pack p)
                send conn $ loginData res
                msg <- Streams.read (source conn)
                C.putStrLn $ C.append "chNumber:" $ C.pack $ show (getChNumber . encode . C.fromStrict $ fromJust msg)
+               appendJSON "Users2.json" res
                close conn
 
 joinWorld :: KDUser -> IO TCP.TCPConnection

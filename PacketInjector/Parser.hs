@@ -1,8 +1,9 @@
-{-# LANGUAGE RecordWildCards, OverloadedStrings #-}
+{-# LANGUAGE DeriveGeneric, RecordWildCards, OverloadedStrings #-}
 
 module Parser ( encode
               , decode
               , parseFile
+              , appendJSON
               , KDServer(..)
               , KDUser(..)
               , FromJSON(..)
@@ -10,8 +11,8 @@ module Parser ( encode
               ) where
 
 import Data.Aeson
-import Data.Monoid
-import Control.Applicative
+import Data.Aeson.Encode.Pretty
+import GHC.Generics
 import qualified Data.ByteString.Lazy       as BS
 
 
@@ -20,11 +21,14 @@ parseFile file = do
     contents <- BS.readFile file
     return $ decode contents
 
+appendJSON :: ToJSON a => FilePath -> a -> IO ()
+appendJSON fp a = do BS.appendFile fp $ encodePretty a    
+
 data KDServer = KDServer { sid   :: String,
                            sname :: String,
                            ip    :: String,
                            port  :: Integer }
-                   deriving (Show, Eq)
+                   deriving (Show, Eq, Generic)
 data KDUser = KDUser { acc           :: String,
                        uid           :: String,
                        opname        :: String,
@@ -34,43 +38,10 @@ data KDUser = KDUser { acc           :: String,
                        key           :: String,
                        chNumber      :: String,
                        amount        :: Integer }
-                   deriving (Show, Eq)
+                   deriving (Show, Eq, Generic)
 
+instance FromJSON KDServer
+instance ToJSON KDServer
 
-instance FromJSON KDServer where
-    parseJSON (Object v) = KDServer     <$>
-                           v .: "sid"   <*>
-                           v .: "sname" <*>
-                           v .: "ip"    <*>
-                           v .: "port"
-    parseJSON _ = mempty
-
-instance ToJSON KDServer where
-    toJSON KDServer{..} = object [ "sid"   .= sid,
-                                   "sname" .= sname,
-                                   "port"  .= port,
-                                   "ip"    .= ip ]
-
-instance FromJSON KDUser where
-    parseJSON (Object u) = KDUser               <$>
-                           u .: "acc"           <*>
-                           u .: "uid"           <*>
-                           u .: "opname"        <*>
-                           u .: "defaultsid"    <*>
-                           u .: "displayNovice" <*>
-                           u .: "create_time"   <*>
-                           u .: "key"           <*>
-                           u .: "chNumber"      <*>
-                           u .: "amount"
-    parseJSON _ = mempty
-
-instance ToJSON KDUser where
-    toJSON KDUser{..} = object [ "acc"           .= acc,
-                                 "uid"           .= uid,
-                                 "opname"        .= opname,
-                                 "defaultsid"    .= defaultsid,
-                                 "displayNovice" .= displayNovice,
-                                 "create_time"   .= create_time,
-                                 "key"           .= key,
-                                 "chNumber"      .= chNumber,
-                                 "amount"        .= amount ]
+instance FromJSON KDUser
+instance ToJSON KDUser
