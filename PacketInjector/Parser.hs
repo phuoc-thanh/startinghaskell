@@ -13,16 +13,17 @@ module Parser ( encode
 import Data.Aeson
 import Data.Aeson.Encode.Pretty
 import GHC.Generics
-import qualified Data.ByteString.Lazy       as BS
+import qualified Data.ByteString       as BS
+import qualified Data.ByteString.Lazy       as BSL
 
 
 parseFile :: FromJSON a => FilePath -> IO (Maybe a)
 parseFile file = do
     contents <- BS.readFile file
-    return $ decode contents
+    return $ decodeStrict contents
 
 appendJSON :: ToJSON a => FilePath -> a -> IO ()
-appendJSON fp a = do BS.writeFile fp $ encodePretty a    
+appendJSON fp a = do BSL.writeFile fp $ encodePretty a    
 
 data KDServer = KDServer { sid   :: String,
                            sname :: String,

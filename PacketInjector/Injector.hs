@@ -22,12 +22,12 @@ getServerInfo i = do
 
 buffUsers :: IO ([KDUser])
 buffUsers = do
-    buffUsers <- parseFile "Users.json" :: IO (Maybe [KDUser])
+    buffUsers <- parseFile "BuffUsers.json" :: IO (Maybe [KDUser])
     return $ fromJust buffUsers
     
 getUser :: String -> IO KDUser    
 getUser uname = do
-    users <- parseFile "Users.json" :: IO (Maybe [KDUser])
+    users <- parseFile "BuffUsers.json" :: IO (Maybe [KDUser])
     return $ head $ filter (\u -> (acc u) == uname) (fromJust $ users)    
 
 sendNTimes :: Integer -> Connection (Socket, SockAddr) -> C.ByteString -> IO ()
