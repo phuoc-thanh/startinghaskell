@@ -43,7 +43,8 @@ login u p = do res <- loginVerify (C.pack u) (C.pack p)
                send conn $ loginData res
                msg <- Streams.read (source conn)
                C.putStrLn $ C.append "chNumber:" $ C.pack $ show (getChNumber . encode . C.fromStrict $ fromJust msg)
-               appendJSON "Users2.json" res
+               bu <- buffUsers
+               appendJSON "BuffUsers.json" (res : bu)
                close conn
 
 joinWorld :: KDUser -> IO TCP.TCPConnection

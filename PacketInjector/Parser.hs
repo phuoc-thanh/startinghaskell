@@ -22,7 +22,7 @@ parseFile file = do
     return $ decode contents
 
 appendJSON :: ToJSON a => FilePath -> a -> IO ()
-appendJSON fp a = do BS.appendFile fp $ encodePretty a    
+appendJSON fp a = do BS.writeFile fp $ encodePretty a    
 
 data KDServer = KDServer { sid   :: String,
                            sname :: String,
