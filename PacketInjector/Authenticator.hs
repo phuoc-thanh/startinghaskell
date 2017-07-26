@@ -20,7 +20,7 @@ d123String = " 123 "
 getChNumber :: C.ByteString -> Integer
 getChNumber = read . concat . ("0x":) . reverse . chunksOf 2 . C.unpack . C.take 8 . C.drop 14
 
-loginData :: KDUser -> C.ByteString
+loginData :: Player -> C.ByteString
 loginData u = C.append (hexLoginSerialize $ C.length loginString) loginString
                  where loginString = C.append loginPrefix
                                    $ C.append (C.pack $ opname u)

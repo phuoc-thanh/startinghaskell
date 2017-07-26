@@ -54,7 +54,7 @@ loginVerifyRq s = setRequestPath loginVerifyURI
 getUserData :: FromJSON a => ByteString -> Maybe a
 getUserData s = decode $ C.append (C.drop 9 $ head $ C.split '}' s) ",\"chNumber\" : \"unknow\",\"amount\" : 1}"
 
-loginVerify :: ByteString -> ByteString -> IO KDUser
+loginVerify :: ByteString -> ByteString -> IO Player
 loginVerify u p = do
     cResponse <- httpLBS $ checkUserRq u p
     response <- httpLBS $ loginVerifyRq (getResponseBody cResponse)

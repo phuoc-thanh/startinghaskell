@@ -4,8 +4,8 @@ module Parser ( encode
               , decode
               , parseFile
               , appendJSON
-              , KDServer(..)
-              , KDUser(..)
+              , Server(..)
+              , Player(..)
               , FromJSON(..)
               , ToJSON(..)
               ) where
@@ -25,12 +25,12 @@ parseFile file = do
 appendJSON :: ToJSON a => FilePath -> a -> IO ()
 appendJSON fp a = do BSL.writeFile fp $ encodePretty a    
 
-data KDServer = KDServer { sid   :: String,
-                           sname :: String,
-                           ip    :: String,
-                           port  :: Integer }
+data Server = Server { sid   :: String,
+                       sname :: String,
+                       ip    :: String,
+                       port  :: Integer }
                    deriving (Show, Eq, Generic)
-data KDUser = KDUser { acc           :: String,
+data Player = Player { acc           :: String,
                        uid           :: String,
                        opname        :: String,
                        defaultsid    :: String,
@@ -41,8 +41,8 @@ data KDUser = KDUser { acc           :: String,
                        amount        :: Integer }
                    deriving (Show, Eq, Generic)
 
-instance FromJSON KDServer
-instance ToJSON KDServer
+instance FromJSON Server
+instance ToJSON Server
 
-instance FromJSON KDUser
-instance ToJSON KDUser
+instance FromJSON Player
+instance ToJSON Player
