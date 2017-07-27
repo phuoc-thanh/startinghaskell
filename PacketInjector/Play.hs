@@ -10,10 +10,10 @@ import Control.Concurrent
 import Data.Connection
 import Control.Monad
 
-addP :: String -> String -> IO ()
-addP u p = do pl <- login u p
-              pls <- players
-              appendJSON "Players.json" (pl:pls)
+adp :: String -> String -> IO ()
+adp u p = do pl <- login u p
+             pls <- players
+             appendJSON "Players.json" (pl:pls)
             
 
 sendP :: String -> Integer -> IO ()                   
@@ -44,6 +44,7 @@ armyRewards = do bUsers <- players
                     forkIO $ do
                         conn <- joinWorld u
                         send conn armyReward
+                        close conn
 
 armyMisAwards :: IO ()                  
 armyMisAwards = do bUsers <- players
@@ -54,6 +55,7 @@ armyMisAwards = do bUsers <- players
                         send conn (armyMisAward "2")
                         send conn (armyMisAward "3")
                         send conn (armyMisAward "4")
+                        close conn
 
 armyMisAccepts :: IO ()                  
 armyMisAccepts = do bUsers <- players
@@ -63,4 +65,5 @@ armyMisAccepts = do bUsers <- players
                          send conn (armyMisAccept "1")
                          send conn (armyMisAccept "2")
                          send conn (armyMisAccept "3")
-                         send conn (armyMisAccept "4")   
+                         send conn (armyMisAccept "4")
+                         close conn
