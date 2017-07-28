@@ -35,8 +35,6 @@ buff idx = do bUsers <- players
                 forkIO $ do
                     conn <- joinWorld u
                     sendNTimes (amount u) conn (bet100 $ C.pack idx)
-                    -- close conn
-            --  return $ C.putStrLn "Done !"
        
 armyRewards :: IO ()                  
 armyRewards = do bUsers <- players
@@ -44,7 +42,6 @@ armyRewards = do bUsers <- players
                     forkIO $ do
                         conn <- joinWorld u
                         send conn armyReward
-                        close conn
 
 armyMisAwards :: IO ()                  
 armyMisAwards = do bUsers <- players
@@ -55,7 +52,6 @@ armyMisAwards = do bUsers <- players
                         send conn (armyMisAward "2")
                         send conn (armyMisAward "3")
                         send conn (armyMisAward "4")
-                        close conn
 
 armyMisAccepts :: IO ()                  
 armyMisAccepts = do bUsers <- players
@@ -66,4 +62,3 @@ armyMisAccepts = do bUsers <- players
                          send conn (armyMisAccept "2")
                          send conn (armyMisAccept "3")
                          send conn (armyMisAccept "4")
-                         close conn
