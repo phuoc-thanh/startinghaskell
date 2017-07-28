@@ -33,3 +33,19 @@ bet100 :: C.ByteString -> C.ByteString
 bet100 idx = C.append (hexSerialize $ C.length s) s
                 where s = C.append "crossserverwar betting "
                         $ C.append idx " 100\NUL"
+
+-- copyC01B01 = C.append (hexSerialize $ C.length s) s
+--                 where s = "copy enter C01B01 1\NUL"
+
+-- copyC01B02 = C.append (hexSerialize $ C.length s) s
+--                 where s = "copy enter C01B02 1\NUL"                
+                
+-- copyBlock = C.append (hexSerialize $ C.length s) s
+--                 where s = "copy block\NUL"
+                
+-- choiceCombat0 = C.append (hexSerialize $ C.length s) s
+--                     where s = "choice_combat 0| 344716#| -1\NUL"
+
+-- clientGuide1 = C.append (hexSerialize $ C.length s) s
+--                 where s = "client guide1\NUL"                    
+                    

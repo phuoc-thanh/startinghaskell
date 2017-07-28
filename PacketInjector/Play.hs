@@ -35,30 +35,18 @@ buff idx = do bUsers <- players
                 forkIO $ do
                     conn <- joinWorld u
                     sendNTimes (amount u) conn (bet100 $ C.pack idx)
-       
-armyRewards :: IO ()                  
-armyRewards = do bUsers <- players
-                 forM_ bUsers $ \u -> do
-                    forkIO $ do
-                        conn <- joinWorld u
-                        send conn armyReward
 
-armyMisAwards :: IO ()                  
-armyMisAwards = do bUsers <- players
-                   forM_ bUsers $ \u -> do
-                      forkIO $ do
-                        conn <- joinWorld u
-                        send conn (armyMisAward "1")
-                        send conn (armyMisAward "2")
-                        send conn (armyMisAward "3")
-                        send conn (armyMisAward "4")
-
-armyMisAccepts :: IO ()                  
-armyMisAccepts = do bUsers <- players
-                    forM_ bUsers $ \u -> do
-                       forkIO $ do
-                         conn <- joinWorld u
-                         send conn (armyMisAccept "1")
-                         send conn (armyMisAccept "2")
-                         send conn (armyMisAccept "3")
-                         send conn (armyMisAccept "4")
+armyMis :: IO ()                  
+armyMis = do bUsers <- players
+             forM_ bUsers $ \u -> do
+                forkIO $ do
+                    conn <- joinWorld u
+                    send conn armyReward
+                    send conn (armyMisAward "1")
+                    send conn (armyMisAward "2")
+                    send conn (armyMisAward "3")
+                    send conn (armyMisAward "4")
+                    send conn (armyMisAccept "1")
+                    send conn (armyMisAccept "2")
+                    send conn (armyMisAccept "3")
+                    send conn (armyMisAccept "4")

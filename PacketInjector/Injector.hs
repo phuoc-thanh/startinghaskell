@@ -19,12 +19,12 @@ getServerInfo i = do
 
 players :: IO ([Player])
 players = do
-    players <- parseFile "qqPlayers.json" :: IO (Maybe [Player])
+    players <- parseFile "Players.json" :: IO (Maybe [Player])
     return $ fromJust players
     
 getPlayer :: String -> IO Player    
 getPlayer uname = do
-    users <- parseFile "qqPlayers.json" :: IO (Maybe [Player])
+    users <- parseFile "Players.json" :: IO (Maybe [Player])
     return $ head $ filter (\u -> (acc u) == uname) (fromJust $ users)    
 
 sendNTimes :: Integer -> Connection (Socket, SockAddr) -> C.ByteString -> IO ()
