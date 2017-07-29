@@ -6,6 +6,7 @@ module Parser ( encode
               , appendJSON
               , Server(..)
               , Player(..)
+              , Match(..)
               , FromJSON(..)
               , ToJSON(..)
               ) where
@@ -41,8 +42,16 @@ data Player = Player { acc           :: String,
                        amount        :: Integer }
                    deriving (Show, Eq, Generic)
 
+data Match = Match { mid  :: String,
+                     win  :: String,
+                     lose :: String }
+                   deriving (Show, Eq, Generic)
+
 instance FromJSON Server
 instance ToJSON Server
 
 instance FromJSON Player
 instance ToJSON Player
+
+instance FromJSON Match
+instance ToJSON Match

@@ -8,7 +8,7 @@
         "create_time": 1500461639,
         "key": "f05f99bc5ae8ee3fee867d9ca04710bd",
         "chNumber": "59003159",
-        "amount": 18
+        "amount": 0
     },
     {
         "acc": "ntk1",
@@ -19,7 +19,7 @@
         "create_time": 1500641411,
         "key": "0a8611490ecff7c5bef20539038e6c27",
         "chNumber": "59003162",
-        "amount": 30
+        "amount": 0
     },
     {
         "acc": "ntk2",
@@ -30,7 +30,7 @@
         "create_time": 1500641493,
         "key": "9ca0a4af010307126cd997a97b49eb18",
         "chNumber": "59003163",
-        "amount": 30
+        "amount": 0
     },
     {
         "acc": "ntk10",
@@ -41,7 +41,7 @@
         "create_time": 1500641570,
         "key": "afaad4417999c4e5a5cebccd9688e7db",
         "chNumber": "59003171",
-        "amount": 30
+        "amount": 0
     },
     {
         "acc": "ntk11",
@@ -52,7 +52,7 @@
         "create_time": 1500641664,
         "key": "9f383dfa5c6f0d40484bd6852dd423d1",
         "chNumber": "59003172",
-        "amount": 26
+        "amount": 0
     },
     {
         "acc": "reply1989",
@@ -63,7 +63,7 @@
         "create_time": 1500642828,
         "key": "92751cc966d356ccf21eec1bb9e27e70",
         "chNumber": "116000075",
-        "amount": 1
+        "amount": 0
     },
     {
         "acc": "10accs421",
@@ -74,7 +74,7 @@
         "create_time": 1500640508,
         "key": "508594a4ea44a2fd0f648acd474ce751",
         "chNumber": "48005473",
-        "amount": 30
+        "amount": 0
     },
     {
         "acc": "10accs422",
@@ -85,7 +85,7 @@
         "create_time": 1500640599,
         "key": "88baaa2ae5de9de4b407e4b54c543388",
         "chNumber": "48005474",
-        "amount": 30
+        "amount": 0
     },
     {
         "acc": "10accs423",
@@ -96,7 +96,7 @@
         "create_time": 1500640651,
         "key": "cb242b557508d3c2091811a65c97d030",
         "chNumber": "48005475",
-        "amount": 30
+        "amount": 0
     },
     {
         "acc": "10accs424",
@@ -107,7 +107,7 @@
         "create_time": 1500640714,
         "key": "4458cf68df5da275672ca8a59198f057",
         "chNumber": "48005476",
-        "amount": 30
+        "amount": 0
     },
     {
         "acc": "10accs425",
@@ -118,7 +118,7 @@
         "create_time": 1500640810,
         "key": "76382dbd41142733e3f8150314d687ca",
         "chNumber": "48005479",
-        "amount": 30
+        "amount": 0
     },
     {
         "acc": "lienchien01",
@@ -129,7 +129,7 @@
         "create_time": 1500640851,
         "key": "bcc20b4d9a02ba106f6af9d4c19c1480",
         "chNumber": "48004884",
-        "amount": 30
+        "amount": 0
     },
     {
         "acc": "lienchien02",
@@ -140,7 +140,7 @@
         "create_time": 1500641073,
         "key": "fe3e2a76dd6be86fdd572d21e4bcf3f4",
         "chNumber": "48004885",
-        "amount": 30
+        "amount": 0
     },
     {
         "acc": "lienchien03",
@@ -151,7 +151,7 @@
         "create_time": 1500641129,
         "key": "1c5defe41e9c8478b5436aa0b801ef95",
         "chNumber": "48004886",
-        "amount": 30
+        "amount": 0
     },
     {
         "acc": "lienchien04",
@@ -162,7 +162,7 @@
         "create_time": 1500641223,
         "key": "d33a284779b69c9e2619d6d064aaf6ef",
         "chNumber": "48004888",
-        "amount": 30
+        "amount": 0
     },
     {
         "acc": "lienchien05",
@@ -173,7 +173,7 @@
         "create_time": 1500641275,
         "key": "b35004406a090b313e4c7d1b04c76c27",
         "chNumber": "48004889",
-        "amount": 30
+        "amount": 0
     },
     {
         "acc": "lienchien06",
@@ -184,7 +184,7 @@
         "create_time": 1500641304,
         "key": "93efba2787d74fc6ce6e631f7fc14902",
         "chNumber": "48004890",
-        "amount": 30
+        "amount": 0
     },
     {
         "acc": "hanlongka40",
@@ -195,7 +195,7 @@
         "create_time": 1500911534,
         "key": "ea49720eb1dc7061feae21eb4c29e16c",
         "chNumber": "48004552",
-        "amount": 30
+        "amount": 0
     },
     {
         "acc": "hanlongka4",
@@ -206,6 +206,6 @@
         "create_time": 1500911577,
         "key": "1f64327ed7dbc238c56e424f7dec4e53",
         "chNumber": "48004132",
-        "amount": 30
+        "amount": 0
     }
 ]

@@ -14,13 +14,23 @@ import qualified System.IO.Streams as Streams
 
 getServerInfo :: String -> IO Server
 getServerInfo i = do
-    serverinfos <- parseFile "ServerInfoQQ.json" :: IO (Maybe [Server])
+    serverinfos <- parseFile "ServerInfo.json" :: IO (Maybe [Server])
     return $ head $ filter (\s -> (sid s) == i) (fromJust $ serverinfos)
+
+getMatch :: String -> IO Match
+getMatch i = do
+    match <- parseFile "Match.json" :: IO (Maybe [Match])
+    return $ head $ filter (\s -> (mid s) == i) (fromJust $ match)
 
 players :: IO ([Player])
 players = do
     players <- parseFile "Players.json" :: IO (Maybe [Player])
     return $ fromJust players
+
+buffPls :: IO ([Player])
+buffPls = do
+    buffPls <- parseFile "Buffs.json" :: IO (Maybe [Player])
+    return $ fromJust buffPls
     
 getPlayer :: String -> IO Player    
 getPlayer uname = do

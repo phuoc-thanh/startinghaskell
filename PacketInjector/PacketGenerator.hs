@@ -8,7 +8,7 @@ import qualified Data.ByteString.Lazy.Char8 as C
 
 rankReward :: C.ByteString
 rankReward = C.append (hexSerialize $ C.length s) s
-                where s = "rankList reward 1\NUL"
+                where s = "rankList reward 5\NUL"
 
 armyReward :: C.ByteString 
 armyReward = C.append (hexSerialize $ C.length s) s
@@ -33,6 +33,18 @@ bet100 :: C.ByteString -> C.ByteString
 bet100 idx = C.append (hexSerialize $ C.length s) s
                 where s = C.append "crossserverwar betting "
                         $ C.append idx " 100\NUL"
+
+bet1000 :: C.ByteString -> C.ByteString
+bet1000 idx = C.append (hexSerialize $ C.length s) s
+                 where s = C.append "crossserverwar betting "
+                         $ C.append idx " 1000\NUL"                        
+-- VTM ZM44, TDLT ZM51
+-- Hunt: teamHunt 4 --> teamHunt 3 i (i =  0|1|2)
+huntRefresh = C.append (hexSerialize $ C.length s) s
+                where s = "teamHunt 15 0,1,2\NUL"
+openRoom i  = C.append (hexSerialize $ C.length s) s
+                where s = C.append "teamHunt 3 "
+                        $ C.append  i "\NUL"
 
 -- copyC01B01 = C.append (hexSerialize $ C.length s) s
 --                 where s = "copy enter C01B01 1\NUL"
