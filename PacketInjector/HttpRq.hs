@@ -19,11 +19,11 @@ checkUserURI = "/payclient.ashx?op=CheckUser"
 getUserURI = "/payclient.ashx?op=GetUser"
 
 -- apiHost = "api.alv.gaba.vn"
--- apiHost = "api.kimdungqq.com"
-apiHost = "api.kd.gaba.vn"
+apiHost = "api.kimdungqq.com"
+-- apiHost = "api.kd.gaba.vn"
 
--- payHost = "m-pay.kimdungqq.com"
-payHost = "m-pay.gaba.vn"
+payHost = "m-pay.kimdungqq.com"
+-- payHost = "m-pay.gaba.vn"
 
 checkUserRq :: ByteString -> ByteString -> Request
 checkUserRq u p = setRequestPath checkUserURI
@@ -52,10 +52,10 @@ loginVerifyRq s = setRequestPath loginVerifyURI
                 $ defaultRequest
 
 getUserData :: FromJSON a => ByteString -> Maybe a
-getUserData s = decode $ C.append (C.drop 9 $ head $ C.split '}' s) ",\"chNumber\" : \"unknow\",\"amount\" : 1}"
+getUserData s = decode $ C.append (C.drop 9 $ head $ C.split '}' s) ",\"chNumber\" : \"unknow\",\"amount\" : 0}"
 
-loginVerify :: ByteString -> ByteString -> IO Player
+loginVerify :: String -> String -> IO Player
 loginVerify u p = do
-    cResponse <- httpLBS $ checkUserRq u p
+    cResponse <- httpLBS $ checkUserRq (C.pack u) (C.pack p)
     response <- httpLBS $ loginVerifyRq (getResponseBody cResponse)
     return $ fromJust $ getUserData $ getResponseBody response

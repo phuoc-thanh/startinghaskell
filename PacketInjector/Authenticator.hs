@@ -3,24 +3,25 @@
 
 module Authenticator where
 
-import qualified Data.ByteString.Lazy.Char8 as C
+import qualified Data.ByteString.Char8 as C
+import Data.ByteString (ByteString)
 import Data.List.Split
 import Serializer
 import Parser hiding (encode, decode)
 
-loginPrefix :: C.ByteString
+loginPrefix :: ByteString
 loginPrefix = "LOGIN 0.0.1 "
 
-enterPrefix :: C.ByteString
+enterPrefix :: ByteString
 enterPrefix = "ENTER "
 
-d123String :: C.ByteString
+d123String :: ByteString
 d123String = " 123 "
 
-getChNumber :: C.ByteString -> Integer
+getChNumber :: ByteString -> Integer
 getChNumber = read . concat . ("0x":) . reverse . chunksOf 2 . C.unpack . C.take 8 . C.drop 14
 
-loginData :: Player -> C.ByteString
+loginData :: Player -> ByteString
 loginData u = C.append (hexLoginSerialize $ C.length loginString) loginString
                  where loginString = C.append loginPrefix
                                    $ C.append (C.pack $ opname u)
@@ -33,7 +34,7 @@ loginData u = C.append (hexLoginSerialize $ C.length loginString) loginString
                                    $ C.append " "
                                    $ C.append (C.pack $ key u) " 0\NUL"
 
-enterW :: C.ByteString -> C.ByteString -> C.ByteString
+enterW :: ByteString -> ByteString -> ByteString
 enterW idx cN = C.append (hexEnterSerialize $ C.length enterString) enterString
                     where enterString = C.append enterPrefix
                                       $ C.append idx

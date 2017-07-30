@@ -15,7 +15,7 @@ import Data.Aeson
 import Data.Aeson.Encode.Pretty
 import GHC.Generics
 import qualified Data.ByteString       as BS
-import qualified Data.ByteString.Lazy       as BSL
+import qualified Data.ByteString.Lazy  as BSL
 
 
 parseFile :: FromJSON a => FilePath -> IO (Maybe a)
@@ -29,7 +29,7 @@ appendJSON fp a = do BSL.writeFile fp $ encodePretty a
 data Server = Server { sid   :: String,
                        sname :: String,
                        ip    :: String,
-                       port  :: Integer }
+                       port  :: String }
                    deriving (Show, Eq, Generic)
 data Player = Player { acc           :: String,
                        uid           :: String,

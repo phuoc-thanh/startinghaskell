@@ -4,7 +4,7 @@
 module PacketGenerator where
 
 import Serializer
-import qualified Data.ByteString.Lazy.Char8 as C
+import qualified Data.ByteString.Char8 as C
 
 rankReward :: C.ByteString
 rankReward = C.append (hexSerialize $ C.length s) s

@@ -3,8 +3,8 @@
 
 module Serializer where
 
-import qualified Data.ByteString.Lazy.Char8 as C
-import Data.ByteString.Base16.Lazy
+import qualified Data.ByteString.Char8 as C
+import Data.ByteString.Base16
 import Numeric
 
 

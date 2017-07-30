@@ -4,17 +4,16 @@ module Injector where
 import Authenticator
 import HttpRq
 import Parser hiding (encode)
-import Network.Socket hiding (send, close)
-import Data.ByteString.Base16.Lazy
-import Data.Connection
+import Network.Socket hiding (send, recv)
+import Network.Socket.ByteString (send, recv, sendAll)
+import Data.ByteString.Base16
 import Data.Maybe
-import qualified Data.ByteString.Lazy.Char8 as C
-import qualified System.IO.Streams.TCP as TCP
-import qualified System.IO.Streams as Streams
+import qualified Data.ByteString.Char8 as C
+import Data.ByteString (ByteString)
 
 getServerInfo :: String -> IO Server
 getServerInfo i = do
-    serverinfos <- parseFile "ServerInfo.json" :: IO (Maybe [Server])
+    serverinfos <- parseFile "ServerInfoQQ.json" :: IO (Maybe [Server])
     return $ head $ filter (\s -> (sid s) == i) (fromJust $ serverinfos)
 
 getMatch :: String -> IO Match
@@ -37,29 +36,36 @@ getPlayer uname = do
     users <- parseFile "Players.json" :: IO (Maybe [Player])
     return $ head $ filter (\u -> (acc u) == uname) (fromJust $ users)    
 
-sendNTimes :: Integer -> Connection (Socket, SockAddr) -> C.ByteString -> IO ()
-sendNTimes 1 c s = send c s
-sendNTimes n c s = do send c s
+sendNTimes :: Integer -> Socket -> ByteString -> IO ()
+sendNTimes 1 c s = sendAll c s
+sendNTimes n c s = do sendAll c s
                       sendNTimes (n - 1) c s 
                                
 login :: String -> String -> IO Player
-login u p = do res <- loginVerify (C.pack u) (C.pack p)
+login u p = do res <- loginVerify u p
                uServer <- getServerInfo (defaultsid res)
-               conn <- TCP.connect (ip uServer) (fromInteger $ port uServer)
-               send conn $ loginData res
-               msg <- Streams.read (source conn)
-               close conn
+               addrinfos <- getAddrInfo Nothing (Just $ ip uServer) (Just $ port uServer)
+               let serveraddr = head addrinfos
+               sock <- socket (addrFamily serveraddr) Stream defaultProtocol
+               connect sock (addrAddress serveraddr)
+               sendAll sock $ loginData res
+               msg <- recv sock 1024
+               close sock
                return $ Player u (uid res) (opname res) (defaultsid res) (displayNovice res) 
                                (create_time res) (key res) 
-                               (show . getChNumber . encode . C.fromStrict $ fromJust msg)
+                               (show . getChNumber $ encode msg)
                                (amount res)
 
-joinWorld :: Player -> IO TCP.TCPConnection
+joinWorld :: Player -> IO Socket
 joinWorld user = do uServer <- getServerInfo (defaultsid $ user)
-                    conn <- TCP.connect (ip uServer) (fromInteger $ port uServer)
-                    send conn $ loginData user
-                    msg <- Streams.read (source conn)
-                    send conn $ enterW (C.pack $ uid user) (C.pack $ chNumber user)
+                    addrinfos <- getAddrInfo Nothing (Just $ ip uServer) (Just $ port uServer)
+                    let serveraddr = head addrinfos
+                    sock <- socket (addrFamily serveraddr) Stream defaultProtocol
+                    connect sock (addrAddress serveraddr)
+                    sendAll sock $ loginData user
+                    msg <- recv sock 1024
+                    sendAll sock $ enterW (C.pack $ uid user) (C.pack $ chNumber user)
+                    msgR <- recv sock 8192
                     C.putStrLn $ C.append (C.pack $ acc user) " has joined the KD world!"
-                    return conn
+                    return sock
                      
