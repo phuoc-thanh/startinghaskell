@@ -21,15 +21,15 @@ getMatch i = do
     match <- parseFile "Match.json" :: IO (Maybe [Match])
     return $ head $ filter (\s -> (mid s) == i) (fromJust $ match)
 
-players :: IO ([Player])
+players :: IO [Player]
 players = do
-    players <- parseFile "Players.json" :: IO (Maybe [Player])
-    return $ fromJust players
+    pls <- parseFile "Players.json" :: IO (Maybe [Player])
+    return $ fromJust pls
 
-buffPls :: IO ([Player])
+buffPls :: IO [Player]
 buffPls = do
-    buffPls <- parseFile "Buffs.json" :: IO (Maybe [Player])
-    return $ fromJust buffPls
+    pls <- parseFile "Buffs.json" :: IO (Maybe [Player])
+    return $ fromJust pls
     
 getPlayer :: String -> IO Player    
 getPlayer uname = do
@@ -49,7 +49,7 @@ login u p = do res <- loginVerify u p
                sock <- socket (addrFamily serveraddr) Stream defaultProtocol
                connect sock (addrAddress serveraddr)
                sendAll sock $ loginData res
-               msg <- recv sock 1024
+               msg <- recv sock 256
                close sock
                return $ Player u (uid res) (opname res) (defaultsid res) (displayNovice res) 
                                (create_time res) (key res) 
@@ -65,7 +65,5 @@ joinWorld user = do uServer <- getServerInfo (defaultsid $ user)
                     sendAll sock $ loginData user
                     msg <- recv sock 1024
                     sendAll sock $ enterW (C.pack $ uid user) (C.pack $ chNumber user)
-                    msgR <- recv sock 8192
                     C.putStrLn $ C.append (C.pack $ acc user) " has joined the KD world!"
                     return sock
-                     

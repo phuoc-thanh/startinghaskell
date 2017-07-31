@@ -12,7 +12,7 @@ import Network.Socket.ByteString (send, recv, sendAll)
 import Data.Maybe
 import Control.Monad
 import Control.Concurrent
-import Control.Concurrent.Async
+-- import Control.Concurrent.Async
 
 main :: IO ()
 main = do match <- getMatch "1"
