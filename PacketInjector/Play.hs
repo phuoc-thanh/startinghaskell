@@ -74,7 +74,6 @@ armyMis = do bUsers <- players
                     sendAll conn (armyMisAward "2")
                     sendAll conn (armyMisAward "3")
                     sendAll conn (armyMisAward "4")
-                    threadDelay 2000000
                     sendAll conn (armyMisAccept "1")
                     sendAll conn (armyMisAccept "2")
                     sendAll conn (armyMisAccept "3")
@@ -83,8 +82,12 @@ armyMis = do bUsers <- players
 tRefresh = do u <- getPlayer "reply0001"
               conn <- joinWorld u
               sendAll conn $ huntRefresh
-              threadDelay 5000000
-              ms <- recv conn 8192
-              C.putStrLn ms
-              C.putStrLn "done"
+              listenM conn
+              -- msg <- recv conn 2048
+              -- C.putStrLn msg
+              close conn
 
+listenM :: Socket -> IO ()              
+listenM conn = do msg <- recv conn 2048
+                  C.putStrLn msg
+                  unless (C.isInfixOf "ZM" msg) C.putStrLn "ended"
