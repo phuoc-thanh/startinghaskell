@@ -8,8 +8,7 @@ import Parser
 import qualified Data.ByteString.Char8 as C
 import Data.ByteString (ByteString)
 import Network.Socket hiding (send, recv)
-import Network.Socket.ByteString (send, recv, sendAll)
-import Data.Maybe
+import Network.Socket.ByteString (recv, sendAll)
 import Control.Monad
 import Control.Concurrent
 -- import Control.Concurrent.Async
@@ -90,4 +89,4 @@ tRefresh = do u <- getPlayer "reply0001"
 listenM :: Socket -> IO ()              
 listenM conn = do msg <- recv conn 2048
                   C.putStrLn msg
-                  unless (C.isInfixOf "ZM" msg) C.putStrLn "ended"
+                  unless (C.isInfixOf "ZM" msg) $ C.putStrLn "ended"
