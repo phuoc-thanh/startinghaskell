@@ -7,6 +7,9 @@ import PacketGenerator
 import Parser
 import qualified Data.ByteString.Char8 as C
 import Data.ByteString (ByteString)
+import Data.List
+import Data.List.Split
+import Data.Maybe
 import Network.Socket hiding (send, recv)
 import Network.Socket.ByteString (recv, sendAll)
 import Control.Monad
@@ -83,9 +86,38 @@ tRefresh = do u <- getPlayer "reply0001"
               sendAll conn $ huntRefresh
               listenM conn
             --   C.putStrLn zm
-              close conn
+              -- close conn
 
-listenM :: Socket -> IO ()              
-listenM conn = do msg <- recv conn 2048
-                  unless (C.isInfixOf "ZM" msg) $ listenM conn
-                  when (C.isInfixOf "ZM" msg) $ C.putStrLn msg
+-- listenM :: Socket -> t -> IO ()              
+listenM conn   = do msg <- recv conn 2048
+                    unless (C.isInfixOf "ZM" msg) $ listenM conn
+                    when (C.isInfixOf "ZM" msg) $ do
+                        let h = tail . map (C.pack . take 4) $ split (startsWith "ZM") $ C.unpack msg
+                        hunt h conn
+
+
+-- CBT ZM39, VNT ZM43, VTM ZM44, HT ZM45, TVK ZM49, KP ZM50, TDLT ZM51
+huntTarget = "ZM39|ZM44|ZM49|ZM50|ZM51"
+
+huntVerify heroes
+    | (C.isInfixOf (heroes !! 0) huntTarget) = Just "0"
+    | (C.isInfixOf (heroes !! 1) huntTarget) = Just "1"
+    | (C.isInfixOf (heroes !! 2) huntTarget) = Just "2"
+    | otherwise = Nothing
+
+hunt h conn = case huntVerify h of
+                Just idx -> do C.putStrLn $ C.append "found hero at " idx
+                               sendAll conn $ openRoom idx
+                               huntStart idx conn
+                Nothing -> do threadDelay 2000000
+                              sendAll conn $ huntRefresh
+                              listenM conn
+
+huntStart idx conn = do threadDelay 5000000
+                        msg <- recv conn 2048
+                        unless (C.isInfixOf "Reply1989" msg) $ huntStart idx conn
+                        when (C.isInfixOf "Reply1989" msg) $ do
+                            sendAll conn $ startRoom idx
+                            msg <- recv conn 2048
+                            threadDelay 3000000
+                            close conn

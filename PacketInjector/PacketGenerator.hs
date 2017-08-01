@@ -46,6 +46,10 @@ openRoom i  = C.append (hexSerialize $ C.length s) s
                 where s = C.append "teamHunt 3 "
                         $ C.append  i "\NUL"
 
+startRoom i = C.append (hexSerialize $ C.length s) s
+                where s = C.append "teamHunt 10 "
+                        $ C.append  i "\NUL" 
+
 -- copyC01B01 = C.append (hexSerialize $ C.length s) s
 --                 where s = "copy enter C01B01 1\NUL"
 
