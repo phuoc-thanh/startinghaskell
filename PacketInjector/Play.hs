@@ -82,11 +82,10 @@ tRefresh = do u <- getPlayer "reply0001"
               conn <- joinWorld u
               sendAll conn $ huntRefresh
               listenM conn
-              -- msg <- recv conn 2048
-              -- C.putStrLn msg
+            --   C.putStrLn zm
               close conn
 
 listenM :: Socket -> IO ()              
 listenM conn = do msg <- recv conn 2048
-                  C.putStrLn msg
-                  unless (C.isInfixOf "ZM" msg) $ C.putStrLn "ended"
+                  unless (C.isInfixOf "ZM" msg) $ listenM conn
+                  when (C.isInfixOf "ZM" msg) $ C.putStrLn msg

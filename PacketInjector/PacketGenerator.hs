@@ -38,7 +38,7 @@ bet1000 :: C.ByteString -> C.ByteString
 bet1000 idx = C.append (hexSerialize $ C.length s) s
                  where s = C.append "crossserverwar betting "
                          $ C.append idx " 1000\NUL"                        
--- VTM ZM44, TDLT ZM51
+-- VTM ZM44, TDLT ZM51, HT ZM45
 -- Hunt: teamHunt 4 --> teamHunt 3 i (i =  0|1|2)
 huntRefresh = C.append (hexSerialize $ C.length s) s
                 where s = "teamHunt 15 0,1,2\NUL"
