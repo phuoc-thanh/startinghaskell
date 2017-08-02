@@ -34,15 +34,15 @@ listenM conn   = do msg <- recv conn 2048
                         let h = tail . map (C.pack . take 4) $ split (startsWith "ZM") $ C.unpack msg
                         findHr h conn
 
-huntVerify :: [ByteString] -> Maybe ByteString
-huntVerify heroes
+hrVerify :: [ByteString] -> Maybe ByteString
+hrVerify heroes
     | (C.isInfixOf (heroes !! 0) huntTarget) = Just "0"
     | (C.isInfixOf (heroes !! 1) huntTarget) = Just "1"
     | (C.isInfixOf (heroes !! 2) huntTarget) = Just "2"
     | otherwise = Nothing
 
 findHr :: [ByteString] -> Socket -> IO ()   
-findHr heroes conn = case huntVerify heroes of
+findHr heroes conn = case hrVerify heroes of
                 Just idx -> do C.putStrLn $ C.append "found hero at " idx
                                sendAll conn $ openRoom idx
                                hunt idx conn
