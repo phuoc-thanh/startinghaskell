@@ -48,7 +48,7 @@ adp u p = do pl <- login u p
             
 adb :: String -> String -> IO ()
 adb u p = do pl <- login u p
-             pls <- players
+             pls <- buffPls
              appendJSON "Buffs.json" (pl:pls)          
 
 login :: String -> String -> IO Player
