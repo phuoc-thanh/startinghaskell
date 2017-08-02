@@ -41,6 +41,16 @@ sendNTimes 1 c s = sendAll c s
 sendNTimes n c s = do sendAll c s
                       sendNTimes (n - 1) c s 
                                
+adp :: String -> String -> IO ()
+adp u p = do pl <- login u p
+             pls <- players
+             appendJSON "Players.json" (pl:pls)
+            
+adb :: String -> String -> IO ()
+adb u p = do pl <- login u p
+             pls <- players
+             appendJSON "Buffs.json" (pl:pls)          
+
 login :: String -> String -> IO Player
 login u p = do res <- loginVerify u p
                uServer <- getServerInfo (defaultsid res)
