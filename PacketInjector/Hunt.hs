@@ -16,9 +16,9 @@ import Network.Socket.ByteString (recv, sendAll)
 import Control.Monad
 import Control.Concurrent
 
--- CBT ZM39, VNT ZM43, VTM ZM44, HT ZM45, TVK ZM48, KP ZM49, TDLT ZM51
+-- MDP ZM39, CBT ZM41, VTM ZM44, HT ZM45, TVK ZM48, KP ZM49, TDLT ZM51
 huntTarget :: ByteString
-huntTarget = "ZM44|ZM51"
+huntTarget = "ZM41|ZM44"
 
 main = do pls <- players
           forM_ pls $ \u -> do
