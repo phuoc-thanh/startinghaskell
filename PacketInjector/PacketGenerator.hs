@@ -24,10 +24,7 @@ armyMisAward n = C.append (hexSerialize $ C.length s) s
 armyMisAccept :: ByteString -> ByteString
 armyMisAccept n = C.append (hexSerialize $ C.length s) s
                     where s = C.append "army misaccept "
-                            $ C.append n "\NUL"
-armyBase :: ByteString
-armyBase = C.append (hexSerialize $ C.length s) s
-                where s = "army base 3\NUL"  
+                            $ C.append n "\NUL" 
 
 armyMisList :: ByteString
 armyMisList = C.append (hexSerialize $ C.length s) s
@@ -41,9 +38,10 @@ armyExit :: ByteString
 armyExit = C.append (hexSerialize $ C.length s) s
                 where s = "army exit \NUL"
 
-armyRequest :: ByteString
-armyRequest = C.append (hexSerialize $ C.length s) s
-                where s = "army request 3\NUL"                 
+armyRequest :: ByteString -> ByteString
+armyRequest idx = C.append (hexSerialize $ C.length s) s
+                    where s = C.append "army request "
+                            $ C.append idx "\NUL"    
 
 tPacket :: ByteString
 tPacket = C.append (hexSerialize $ C.length s) s

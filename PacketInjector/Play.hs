@@ -23,71 +23,67 @@ armyMis :: IO ()
 armyMis = do bUsers <- players
              forM_ bUsers $ \u -> do
                 forkIO $ do
+                    tid <- myThreadId
                     conn <- joinWorld u
-                    sendAll conn armyRequest
-                    requestA conn
+                    sendAll conn (armyRequest "3")
+                    requestA conn tid
 
 armyMis' :: IO ()                  
 armyMis' = do bUsers <- players
               forM_ bUsers $ \u -> do
-                 forkIO $ do
+                forkIO $ do
+                    tid <- myThreadId
                     conn <- joinWorld u
                     sendAll conn armyReward
-                    sendAll conn armyBase
-                    listenA' conn
+                    sendAll conn armyMisList
+                    listenA' conn tid
 
-requestA :: Socket -> IO ()
-requestA conn  = do threadDelay 2000000
-                    msg <- recv conn 2048
-                    unless (C.isInfixOf "0300aa0801" $ encode msg) $ requestA conn
-                    when (C.isInfixOf "0300aa0801" $ encode msg) $ do
-                        sendAll conn armyReward
-                        sendAll conn armyBase
-                        listenA conn
+requestA :: Socket -> ThreadId -> IO ()
+requestA conn t = do threadDelay 2000000
+                     msg <- recv conn 2048
+                     unless (C.isInfixOf "0300aa0801" $ encode msg) $ requestA conn t
+                     when (C.isInfixOf "0300aa0801" $ encode msg) $ do
+                         sendAll conn armyReward
+                         sendAll conn armyMisList
+                         listenA conn t
                     
 
-listenA :: Socket -> IO ()              
-listenA conn   = do threadDelay 1000000
+listenA :: Socket -> ThreadId -> IO ()              
+listenA conn t = do threadDelay 1000000
                     msg <- recv conn 2048
                     when (C.isInfixOf "0300a12905" $ encode msg) $ do
                         sendAll conn armyExit
-                        recv conn 2048
-                        threadDelay 2000000
+                        threadDelay 1000000
                         C.putStrLn "exit Army!"
                         close conn
-                    unless (C.isInfixOf "boss" msg) $ listenA conn
-                    when (C.isInfixOf "boss" msg) $ do
-                        sendAll conn (armyMisAward "1")
-                        sendAll conn (armyMisAward "2")
-                        sendAll conn (armyMisAward "3")
-                        sendAll conn (armyMisAward "4")
+                        killThread t
+                    unless (C.isInfixOf "2300e904" $ encode msg) $ listenA conn t
+                    when (C.isInfixOf "2300e904" $ encode msg) $ do
+                        forM_ (map (armyMisAward) ["1","2","3","4"]) $ \p -> do
+                            sendAll conn p
                         threadDelay 1000000
                         recv conn 2048
-                        sendAll conn (armyMisAccept "1")
-                        sendAll conn (armyMisAccept "2")
-                        sendAll conn (armyMisAccept "3")
-                        sendAll conn (armyMisAccept "4")
+                        forM_ (map (armyMisAccept) ["1","2","3","4"]) $ \p -> do
+                            sendAll conn p
                         threadDelay 2000000
                         sendAll conn armyMisSpdUp
-                        sendAll conn armyBase
-                        listenA conn
+                        sendAll conn armyMisList
+                        listenA conn t
                     
-listenA' :: Socket -> IO ()              
-listenA' conn  = do threadDelay 1000000
-                    msg <- recv conn 2048
-                    unless (C.isInfixOf "boss" msg) $ listenA conn
-                    when (C.isInfixOf "boss" msg) $ do
-                        sendAll conn (armyMisAward "1")
-                        sendAll conn (armyMisAward "2")
-                        sendAll conn (armyMisAward "3")
-                        sendAll conn (armyMisAward "4")
-                        threadDelay 1000000
-                        recv conn 2048
-                        sendAll conn (armyMisAccept "1")
-                        sendAll conn (armyMisAccept "2")
-                        sendAll conn (armyMisAccept "3")
-                        sendAll conn (armyMisAccept "4")
-                        threadDelay 2000000
-                        sendAll conn armyMisSpdUp
-                        sendAll conn armyBase
-                        listenA conn
+listenA' :: Socket -> ThreadId -> IO ()              
+listenA' conn t = do    msg <- recv conn 2048
+                        when (C.isInfixOf "0300a12905" $ encode msg) $ do
+                            C.putStrLn "done!"
+                            close conn
+                            killThread t
+                        unless (C.isInfixOf "2300e904" $ encode msg) $ listenA' conn t
+                        when (C.isInfixOf "2300e904" $ encode msg) $ do
+                            forM_ (map (armyMisAward) ["1","2","3","4"]) $ \p -> do
+                                sendAll conn p
+                            threadDelay 1000000
+                            forM_ (map (armyMisAccept) ["1","2","3","4"]) $ \p -> do
+                                sendAll conn p
+                            threadDelay 2000000
+                            sendAll conn armyMisSpdUp
+                            sendAll conn armyMisList
+                            listenA' conn t
