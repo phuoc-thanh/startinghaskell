@@ -16,9 +16,9 @@ import Network.Socket.ByteString (recv, sendAll)
 import Control.Monad
 import Control.Concurrent
 
--- CBT ZM39, VNT ZM43, VTM ZM44, HT ZM45, TVK ZM48, KP ZM49, TDLT ZM51
+-- HD ZM40, CBT ZM41, VTM ZM44, HT ZM45, TVK ZM48, KP ZM49, TDLT ZM51
 huntTarget :: ByteString
-huntTarget = "ZM44|ZM51"
+huntTarget = "ZM49|ZM51"
 
 main = do pls <- players
           forM_ pls $ \u -> do
@@ -67,7 +67,7 @@ hunt idx conn  = do threadDelay 100000
                     msg <- recv conn 1024
                     unless (C.isInfixOf "1b14010102" $ encode msg) $ hunt idx conn
                     when (C.isInfixOf "1b14010102" $ encode msg) $ do
-                        threadDelay 3000000
+                        threadDelay 7000000
                         sendAll conn $ goHunt idx
                         msg <- recv conn 1024
                         threadDelay 3000000

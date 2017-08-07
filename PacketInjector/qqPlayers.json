@@ -1,4 +1,125 @@
-[   
+[
+       {
+        "amount": 0,
+        "displayNovice": 1,
+        "chNumber": "2128",
+        "uid": "15376",
+        "key": "dd387155813ed76b1ab6af34bf458911",
+        "defaultsid": "1",
+        "opname": "10",
+        "create_time": 1501853069,
+        "acc": "kdqq11"
+    },
+    {
+        "amount": 0,
+        "displayNovice": 1,
+        "chNumber": "2126",
+        "uid": "15375",
+        "key": "123b896697dc21910d4e8311bc4cb760",
+        "defaultsid": "1",
+        "opname": "10",
+        "create_time": 1501853049,
+        "acc": "kdqq10"
+    },
+    {
+        "amount": 0,
+        "displayNovice": 1,
+        "chNumber": "2124",
+        "uid": "15372",
+        "key": "9059b5000176a514f3e1987d03ac5a36",
+        "defaultsid": "1",
+        "opname": "10",
+        "create_time": 1501853044,
+        "acc": "kdqq09"
+    },
+    {
+        "amount": 0,
+        "displayNovice": 1,
+        "chNumber": "2123",
+        "uid": "15371",
+        "key": "871da9f3b05188d8b8efee01cfe8327e",
+        "defaultsid": "1",
+        "opname": "10",
+        "create_time": 1501853040,
+        "acc": "kdqq08"
+    },
+    {
+        "amount": 0,
+        "displayNovice": 1,
+        "chNumber": "2122",
+        "uid": "15370",
+        "key": "e074cafcc0eff2b433f69aaaf9575d1c",
+        "defaultsid": "1",
+        "opname": "10",
+        "create_time": 1501853036,
+        "acc": "kdqq07"
+    },
+    {
+        "amount": 0,
+        "displayNovice": 1,
+        "chNumber": "2121",
+        "uid": "15369",
+        "key": "95ff91e52ec456eb59cc5ff47631e211",
+        "defaultsid": "1",
+        "opname": "10",
+        "create_time": 1501853028,
+        "acc": "kdqq06"
+    },
+    {
+        "amount": 0,
+        "displayNovice": 1,
+        "chNumber": "2067",
+        "uid": "15309",
+        "key": "ec839a5b73909515963ea49856b2ff6e",
+        "defaultsid": "1",
+        "opname": "10",
+        "create_time": 1501853014,
+        "acc": "kdqq05"
+    },
+    {
+        "amount": 0,
+        "displayNovice": 1,
+        "chNumber": "2062",
+        "uid": "15306",
+        "key": "646d1e92c087be091452cece112c71a0",
+        "defaultsid": "1",
+        "opname": "10",
+        "create_time": 1501853009,
+        "acc": "kdqq04"
+    },
+    {
+        "amount": 0,
+        "displayNovice": 1,
+        "chNumber": "2060",
+        "uid": "15302",
+        "key": "5f965bb3be5b445012089dcd230ca99e",
+        "defaultsid": "1",
+        "opname": "10",
+        "create_time": 1501853004,
+        "acc": "kdqq03"
+    },
+    {
+        "amount": 0,
+        "displayNovice": 1,
+        "chNumber": "2059",
+        "uid": "15300",
+        "key": "5c467d1b9c37c1fcb6852e1ef638b34d",
+        "defaultsid": "1",
+        "opname": "10",
+        "create_time": 1501853000,
+        "acc": "kdqq02"
+    },
+    {
+        "amount": 0,
+        "displayNovice": 1,
+        "chNumber": "2057",
+        "uid": "15299",
+        "key": "3ba5277087dff0dcfe37774f3c539680",
+        "defaultsid": "1",
+        "opname": "10",
+        "create_time": 1501852989,
+        "acc": "kdqq01"
+    },
     {
         "amount": 1,
         "displayNovice": 1,
