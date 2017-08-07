@@ -1,15 +1,5 @@
 [
-       {
-        "amount": 0,
-        "displayNovice": 1,
-        "chNumber": "2128",
-        "uid": "15376",
-        "key": "dd387155813ed76b1ab6af34bf458911",
-        "defaultsid": "1",
-        "opname": "10",
-        "create_time": 1501853069,
-        "acc": "kdqq11"
-    },
+
     {
         "amount": 0,
         "displayNovice": 1,
@@ -35,17 +25,6 @@
     {
         "amount": 0,
         "displayNovice": 1,
-        "chNumber": "2123",
-        "uid": "15371",
-        "key": "871da9f3b05188d8b8efee01cfe8327e",
-        "defaultsid": "1",
-        "opname": "10",
-        "create_time": 1501853040,
-        "acc": "kdqq08"
-    },
-    {
-        "amount": 0,
-        "displayNovice": 1,
         "chNumber": "2122",
         "uid": "15370",
         "key": "e074cafcc0eff2b433f69aaaf9575d1c",
@@ -57,17 +36,6 @@
     {
         "amount": 0,
         "displayNovice": 1,
-        "chNumber": "2121",
-        "uid": "15369",
-        "key": "95ff91e52ec456eb59cc5ff47631e211",
-        "defaultsid": "1",
-        "opname": "10",
-        "create_time": 1501853028,
-        "acc": "kdqq06"
-    },
-    {
-        "amount": 0,
-        "displayNovice": 1,
         "chNumber": "2067",
         "uid": "15309",
         "key": "ec839a5b73909515963ea49856b2ff6e",
@@ -75,17 +43,6 @@
         "opname": "10",
         "create_time": 1501853014,
         "acc": "kdqq05"
-    },
-    {
-        "amount": 0,
-        "displayNovice": 1,
-        "chNumber": "2062",
-        "uid": "15306",
-        "key": "646d1e92c087be091452cece112c71a0",
-        "defaultsid": "1",
-        "opname": "10",
-        "create_time": 1501853009,
-        "acc": "kdqq04"
     },
     {
         "amount": 0,
@@ -196,17 +153,6 @@
         "opname": "10",
         "create_time": 1501126014,
         "acc": "kdqq13"
-    },
-    {
-        "amount": 1,
-        "displayNovice": 1,
-        "chNumber": "2576",
-        "uid": "16343",
-        "key": "8c4520595a12ffb13c42ed4329bb0df2",
-        "defaultsid": "1",
-        "opname": "10",
-        "create_time": 1501126007,
-        "acc": "kdqq12"
     },
     {
         "amount": 1,

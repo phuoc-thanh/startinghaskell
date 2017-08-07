@@ -13,7 +13,7 @@ import Data.ByteString (ByteString)
 
 getServerInfo :: String -> IO Server
 getServerInfo i = do
-    serverinfos <- parseFile "ServerInfoQQ.json" :: IO (Maybe [Server])
+    serverinfos <- parseFile "ServerInfo.json" :: IO (Maybe [Server])
     return $ head $ filter (\s -> (sid s) == i) (fromJust $ serverinfos)
 
 getMatch :: String -> IO Match

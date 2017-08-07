@@ -11,4 +11,4 @@ Learning Haskell with CIS-194 Spring 2015
 
 4. Install Haskell Syntax Highlighting, Haskell ghc-mod Extension (search on VS Code)
 
-5. Network package: network http-conduit tcp-streams base16-bytestring split aeson-pretty
+5. Network package: network http-conduit base16-bytestring split aeson-pretty
