@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -Wall #-}
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE BangPatterns #-}
 module HW06 where
 
 import Data.List
@@ -69,19 +69,29 @@ rand s = Cons c $ rand c
 
 -- Exercise 8 -----------------------------------------
 
-{- Total Memory in use: ??? MB -}
+{- Total Memory in use: 223 MB -}
 minMaxSlow :: [Int] -> Maybe (Int, Int)
 minMaxSlow [] = Nothing   -- no min or max if there are no elements
 minMaxSlow xs = Just (minimum xs, maximum xs)
 
 -- Exercise 9 -----------------------------------------
 
-{- Total Memory in use: ??? MB -}
+{- Total Memory in use: 1 MB -}
 minMax :: [Int] -> Maybe (Int, Int)
-minMax = undefined
+minMax = go Nothing where
+    go p []      = p
+    go !p (x:xs) = go (comp p x) xs
+
+comp :: Ord t => Maybe (t, t) -> t -> Maybe (t, t)    
+comp p x = case p of
+    Nothing -> Just (x, x)
+    Just (mi, ma)
+        | x < mi -> Just (x, ma)
+        | x > ma -> Just (mi, x)
+        | otherwise -> Just (mi, ma)
 
 main :: IO ()
-main = print $ minMaxSlow $ sTake 1000000 $ rand 7666532
+main = print $ minMax $ sTake 1000000 $ rand 7666532
 
 -- Exercise 10 ----------------------------------------
 

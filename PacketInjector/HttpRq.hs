@@ -17,6 +17,21 @@ import Network.HTTP.Simple
 loginVerifyURI = "/jinyong/vega/loginVerify"
 checkUserURI = "/payclient.ashx?op=CheckUser"
 getUserURI = "/payclient.ashx?op=GetUser"
+addCoinURI = "/payclient.ashx?op=AddCoin"
+
+-- addCoinRq :: ByteString -> ByteString -> Request
+addCoinRq       = setRequestPath addCoinURI
+                $ setRequestHost payHost
+                $ setRequestBodyLBS addCoinBody
+                $ setRequestMethod "POST"
+                $ defaultRequest
+
+addCoinBody     = C.append "userId=22364"
+                $ C.append "&session=e8009d74-9121-4fe6-99ae-f0d12cfa651b"
+                "&amount=1&gameServerId=1&serverMode=UNKNOWN&roleId=0&gameId=46"
+addCoin :: IO ByteString
+addCoin = do response <- httpLBS addCoinRq
+             return $ getResponseBody response
 
 -- apiHost = "api.alv.gaba.vn"
 apiHost = "api.kimdungqq.com"
