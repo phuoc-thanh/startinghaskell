@@ -88,3 +88,26 @@ listenA' conn t = do    msg <- recv conn 2048
                             sendAll conn armyMisSpdUp
                             sendAll conn armyMisList
                             listenA' conn t
+
+lvlup = do u <- getPlayer "itunes18"
+           conn <- joinWorld u
+           sendAll conn copyC01B02
+           sendAll conn copyBlock
+           listenU conn
+           
+listenU conn = do threadDelay 100000
+                  msg <- recv conn 2048
+                  unless (C.isInfixOf "0d00440700" $ encode msg) $ listenU conn
+                  when (C.isInfixOf "0d00440700" $ encode msg) $ do
+                  sendAll conn copyC01B03
+                  sendAll conn copyBlock
+                  listenU1 conn
+
+listenU1 conn = do threadDelay 100000
+                   msg <- recv conn 2048
+                   unless (C.isInfixOf "0d00440700" $ encode msg) $ listenU1 conn
+                   when (C.isInfixOf "0d00440700" $ encode msg) $ do
+                   sendAll conn copyC01B04                 
+                   sendAll conn copyBlock
+--0d0044070043303142303200010000|DC01B02                  
+--0d0044070043303142303300010000|DC01B03
