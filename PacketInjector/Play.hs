@@ -19,17 +19,18 @@ sendP uname n = do user <- getPlayer uname
                    sendNTimes n conn tPacket
                    close conn
 
-armyMis :: IO ()                  
-armyMis = do bUsers <- players
-             forM_ bUsers $ \u -> do
+armyMis_ :: IO ()                  
+armyMis_ = do bUsers <- players
+              forM_ bUsers $ \u -> do
                 forkIO $ do
                     tid <- myThreadId
                     conn <- joinWorld u
                     sendAll conn (armyRequest "3")
+                    -- sendAll conn (armyRequest "1000218")
                     requestA conn tid
 
-armyMis' :: IO ()                  
-armyMis' = do bUsers <- players
+armyMis :: IO ()                  
+armyMis  = do bUsers <- players
               forM_ bUsers $ \u -> do
                 forkIO $ do
                     tid <- myThreadId

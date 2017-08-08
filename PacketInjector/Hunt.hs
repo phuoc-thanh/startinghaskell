@@ -18,7 +18,7 @@ import Control.Concurrent
 
 -- HD 40, MDP ZM39, CBT ZM41, VTM ZM44, HT ZM45, TVK ZM48, KP ZM49, TDLT ZM51
 huntTarget :: ByteString
-huntTarget = "ZM49"
+huntTarget = "ZM40|ZM49|ZM51"
 
 main = do pls <- players
           forM_ pls $ \u -> do
@@ -64,7 +64,7 @@ hunt' idx conn = do threadDelay 1000000
 
 
 hunt :: ByteString -> Socket -> ThreadId -> IO ()                               
-hunt idx conn t = do threadDelay 100000
+hunt idx conn t = do threadDelay 1000000
                      msg <- recv conn 1024
                      unless (C.isInfixOf "1b14010102" $ encode msg) $ hunt idx conn t
                      when (C.isInfixOf "1b14010102" $ encode msg) $ do
