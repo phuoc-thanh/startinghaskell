@@ -35,6 +35,7 @@ armyMis  = do bUsers <- players
                 forkIO $ do
                     tid <- myThreadId
                     conn <- joinWorld u
+                    sendAll conn armyBase
                     sendAll conn armyReward
                     sendAll conn armyMisList
                     listenA' conn tid
@@ -50,7 +51,7 @@ requestA conn t = do threadDelay 2000000
                     
 
 listenA :: Socket -> ThreadId -> IO ()              
-listenA conn t = do threadDelay 1000000
+listenA conn t = do threadDelay 2000000
                     msg <- recv conn 2048
                     when (C.isInfixOf "0300a12905" $ encode msg) $ do
                         sendAll conn armyExit
@@ -60,6 +61,8 @@ listenA conn t = do threadDelay 1000000
                         killThread t
                     unless (C.isInfixOf "2300e904" $ encode msg) $ listenA conn t
                     when (C.isInfixOf "2300e904" $ encode msg) $ do
+                        sendAll conn armyBase
+                        threadDelay 200000
                         forM_ (map (armyMisAward) ["1","2","3","4"]) $ \p -> do
                             sendAll conn p
                         threadDelay 1000000
@@ -72,7 +75,8 @@ listenA conn t = do threadDelay 1000000
                         listenA conn t
                     
 listenA' :: Socket -> ThreadId -> IO ()              
-listenA' conn t = do    msg <- recv conn 2048
+listenA' conn t = do    threadDelay 200000
+                        msg <- recv conn 2048
                         when (C.isInfixOf "0300a12905" $ encode msg) $ do
                             C.putStrLn "done!"
                             close conn

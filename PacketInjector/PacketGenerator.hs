@@ -11,6 +11,10 @@ rankReward :: ByteString
 rankReward = C.append (hexSerialize $ C.length s) s
                 where s = "rankList reward 8\NUL"
 
+armyBase :: ByteString
+armyBase = C.append (hexSerialize $ C.length s) s
+                where s = "army base 0\NUL"
+
 armyReward :: ByteString 
 armyReward = C.append (hexSerialize $ C.length s) s
                 where s = "army armyFoundation_award\NUL"
