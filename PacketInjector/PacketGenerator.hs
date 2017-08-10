@@ -77,16 +77,35 @@ goHunt idx = C.append (hexSerialize $ C.length s) s
                 where s = C.append "teamHunt 10 "
                         $ C.append  idx "\NUL" 
 
+newUser :: ByteString -> ByteString
+newUser uname = C.append (hexEnterSerialize $ C.length s) s
+                where s = C.append "new_user "
+                        $ C.append  uname " 1 2\NUL" 
+
 chapter :: ByteString -> ByteString                
 chapter c = C.append (hexSerialize $ C.length s) s
                 where s = C.append "copy enter "
                         $ C.append  c " 1\NUL"
+
+xchapter :: ByteString -> ByteString                
+xchapter c = C.append (hexSerialize $ C.length s) s
+                where s = C.append "xb_copy enter "
+                        $ C.append  c "\NUL"                        
                                          
 copyBlock :: ByteString
 copyBlock = C.append (hexSerialize $ C.length s) s
                 where s = "copy block\NUL"
+
+firstReward :: ByteString                
+firstReward = C.append (hexSerialize $ C.length s) s
+                where s = "activity_reward 326 0\NUL"
+
+useEnergy :: ByteString                
+useEnergy = C.append (hexSerialize $ C.length s) s
+                where s = "prop_use 1022 2\NUL"               
                 
-choiceCombat0 = C.append (hexSerialize $ C.length s) s
-                    where s = "choice_combat 0| 344716#| -1\NUL"
+choiceCombat idx = C.append (hexSerialize $ C.length s) s
+                    where s = C.append "choice_combat 0| "
+                            $ C.append idx "#| -1\NUL"
 
                     
