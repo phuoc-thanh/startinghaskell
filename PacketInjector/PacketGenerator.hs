@@ -19,7 +19,6 @@ armyReward :: ByteString
 armyReward = C.append (hexSerialize $ C.length s) s
                 where s = "army armyFoundation_award\NUL"
 
-                --
 armyMisAward :: ByteString -> ByteString
 armyMisAward n = C.append (hexSerialize $ C.length s) s
                     where s = C.append "army misaward "
@@ -78,27 +77,16 @@ goHunt idx = C.append (hexSerialize $ C.length s) s
                 where s = C.append "teamHunt 10 "
                         $ C.append  idx "\NUL" 
 
-copyC01B01 = C.append (hexSerialize $ C.length s) s
-                where s = "copy enter C01B01 1\NUL"
-
-copyC01B02 = C.append (hexSerialize $ C.length s) s
-                where s = "copy enter C01B02 1\NUL"
-copyC01B03 = C.append (hexSerialize $ C.length s) s
-                where s = "copy enter C01B03 1\NUL"
-copyC01B04 = C.append (hexSerialize $ C.length s) s
-                where s = "copy enter C01B04 1\NUL"                
-                
+chapter :: ByteString -> ByteString                
+chapter c = C.append (hexSerialize $ C.length s) s
+                where s = C.append "copy enter "
+                        $ C.append  c " 1\NUL"
+                                         
+copyBlock :: ByteString
 copyBlock = C.append (hexSerialize $ C.length s) s
                 where s = "copy block\NUL"
                 
 choiceCombat0 = C.append (hexSerialize $ C.length s) s
                     where s = "choice_combat 0| 344716#| -1\NUL"
 
-clientGuide1 = C.append (hexSerialize $ C.length s) s
-                where s = "client guide1\NUL" 
-
-clientGuide2 = C.append (hexSerialize $ C.length s) s
-                where s = "client guide2\NUL" 
-clientGuide15 = C.append (hexSerialize $ C.length s) s
-                where s = "client guide15\NUL" 
                     

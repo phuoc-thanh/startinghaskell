@@ -7,6 +7,7 @@ import PacketGenerator
 import qualified Data.ByteString.Char8 as C
 import Data.ByteString (ByteString)
 import Data.ByteString.Base16
+-- import Data.List
 import Network.Socket hiding (send, recv)
 import Network.Socket.ByteString (recv, sendAll)
 import Control.Monad
@@ -93,25 +94,23 @@ listenA' conn t = do    threadDelay 200000
                             sendAll conn armyMisList
                             listenA' conn t
 
-lvlup = do u <- getPlayer "itunes18"
-           conn <- joinWorld u
-           sendAll conn copyC01B02
-           sendAll conn copyBlock
-           listenU conn
-           
-listenU conn = do threadDelay 100000
-                  msg <- recv conn 2048
-                  unless (C.isInfixOf "0d00440700" $ encode msg) $ listenU conn
-                  when (C.isInfixOf "0d00440700" $ encode msg) $ do
-                  sendAll conn copyC01B03
-                  sendAll conn copyBlock
-                  listenU1 conn
+chapterOne = map (chapter) ["C01B02","C01B03","C01B04","C01B05","C01B06","C01B07","C01B08"]
+chapterTwo = map (chapter) ["C02B01","C02B02","C02B03","C02B04","C02B05","C02B05","C02B07","C02B08","C02B09","C02B10"]
 
-listenU1 conn = do threadDelay 100000
-                   msg <- recv conn 2048
-                   unless (C.isInfixOf "0d00440700" $ encode msg) $ listenU1 conn
-                   when (C.isInfixOf "0d00440700" $ encode msg) $ do
-                   sendAll conn copyC01B04                 
-                   sendAll conn copyBlock
---0d0044070043303142303200010000|DC01B02                  
---0d0044070043303142303300010000|DC01B03
+
+lvlup = do u <- getPlayer "itunes23"
+           conn <- joinWorld u
+           sendAll conn $ chapter "C01B02"
+           listenU conn chapterTwo
+
+listenU :: Socket -> [ByteString] -> IO ()           
+listenU conn [] = do threadDelay 2000000
+                     C.putStrLn "done!"
+                     close conn
+listenU conn chapter = do  threadDelay 4000000
+                           msg <- recv conn 2048
+                           unless (C.isInfixOf "0d00440700" $ encode msg) $ listenU conn chapter
+                           when (C.isInfixOf "0d00440700" $ encode msg) $ do
+                           sendAll conn copyBlock
+                           sendAll conn $ head chapter
+                           listenU conn $ tail chapter
