@@ -49,7 +49,12 @@ adp u p = do pl <- login u p
 adb :: String -> String -> IO ()
 adb u p = do pl <- login u p
              pls <- buffPls
-             appendJSON "Buffs.json" (pl:pls)          
+             appendJSON "Buffs.json" (pl:pls)
+             
+adc :: String -> String -> IO ()
+adc u p = do pl <- login u p
+             pls <- buffPls
+             appendJSON "Clone.json" (pl:pls)             
 
 login :: String -> String -> IO Player
 login u p = do res <- loginVerify u p
@@ -65,6 +70,16 @@ login u p = do res <- loginVerify u p
                                (create_time res) (key res) 
                                (show . getChNumber $ encode msg)
                                (amount res)
+
+reg u p s = do res <- regAccount u p
+               uServer <- getServerInfo s
+               addrinfos <- getAddrInfo Nothing (Just $ ip uServer) (Just $ port uServer)
+               let serveraddr = head addrinfos
+               sock <- socket (addrFamily serveraddr) Stream defaultProtocol
+               connect sock (addrAddress serveraddr)
+               sendAll sock $ loginData res
+               msg <- recv sock 256
+               return sock
 
 joinWorld :: Player -> IO Socket
 joinWorld user = do uServer <- getServerInfo (defaultsid $ user)

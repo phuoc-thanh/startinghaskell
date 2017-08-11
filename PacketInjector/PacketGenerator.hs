@@ -102,8 +102,9 @@ firstReward = C.append (hexSerialize $ C.length s) s
 
 useEnergy :: ByteString                
 useEnergy = C.append (hexSerialize $ C.length s) s
-                where s = "prop_use 1022 2\NUL"               
+                where s = "prop_use 1022 2\NUL"
                 
+choiceCombat :: ByteString -> ByteString                
 choiceCombat idx = C.append (hexSerialize $ C.length s) s
                     where s = C.append "choice_combat 0| "
                             $ C.append idx "#| -1\NUL"

@@ -99,88 +99,90 @@ chapterTwo = map (chapter) ["C02B01","C02B02","C02B03","C02B04","C02B05","C02B06
 chapterThree = take 20 . repeat $ (chapter "C03B01")
 xchapterOne = map (xchapter) ["XB01B02","XB01B03","XB01B04","XB01B05"]
 
-lvlup = do u <- getPlayer "itunes35"
-           conn <- joinWorld u
-           sendAll conn $ chapter "C01B02"
-           listenU conn (chapterOne ++ chapterTwo)
+lvlup u  p = do pl <- login u p
+                conn <- joinWorld pl
+                sendAll conn $ chapter "C01B01"
+                combat conn
 
-listenU :: Socket -> [ByteString] -> IO ()           
-listenU conn [] = do threadDelay 2000000
+goPtOne :: Socket -> [ByteString] -> IO ()           
+goPtOne conn [] = do threadDelay 2000000
                      sendAll conn $ xchapter "XB01B01"
-                     listenX conn xchapterOne
-listenU conn chapter = do  threadDelay 4000000
+                     goPtTwo conn xchapterOne
+goPtOne conn chapter = do  threadDelay 4000000
                            msg <- recv conn 2048
-                           unless (C.isInfixOf "0d00440700" $ encode msg) $ listenU conn chapter
+                           unless (C.isInfixOf "0d00440700" $ encode msg) $ goPtOne conn chapter
                            when (C.isInfixOf "0d00440700" $ encode msg) $ do
                                sendAll conn copyBlock
                                sendAll conn $ head chapter
-                               listenU conn $ tail chapter
+                               goPtOne conn $ tail chapter
 
-listenX :: Socket -> [ByteString] -> IO ()           
-listenX conn [] = do threadDelay 2000000
+goPtTwo :: Socket -> [ByteString] -> IO ()           
+goPtTwo conn [] = do threadDelay 2000000
                      sendAll conn $ chapter "C03B01"
-                     loopC03 conn chapterThree
-listenX conn chapter = do  threadDelay 4000000
+                     goPtThree conn chapterThree
+goPtTwo conn chapter = do  threadDelay 4000000
                            msg <- recv conn 2048
-                           unless (C.isInfixOf "0d00440700" $ encode msg) $ listenX conn chapter
+                           unless (C.isInfixOf "0d00440700" $ encode msg) $ goPtTwo conn chapter
                            when (C.isInfixOf "0d00440700" $ encode msg) $ do
                                sendAll conn copyBlock
                                sendAll conn $ head chapter
-                               listenX conn $ tail chapter
+                               goPtTwo conn $ tail chapter
 
-loopC03 :: Socket -> [ByteString] -> IO ()           
-loopC03 conn [] = do threadDelay 2000000
-                     sendAll conn firstReward
-                     threadDelay 2000000
-                     sendAll conn useEnergy
-                     threadDelay 2000000
-                     sendAll conn $ chapter "C03B01"
-                     loopC04 conn chapterThree
-loopC03 conn chapter = do threadDelay 3000000
-                          msg <- recv conn 2048
-                          unless (C.isInfixOf "0d00440700" $ encode msg) $ loopC03 conn chapter
-                          when (C.isInfixOf "0d00440700" $ encode msg) $ do
+goPtThree :: Socket -> [ByteString] -> IO ()           
+goPtThree conn [] = do threadDelay 2000000
+                       sendAll conn firstReward
+                       threadDelay 2000000
+                       sendAll conn useEnergy
+                       threadDelay 2000000
+                       sendAll conn $ chapter "C03B01"
+                       goPtFour conn chapterThree
+goPtThree conn chapter = do threadDelay 3000000
+                            msg <- recv conn 2048
+                            unless (C.isInfixOf "0d00440700" $ encode msg) $ goPtThree conn chapter
+                            when (C.isInfixOf "0d00440700" $ encode msg) $ do
                               sendAll conn copyBlock
                               sendAll conn $ head chapter
-                              loopC03 conn $ tail chapter
+                              goPtThree conn $ tail chapter
 
-loopC04 :: Socket -> [ByteString] -> IO ()           
-loopC04 conn [] = do threadDelay 2000000
-                     C.putStrLn "done!"
-                     close conn
-loopC04 conn chapter = do threadDelay 3000000
-                          msg <- recv conn 2048
-                          unless (C.isInfixOf "0d00440700" $ encode msg) $ loopC04 conn chapter
-                          when (C.isInfixOf "0d00440700" $ encode msg) $ do
-                              sendAll conn copyBlock
-                              sendAll conn $ head chapter
-                              loopC04 conn $ tail chapter                          
+goPtFour :: Socket -> [ByteString] -> IO ()           
+goPtFour conn [] = do threadDelay 2000000
+                      C.putStrLn "done!"
+                      close conn
+goPtFour conn chapter = do threadDelay 3000000
+                           msg <- recv conn 2048
+                           unless (C.isInfixOf "0d00440700" $ encode msg) $ goPtFour conn chapter
+                           when (C.isInfixOf "0d00440700" $ encode msg) $ do
+                               sendAll conn copyBlock
+                               sendAll conn $ head chapter
+                               goPtFour conn $ tail chapter                          
 
 lastN :: Int -> ByteString -> ByteString
 lastN n xs = C.drop (C.length xs - n) xs
 
-tanker :: ByteString -> Integer
-tanker xs = 25 + (read . concat . ("0x":) . reverse . chunksOf 2 . C.unpack . C.take 8 $ lastN 6 xs)
+eCombat :: ByteString -> Integer
+eCombat = read . concat . ("0x":) . reverse . chunksOf 2 . C.unpack . lastN 6
 
-lvlup_ = do u <- getPlayer "itunes46"
-            conn <- joinWorld u
-            sendAll conn $ chapter "C01B01"
-            combat conn
+newChNumber :: ByteString -> Integer
+newChNumber = read . concat . ("0x":) . reverse . chunksOf 2 . C.unpack . C.take 6 . C.drop 6
 
-figo conn = do   threadDelay 100000
-                 msg <- recv conn 2048
-                 unless (C.isInfixOf "0d00440700" $ encode msg) $ figo conn
-                 when (C.isInfixOf "0d00440700" $ encode msg) $ do
-                    sendAll conn copyBlock
-                    combat conn
+lvlup_ u p = do pl <- login u p
+                conn <- joinWorld pl
+                sendAll conn $ chapter "C01B01"
+                combat conn
 
-combat conn = do threadDelay 1000000
-                 msg <- recv conn 2048
-                 unless (C.isInfixOf "0002000000" $ encode msg) $ combat conn
-                 when (C.isInfixOf "0002000000" $ encode msg) $ do
-                    C.putStrLn $ fst $ C.breakSubstring "0002000000" (encode msg)
-                    sendAll conn $ choiceCombat (C.pack . show . tanker $ fst $ C.breakSubstring "0002000000" $ encode msg)
+combat conn = do threadDelay 2000000
+                 msg <- recv conn 1024
+                 unless (C.isInfixOf "0090130000" $ encode msg) $ combat conn
+                 when (C.isInfixOf "0090130000" $ encode msg) $ do
+                    sendAll conn $ choiceCombat (C.pack . show . eCombat $ fst $ C.breakSubstring "0090130000" $ encode msg)
                     threadDelay 2000000
-                    close conn
+                    sendAll conn copyBlock
+                    sendAll conn $ chapter "C01B02"
+                    goPtOne conn (chapterOne ++ chapterTwo)
 
---0300aa0e01                          
+cChar u p s = do 
+    conn <- reg u p s
+    sendAll conn $ newUser (C.pack u)
+    msg <- recv conn 256
+    C.putStrLn $ encode msg
+    C.putStrLn $ C.pack $ show $ newChNumber (encode msg)
