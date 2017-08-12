@@ -4,6 +4,8 @@ module Play where
 
 import Injector
 import PacketGenerator
+import Parser hiding (encode, decode)
+import Serializer (hexDeserialize)
 import qualified Data.ByteString.Char8 as C
 import Data.ByteString (ByteString)
 import Data.ByteString.Base16
@@ -99,10 +101,9 @@ chapterTwo = map (chapter) ["C02B01","C02B02","C02B03","C02B04","C02B05","C02B06
 chapterThree = take 20 . repeat $ (chapter "C03B01")
 xchapterOne = map (xchapter) ["XB01B02","XB01B03","XB01B04","XB01B05"]
 
-lvlup u  p = do pl <- login u p
-                conn <- joinWorld pl
-                sendAll conn $ chapter "C01B01"
-                combat conn
+lvlup pl = do conn <- joinWorld pl
+              sendAll conn $ chapter "C01B01"
+              combat conn
 
 goPtOne :: Socket -> [ByteString] -> IO ()           
 goPtOne conn [] = do threadDelay 2000000
@@ -160,15 +161,7 @@ lastN :: Int -> ByteString -> ByteString
 lastN n xs = C.drop (C.length xs - n) xs
 
 eCombat :: ByteString -> Integer
-eCombat = read . concat . ("0x":) . reverse . chunksOf 2 . C.unpack . lastN 6
-
-newChNumber :: ByteString -> Integer
-newChNumber = read . concat . ("0x":) . reverse . chunksOf 2 . C.unpack . C.take 6 . C.drop 6
-
-lvlup_ u p = do pl <- login u p
-                conn <- joinWorld pl
-                sendAll conn $ chapter "C01B01"
-                combat conn
+eCombat = hexDeserialize . lastN 6
 
 combat conn = do threadDelay 2000000
                  msg <- recv conn 1024
@@ -180,9 +173,18 @@ combat conn = do threadDelay 2000000
                     sendAll conn $ chapter "C01B02"
                     goPtOne conn (chapterOne ++ chapterTwo)
 
+regString = zipWith (++) (repeat "revive") (map show [11..22])
+                
+massReg (x:xs) = do cChar x "123456" "1"
+                    massReg xs              
+
 cChar u p s = do 
-    conn <- reg u p s
-    sendAll conn $ newUser (C.pack u)
-    msg <- recv conn 256
-    C.putStrLn $ encode msg
-    C.putStrLn $ C.pack $ show $ newChNumber (encode msg)
+    pl <- reg u p s
+    pls <- cPls
+    appendJSON "Clone.json" (pl:pls)
+
+lvlup_ = do pl <- cPls
+            forM_ pl $ \u -> do
+                forkIO $ do
+                    lvlup u
+                    --75/76/80

@@ -18,7 +18,7 @@ import Control.Concurrent
 
 -- HD ZM40, MDP ZM39, CBT ZM41, VNT ZM43, VTM ZM44, HT ZM45, TVK ZM48, KP ZM49, TDLT ZM51
 huntTarget :: ByteString
-huntTarget = "ZM48|ZM49|ZM51"
+huntTarget = "|ZM49|"
 
 main = do pls <- players
           forM_ pls $ \u -> do

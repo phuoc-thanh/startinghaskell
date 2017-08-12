@@ -20,7 +20,6 @@ getUserURI = "/payclient.ashx?op=GetUser"
 regUserURI = "/payclient.ashx?op=RegisterUser"
 addCoinURI = "/payclient.ashx?op=AddCoin"
 
---partnerId=0&userName=itunes55&session=681fd11a-1aaa-448c-9fa6-a867a8113e9d&device_user=&deviceId=30b5c285e4788278&device=ZTE+N918St&serverMode=UNKNOWN&os=android&mobile=&hash=d4af4a6ee26dcb6a5147a20163f74459&email=&password=666666&refcode=0&gameId=46
 -- apiHost = "api.alv.gaba.vn"
 apiHost = "api.kimdungqq.com"
 -- apiHost = "api.kd.gaba.vn"

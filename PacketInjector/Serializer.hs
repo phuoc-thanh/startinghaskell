@@ -5,6 +5,7 @@ module Serializer where
 
 import qualified Data.ByteString.Char8 as C
 import Data.ByteString.Base16
+import Data.List.Split
 import Numeric
 
 
@@ -18,6 +19,9 @@ decToHex :: (Show a, Integral a) => a -> C.ByteString
 decToHex c
     | c < 16 = C.append "0" . C.pack $ showHex c ""
     | otherwise = C.pack $ showHex c ""
+
+hexDeserialize :: C.ByteString -> Integer
+hexDeserialize = read . concat . ("0x":) . reverse . chunksOf 2 . C.unpack
 
 hexSerialize' :: (Show a, Integral a) => a -> C.ByteString
 hexSerialize' d = C.append (decToHex (d + 4))

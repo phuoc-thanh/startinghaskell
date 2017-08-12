@@ -3,6 +3,7 @@
 module Injector where
 import Authenticator
 import HttpRq
+import PacketGenerator (newUser)
 import Parser hiding (encode)
 import Network.Socket hiding (send, recv)
 import Network.Socket.ByteString (send, recv, sendAll)
@@ -31,6 +32,11 @@ buffPls = do
     pls <- parseFile "Buffs.json" :: IO (Maybe [Player])
     return $ fromJust pls
     
+cPls :: IO [Player]
+cPls = do
+    pls <- parseFile "Clone.json" :: IO (Maybe [Player])
+    return $ fromJust pls
+
 getPlayer :: String -> IO Player    
 getPlayer uname = do
     users <- parseFile "Players.json" :: IO (Maybe [Player])
@@ -53,7 +59,7 @@ adb u p = do pl <- login u p
              
 adc :: String -> String -> IO ()
 adc u p = do pl <- login u p
-             pls <- buffPls
+             pls <- cPls
              appendJSON "Clone.json" (pl:pls)             
 
 login :: String -> String -> IO Player
@@ -66,8 +72,8 @@ login u p = do res <- loginVerify u p
                sendAll sock $ loginData res
                msg <- recv sock 256
                close sock
-               return $ Player u (uid res) (opname res) (defaultsid res) (displayNovice res) 
-                               (create_time res) (key res) 
+               return $ Player u (uid res) (opname res) (defaultsid res)
+                               (displayNovice res) (create_time res) (key res) 
                                (show . getChNumber $ encode msg)
                                (amount res)
 
@@ -77,9 +83,14 @@ reg u p s = do res <- regAccount u p
                let serveraddr = head addrinfos
                sock <- socket (addrFamily serveraddr) Stream defaultProtocol
                connect sock (addrAddress serveraddr)
-               sendAll sock $ loginData res
+               sendAll sock $ regData res (C.pack s)
+               recv sock 256
+               sendAll sock $ newUser (C.pack u)
                msg <- recv sock 256
-               return sock
+               return $ Player u (uid res) (opname res) s
+                               (displayNovice res) (create_time res) (key res)
+                               (show . newChNumber $ encode msg)
+                               (amount res)
 
 joinWorld :: Player -> IO Socket
 joinWorld user = do uServer <- getServerInfo (defaultsid $ user)
