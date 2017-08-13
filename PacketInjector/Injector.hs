@@ -87,10 +87,11 @@ reg u p s = do res <- regAccount u p
                recv sock 256
                sendAll sock $ newUser (C.pack u)
                msg <- recv sock 256
+               let chN = show . newChNumber $ encode msg
+               sendAll sock $ enterW (C.pack $ uid res) (C.pack chN)
                return $ Player u (uid res) (opname res) s
                                (displayNovice res) (create_time res) (key res)
-                               (show . newChNumber $ encode msg)
-                               (amount res)
+                               chN (amount res)
 
 joinWorld :: Player -> IO Socket
 joinWorld user = do uServer <- getServerInfo (defaultsid $ user)

@@ -18,7 +18,7 @@ import Control.Concurrent
 
 -- HD ZM40, MDP ZM39, CBT ZM41, VNT ZM43, VTM ZM44, HT ZM45, TVK ZM48, KP ZM49, TDLT ZM51
 huntTarget :: ByteString
-huntTarget = "|ZM49|"
+huntTarget = "ZM49|ZM51"
 
 main = do pls <- players
           forM_ pls $ \u -> do
@@ -29,7 +29,8 @@ main = do pls <- players
                 listenM conn tid
 
 listenM :: Socket -> ThreadId -> IO ()              
-listenM conn t = do msg <- recv conn 2048
+listenM conn t = do threadDelay 2000000
+                    msg <- recv conn 2048
                     unless (C.isInfixOf "ZM" msg) $ listenM conn t
                     when (C.isInfixOf "ZM" msg) $ do
                         let h = tail . map (C.pack . take 4) $ split (startsWith "ZM") $ C.unpack msg

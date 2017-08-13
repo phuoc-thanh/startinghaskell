@@ -20,8 +20,11 @@ d123String = " 123 "
 getChNumber :: ByteString -> Integer
 getChNumber = hexDeserialize . C.take 8 . C.drop 14
 
+-- newChNumber :: ByteString -> Integer
+-- newChNumber = hexDeserialize . C.take 6 . C.drop 6
+
 newChNumber :: ByteString -> Integer
-newChNumber = hexDeserialize . C.take 6 . C.drop 6
+newChNumber = hexDeserialize . C.take 8 . C.drop 6
 
 loginData :: Player -> ByteString
 loginData u = C.append (hexLoginSerialize $ C.length loginString) loginString

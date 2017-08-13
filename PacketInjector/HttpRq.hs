@@ -18,7 +18,6 @@ loginVerifyURI = "/jinyong/vega/loginVerify"
 checkUserURI = "/payclient.ashx?op=CheckUser"
 getUserURI = "/payclient.ashx?op=GetUser"
 regUserURI = "/payclient.ashx?op=RegisterUser"
-addCoinURI = "/payclient.ashx?op=AddCoin"
 
 -- apiHost = "api.alv.gaba.vn"
 apiHost = "api.kimdungqq.com"
