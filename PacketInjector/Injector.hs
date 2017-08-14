@@ -9,12 +9,14 @@ import Network.Socket hiding (send, recv)
 import Network.Socket.ByteString (send, recv, sendAll)
 import Data.ByteString.Base16
 import Data.Maybe
+import Control.Monad
+import Control.Concurrent
 import qualified Data.ByteString.Char8 as C
 import Data.ByteString (ByteString)
 
 getServerInfo :: String -> IO Server
 getServerInfo i = do
-    serverinfos <- parseFile "ServerInfoQQ.json" :: IO (Maybe [Server])
+    serverinfos <- parseFile "ServerInfo.json" :: IO (Maybe [Server])
     return $ head $ filter (\s -> (sid s) == i) (fromJust $ serverinfos)
 
 getMatch :: String -> IO Match
@@ -60,15 +62,28 @@ adb u p = do pl <- login u p
 adc :: String -> String -> IO ()
 adc u p = do pl <- login u p
              pls <- cPls
-             appendJSON "Clone.json" (pl:pls)             
+             appendJSON "Clone.json" (pl:pls)
+
+connect_ :: HostName -> ServiceName -> IO Socket
+connect_ host port = do 
+    addrinfos <- getAddrInfo Nothing (Just $ host) (Just $ port)
+    let serveraddr = head addrinfos
+    sock <- socket (addrFamily serveraddr) Stream defaultProtocol
+    connect sock (addrAddress serveraddr)
+    return sock
+
+waitfor :: ByteString -> Socket -> t -> (ByteString -> Socket -> t -> IO ()) -> IO ()
+waitfor str conn tid f = do 
+    threadDelay 1000000
+    msg <- recv conn 1024
+    let m = C.isInfixOf str msg
+    unless m $ waitfor str conn tid f
+    when m $ f msg conn tid
 
 login :: String -> String -> IO Player
 login u p = do res <- loginVerify u p
                uServer <- getServerInfo (defaultsid res)
-               addrinfos <- getAddrInfo Nothing (Just $ ip uServer) (Just $ port uServer)
-               let serveraddr = head addrinfos
-               sock <- socket (addrFamily serveraddr) Stream defaultProtocol
-               connect sock (addrAddress serveraddr)
+               sock <- connect_ (ip uServer) (port uServer)
                sendAll sock $ loginData res
                msg <- recv sock 256
                close sock
@@ -77,12 +92,10 @@ login u p = do res <- loginVerify u p
                                (show . getChNumber $ encode msg)
                                (amount res)
 
+reg :: String -> String -> String -> IO Player                               
 reg u p s = do res <- regAccount u p
                uServer <- getServerInfo s
-               addrinfos <- getAddrInfo Nothing (Just $ ip uServer) (Just $ port uServer)
-               let serveraddr = head addrinfos
-               sock <- socket (addrFamily serveraddr) Stream defaultProtocol
-               connect sock (addrAddress serveraddr)
+               sock <- connect_ (ip uServer) (port uServer)
                sendAll sock $ regData res (C.pack s)
                recv sock 256
                sendAll sock $ newUser (C.pack u)
@@ -95,10 +108,7 @@ reg u p s = do res <- regAccount u p
 
 joinWorld :: Player -> IO Socket
 joinWorld user = do uServer <- getServerInfo (defaultsid $ user)
-                    addrinfos <- getAddrInfo Nothing (Just $ ip uServer) (Just $ port uServer)
-                    let serveraddr = head addrinfos
-                    sock <- socket (addrFamily serveraddr) Stream defaultProtocol
-                    connect sock (addrAddress serveraddr)
+                    sock <- connect_ (ip uServer) (port uServer)
                     sendAll sock $ loginData user
                     msg <- recv sock 1024
                     sendAll sock $ enterW (C.pack $ uid user) (C.pack $ chNumber user)

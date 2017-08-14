@@ -18,7 +18,7 @@ import Control.Concurrent
 
 -- HD ZM40, MDP ZM39, CBT ZM41, VNT ZM43, VTM ZM44, HT ZM45, TVK ZM48, KP ZM49, TDLT ZM51
 huntTarget :: ByteString
-huntTarget = "ZM49|ZM51"
+huntTarget = "|ZM43"
 
 main = do pls <- players
           forM_ pls $ \u -> do
@@ -26,15 +26,12 @@ main = do pls <- players
                 tid <- myThreadId
                 conn <- joinWorld u
                 sendAll conn $ iniHunt
-                listenM conn tid
+                waitfor "ZM" conn tid splitM
 
-listenM :: Socket -> ThreadId -> IO ()              
-listenM conn t = do threadDelay 2000000
-                    msg <- recv conn 2048
-                    unless (C.isInfixOf "ZM" msg) $ listenM conn t
-                    when (C.isInfixOf "ZM" msg) $ do
-                        let h = tail . map (C.pack . take 4) $ split (startsWith "ZM") $ C.unpack msg
-                        findHr h conn t
+-- splitM :: Socket -> ThreadId -> IO ()              
+splitM msg conn t = do 
+    let h = tail . map (C.pack . take 4) $ split (startsWith "ZM") $ C.unpack msg
+    findHr h conn t
 
 hrVerify :: [ByteString] -> Maybe ByteString
 hrVerify heroes
@@ -48,9 +45,9 @@ findHr heroes conn t = case hrVerify heroes of
                 Just idx -> do C.putStrLn $ C.append "found hero at " idx
                                sendAll conn $ openRoom idx
                                hunt idx conn t
-                Nothing  -> do threadDelay 2000000
+                Nothing  -> do threadDelay 1000000
                                sendAll conn $ renewHunt
-                               listenM conn t
+                               waitfor "ZM" conn t splitM
 
 hunt' :: ByteString -> Socket -> IO ()                               
 hunt' idx conn = do threadDelay 1000000
@@ -74,10 +71,5 @@ hunt idx conn t = do threadDelay 1000000
                          msg <- recv conn 1024
                          threadDelay 3000000
                          close conn
-                         killThread t           
-
-quickHunt idx = do  u <- getPlayer "kdqq001"
-                    conn <- joinWorld u
-                    sendAll conn $ openRoom idx
-                    hunt' idx conn
+                         killThread t
                 
