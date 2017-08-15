@@ -84,7 +84,7 @@ login :: String -> String -> IO Player
 login u p = do res <- loginVerify u p
                uServer <- getServerInfo (defaultsid res)
                sock <- connect_ (ip uServer) (port uServer)
-               sendAll sock $ loginData res
+               sendAll sock $ loginData res (C.pack $ defaultsid res)
                msg <- recv sock 256
                close sock
                return $ Player u (uid res) (opname res) (defaultsid res)
@@ -96,7 +96,7 @@ reg :: String -> String -> String -> IO Player
 reg u p s = do res <- regAccount u p
                uServer <- getServerInfo s
                sock <- connect_ (ip uServer) (port uServer)
-               sendAll sock $ regData res (C.pack s)
+               sendAll sock $ loginData res (C.pack s)
                recv sock 256
                sendAll sock $ newUser (C.pack u)
                msg <- recv sock 256
@@ -109,7 +109,7 @@ reg u p s = do res <- regAccount u p
 joinWorld :: Player -> IO Socket
 joinWorld user = do uServer <- getServerInfo (defaultsid $ user)
                     sock <- connect_ (ip uServer) (port uServer)
-                    sendAll sock $ loginData user
+                    sendAll sock $ loginData user (C.pack $ defaultsid user)
                     msg <- recv sock 1024
                     sendAll sock $ enterW (C.pack $ uid user) (C.pack $ chNumber user)
                     C.putStrLn $ C.append (C.pack $ acc user) " has joined the KD world!"
