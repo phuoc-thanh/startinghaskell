@@ -16,9 +16,9 @@ import Network.Socket.ByteString (recv, sendAll)
 import Control.Monad
 import Control.Concurrent
 
--- HD ZM40, MDP ZM39, CBT ZM41, VNT ZM43, VTM ZM44, HT ZM45, TVK ZM48, KP ZM49, TDLT ZM51
+-- HD ZM40, CBT ZM41, VNT ZM43, VTM ZM44, HT ZM45, TVK ZM48, KP ZM49, TDLT ZM51
 huntTarget :: ByteString
-huntTarget = "|ZM43"
+huntTarget = "ZM49|ZM51"
 
 main = do pls <- players
           forM_ pls $ \u -> do
@@ -26,12 +26,17 @@ main = do pls <- players
                 tid <- myThreadId
                 conn <- joinWorld u
                 sendAll conn $ iniHunt
-                waitfor "ZM" conn tid splitM
+                splitM conn tid
 
--- splitM :: Socket -> ThreadId -> IO ()              
-splitM msg conn t = do 
-    let h = tail . map (C.pack . take 4) $ split (startsWith "ZM") $ C.unpack msg
-    findHr h conn t
+splitM :: Socket -> ThreadId -> IO ()              
+splitM conn t = do
+    threadDelay 1000000
+    msg <- recv conn 1024
+    if C.isInfixOf "ZM" msg
+    then do
+        let h = tail . map (C.pack . take 4) $ split (startsWith "ZM") $ C.unpack msg
+        findHr h conn t
+    else splitM conn t
 
 hrVerify :: [ByteString] -> Maybe ByteString
 hrVerify heroes
@@ -47,7 +52,7 @@ findHr heroes conn t = case hrVerify heroes of
                                hunt idx conn t
                 Nothing  -> do threadDelay 1000000
                                sendAll conn $ renewHunt
-                               waitfor "ZM" conn t splitM
+                               splitM conn t
 
 hunt' :: ByteString -> Socket -> IO ()                               
 hunt' idx conn = do threadDelay 1000000

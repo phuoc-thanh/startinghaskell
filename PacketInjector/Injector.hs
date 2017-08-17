@@ -16,7 +16,7 @@ import Data.ByteString (ByteString)
 
 getServerInfo :: String -> IO Server
 getServerInfo i = do
-    serverinfos <- parseFile "ServerInfo.json" :: IO (Maybe [Server])
+    serverinfos <- parseFile "ServerInfoQQ.json" :: IO (Maybe [Server])
     return $ head $ filter (\s -> (sid s) == i) (fromJust $ serverinfos)
 
 getMatch :: String -> IO Match
@@ -71,14 +71,6 @@ connect_ host port = do
     sock <- socket (addrFamily serveraddr) Stream defaultProtocol
     connect sock (addrAddress serveraddr)
     return sock
-
-waitfor :: ByteString -> Socket -> t -> (ByteString -> Socket -> t -> IO ()) -> IO ()
-waitfor str conn tid f = do 
-    threadDelay 1000000
-    msg <- recv conn 1024
-    let m = C.isInfixOf str msg
-    unless m $ waitfor str conn tid f
-    when m $ f msg conn tid
 
 login :: String -> String -> IO Player
 login u p = do res <- loginVerify u p
