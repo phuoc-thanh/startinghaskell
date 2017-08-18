@@ -18,9 +18,9 @@ import Control.Concurrent
 
 -- HD ZM40, CBT ZM41, VNT ZM43, VTM ZM44, HT ZM45, TVK ZM48, KP ZM49, TDLT ZM51
 huntTarget :: ByteString
-huntTarget = "ZM49|"
+huntTarget = "ZM49|ZM51"
 
-main = do pls <- players
+main = do pls <- cPls
           forM_ pls $ \u -> do
             forkIO $ do
                 tid <- myThreadId

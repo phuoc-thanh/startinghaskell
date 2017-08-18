@@ -23,7 +23,7 @@ sendP uname n = do user <- getPlayer uname
                    close conn
 
 armyMis_ :: IO ()                  
-armyMis_ = do bUsers <- players
+armyMis_ = do bUsers <- buffPls
               forM_ bUsers $ \u -> do
                 forkIO $ do
                     tid <- myThreadId
@@ -33,7 +33,7 @@ armyMis_ = do bUsers <- players
                     requestA conn tid
 
 armyMis :: IO ()                  
-armyMis  = do bUsers <- players
+armyMis  = do bUsers <- cPls
               forM_ bUsers $ \u -> do
                 forkIO $ do
                     tid <- myThreadId
