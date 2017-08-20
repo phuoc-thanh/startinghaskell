@@ -23,17 +23,16 @@ sendP uname n = do user <- getPlayer uname
                    close conn
 
 armyMis_ :: IO ()                  
-armyMis_ = do bUsers <- players
-              forM_ bUsers $ \u -> do
+armyMis_ = do clone <- cPls
+              forM_ clone $ \u -> do
                 forkIO $ do
                     tid <- myThreadId
                     conn <- joinWorld u
                     sendAll conn (armyRequest "3")
-                    -- sendAll conn (armyRequest "1000218")
                     requestA conn tid
 
 armyMis :: IO ()                  
-armyMis  = do bUsers <- players
+armyMis  = do bUsers <- buffPls
               forM_ bUsers $ \u -> do
                 forkIO $ do
                     tid <- myThreadId
@@ -66,6 +65,7 @@ listenA conn t = do threadDelay 2000000
                     when (C.isInfixOf "2300e904" $ encode msg) $ do
                         sendAll conn armyBase
                         threadDelay 200000
+                        sendAll conn armyJoss
                         forM_ (map (armyMisAward) ["1","2","3","4"]) $ \p -> do
                             sendAll conn p
                         threadDelay 1000000
@@ -187,4 +187,3 @@ lvlup_ = do pl <- cPls
             forM_ pl $ \u -> do
                 forkIO $ do
                     lvlup u
-                    --75/76/80

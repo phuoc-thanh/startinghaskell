@@ -20,7 +20,7 @@ import Control.Concurrent
 huntTarget :: ByteString
 huntTarget = "ZM49|ZM51"
 
-main = do pls <- players
+main = do pls <- cPls
           forM_ pls $ \u -> do
             forkIO $ do
                 tid <- myThreadId

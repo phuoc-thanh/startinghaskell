@@ -19,6 +19,10 @@ armyReward :: ByteString
 armyReward = C.append (hexSerialize $ C.length s) s
                 where s = "army armyFoundation_award\NUL"
 
+armyJoss :: ByteString 
+armyJoss = C.append (hexSerialize $ C.length s) s
+                where s = "army joss 2\NUL"
+
 armyMisAward :: ByteString -> ByteString
 armyMisAward n = C.append (hexSerialize $ C.length s) s
                     where s = C.append "army misaward "
@@ -96,9 +100,14 @@ copyBlock :: ByteString
 copyBlock = C.append (hexSerialize $ C.length s) s
                 where s = "copy block\NUL"
 
+-- firstReward :: ByteString                
+-- firstReward = C.append (hexSerialize $ C.length s) s
+--                 where s = "activity_reward 326 0\NUL"
+
+-- Kim Dung Truyen
 firstReward :: ByteString                
 firstReward = C.append (hexSerialize $ C.length s) s
-                where s = "activity_reward 326 0\NUL"
+                where s = "activity_reward 86332 0\NUL"
 
 useEnergy :: ByteString                
 useEnergy = C.append (hexSerialize $ C.length s) s
