@@ -20,11 +20,11 @@ getUserURI = "/payclient.ashx?op=GetUser"
 regUserURI = "/payclient.ashx?op=RegisterUser"
 
 -- apiHost = "api.alv.gaba.vn"
-apiHost = "api.kimdungqq.com"
--- apiHost = "api.kd.gaba.vn"
+-- apiHost = "api.kimdungqq.com"
+apiHost = "api.kd.gaba.vn"
 
-payHost = "m-pay.kimdungqq.com"
--- payHost = "m-pay.gaba.vn"
+-- payHost = "m-pay.kimdungqq.com"
+payHost = "m-pay.gaba.vn"
 
 checkUserRq :: ByteString -> ByteString -> Request
 checkUserRq u p = setRequestPath checkUserURI

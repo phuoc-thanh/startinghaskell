@@ -100,6 +100,11 @@ copyBlock :: ByteString
 copyBlock = C.append (hexSerialize $ C.length s) s
                 where s = "copy block\NUL"
 
+copySwap :: ByteString -> ByteString
+copySwap c = C.append (hexSerialize $ C.length s) s
+                where s = C.append "copy swap "
+                        $ C.append  c " 1 18\NUL"
+
 -- firstReward :: ByteString                
 -- firstReward = C.append (hexSerialize $ C.length s) s
 --                 where s = "activity_reward 326 0\NUL"
@@ -109,6 +114,10 @@ firstReward :: ByteString
 firstReward = C.append (hexSerialize $ C.length s) s
                 where s = "activity_reward 86332 0\NUL"
 
+registeReward :: ByteString
+registeReward = C.append (hexSerialize $ C.length s) s
+    where s = "registeReward reward\NUL"
+
 useEnergy :: ByteString                
 useEnergy = C.append (hexSerialize $ C.length s) s
                 where s = "prop_use 1022 2\NUL"
@@ -117,5 +126,8 @@ choiceCombat :: ByteString -> ByteString
 choiceCombat idx = C.append (hexSerialize $ C.length s) s
                     where s = C.append "choice_combat 0| "
                             $ C.append idx "#| -1\NUL"
-
+campSelect :: ByteString -> ByteString
+campSelect idc = C.append (hexSerialize $ C.length s) s
+                where s = C.append "camp select "
+                        $ C.append idc "\NUL"
                     

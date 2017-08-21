@@ -77,6 +77,14 @@ listenA conn t = do threadDelay 2000000
                         sendAll conn armyMisList
                         listenA conn t
                     
+--2300e904 010501dc05 0000 0202015802 0000 030501dc05 0000 0401012c01 000000 2d020000
+--2300e904 010501dc05 0000 0202015802 0000 030501dc05 0000 0401012c01 000000 0c010000
+--2300e904 010401b004 0000 020501dc05 0000 0303018403 0000 040401b004 000000 a1000000
+--2300e904 0104030000 0000 0201030000 0000 030401b004 0000 0403018403 000000 00000000
+--2300e904 0102015802 0000 020501dc05 0000 030501dc05 0000 0402015802 000000 08070000
+-- the 3rd byte
+--yellow:0501dc05
+--purple:0401b004
 listenA' :: Socket -> ThreadId -> IO ()              
 listenA' conn t = do    threadDelay 200000
                         msg <- recv conn 2048
@@ -147,15 +155,31 @@ goPtThree conn chapter = do threadDelay 3000000
 
 goPtFour :: Socket -> [ByteString] -> IO ()           
 goPtFour conn [] = do threadDelay 2000000
-                      C.putStrLn "done!"
-                      close conn
+                      sendAll conn registeReward
+                      threadDelay 2000000
+                      sendAll conn useEnergy
+                      threadDelay 2000000
+                      sendAll conn $ (copySwap "C03B01")
+                      goPtFive conn $ [(copySwap "C03B01"), (copySwap "C03B01")]                     
 goPtFour conn chapter = do threadDelay 3000000
                            msg <- recv conn 2048
                            unless (C.isInfixOf "0d00440700" $ encode msg) $ goPtFour conn chapter
                            when (C.isInfixOf "0d00440700" $ encode msg) $ do
                                sendAll conn copyBlock
                                sendAll conn $ head chapter
-                               goPtFour conn $ tail chapter                          
+                               goPtFour conn $ tail chapter
+                               
+goPtFive :: Socket -> [ByteString] -> IO ()
+goPtFive conn [] = do threadDelay 2000000
+                      C.putStrLn "Done"
+                      close conn
+goPtFive conn chapter = do threadDelay 2000000
+                           msg <- recv conn 2048
+                           unless (C.isInfixOf "0900210300" $ encode msg) $ goPtFive conn chapter
+                           when (C.isInfixOf "0900210300" $ encode msg) $ do
+                               sendAll conn useEnergy
+                               sendAll conn $ head chapter
+                               goPtFive conn $ tail chapter
 
 lastN :: Int -> ByteString -> ByteString
 lastN n xs = C.drop (C.length xs - n) xs
