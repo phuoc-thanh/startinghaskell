@@ -32,7 +32,7 @@ armyMis_ = do clone <- cPls
                     requestA conn tid
 
 armyMis :: IO ()                  
-armyMis  = do bUsers <- cPls
+armyMis  = do bUsers <- buffPls
               forM_ bUsers $ \u -> do
                 forkIO $ do
                     tid <- myThreadId
@@ -187,4 +187,3 @@ lvlup_ = do pl <- cPls
             forM_ pl $ \u -> do
                 forkIO $ do
                     lvlup u
-                    --75/76/80

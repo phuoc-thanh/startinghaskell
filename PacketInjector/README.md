@@ -1,7 +1,15 @@
-## get user Data
+### 1. Install Haskell platform
 
-> loginVerify "username" "password"
+Win 32bit:
 
-## buff a char in cross server war
+https://haskell.org/platform/download/8.0.2/HaskellPlatform-8.0.2-a-minimal-i386-setup.exe
 
-> buff "idx"
+Win 64bit:
+
+https://haskell.org/platform/download/8.0.2/HaskellPlatform-8.0.2-a-minimal-x86_64-setup.exe
+
+### 2. Install missing packages
+
+> cabal update
+
+> cabal install network http-conduit base16-bytestring split aeson-pretty
