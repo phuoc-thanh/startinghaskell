@@ -21,7 +21,6 @@ sendP :: String -> Integer -> IO ()
 sendP uname n = do user <- getPlayer uname
                    conn <- joinWorld user
                    sendNTimes n conn tPacket
-                   close conn
 
 armyMis_ :: IO ()                  
 armyMis_ = do clone <- cPls
@@ -29,7 +28,7 @@ armyMis_ = do clone <- cPls
                 forkIO $ do
                     tid <- myThreadId
                     conn <- joinWorld u
-                    sendAll conn (armyRequest "3")
+                    sendAll conn (armyRequest "48000006")
                     requestA conn tid
 
 armyMis :: IO ()                  
@@ -107,30 +106,27 @@ listenA' conn t = do    threadDelay 200000
 
 chapterOne = map (chapter) ["C01B03","C01B04","C01B05","C01B06","C01B07","C01B08"]
 chapterTwo = map (chapter) ["C02B01","C02B02","C02B03","C02B04","C02B05","C02B06","C02B07","C02B08","C02B09","C02B10"]
-chapterThree = take 20 . repeat $ (chapter "C03B01")
-xchapterOne = map (xchapter) ["XB01B02","XB01B03","XB01B04","XB01B05"]
+repeatchapter x = take x . repeat $ (chapter "C03B01")
 
 lvlup pl = do conn <- joinWorld pl
               sendAll conn $ chapter "C01B01"
-              combat conn
+              goPtOne conn
 
-goPtOne :: Socket -> [ByteString] -> IO ()           
-goPtOne conn [] = do threadDelay 2000000
-                     sendAll conn $ xchapter "XB01B01"
-                     goPtTwo conn xchapterOne
-goPtOne conn chapter = do  threadDelay 4000000
-                           msg <- recv conn 2048
-                           unless (C.isInfixOf "0d00440700" $ encode msg) $ goPtOne conn chapter
-                           when (C.isInfixOf "0d00440700" $ encode msg) $ do
-                               sendAll conn copyBlock
-                               sendAll conn $ head chapter
-                               goPtOne conn $ tail chapter
+goPtOne conn = do 
+    threadDelay 2000000
+    msg <- recv conn 1024
+    unless (C.isInfixOf "0090130000" $ encode msg) $ goPtOne conn
+    when (C.isInfixOf "0090130000" $ encode msg) $ do
+        sendAll conn $ choiceCombat (C.pack . show . eCombat $ fst $ C.breakSubstring "0090130000" $ encode msg)
+        threadDelay 2000000
+        sendAll conn copyBlock
+        sendAll conn $ chapter "C01B02"
+        goPtTwo conn (chapterOne ++ chapterTwo)
 
 goPtTwo :: Socket -> [ByteString] -> IO ()           
-goPtTwo conn [] = do threadDelay 2000000
-                     sendAll conn $ chapter "C03B01"
-                     goPtThree conn chapterThree
-goPtTwo conn chapter = do  threadDelay 4000000
+goPtTwo conn [] = do sendAll conn $ chapter "C03B01"
+                     goPtThree conn $ repeatchapter 24
+goPtTwo conn chapter = do  threadDelay 3600000
                            msg <- recv conn 2048
                            unless (C.isInfixOf "0d00440700" $ encode msg) $ goPtTwo conn chapter
                            when (C.isInfixOf "0d00440700" $ encode msg) $ do
@@ -139,12 +135,11 @@ goPtTwo conn chapter = do  threadDelay 4000000
                                goPtTwo conn $ tail chapter
 
 goPtThree :: Socket -> [ByteString] -> IO ()           
-goPtThree conn [] = do threadDelay 2000000
-                       sendAll conn registeReward
+goPtThree conn [] = do sendAll conn registeReward
                        sendAll conn useEnergy
-                       threadDelay 2000000
+                       threadDelay 200000
                        sendAll conn $ chapter "C03B01"
-                       goPtFour conn chapterThree
+                       goPtFour conn $ repeatchapter 23
 goPtThree conn chapter = do threadDelay 3000000
                             msg <- recv conn 2048
                             unless (C.isInfixOf "0d00440700" $ encode msg) $ goPtThree conn chapter
@@ -155,9 +150,9 @@ goPtThree conn chapter = do threadDelay 3000000
 
 goPtFour :: Socket -> [ByteString] -> IO ()           
 goPtFour conn [] = do sendAll conn useEnergy
-                      threadDelay 2000000
+                      threadDelay 200000
                       sendAll conn $ (copySwap "C03B01")
-                      goPtFive conn $ [(copySwap "C03B01"), (copySwap "C03B01")]                     
+                      goPtFive conn $ [(copySwap "C03B01"), (copySwap "C03B01")]
 goPtFour conn chapter = do threadDelay 3000000
                            msg <- recv conn 2048
                            unless (C.isInfixOf "0d00440700" $ encode msg) $ goPtFour conn chapter
@@ -167,10 +162,11 @@ goPtFour conn chapter = do threadDelay 3000000
                                goPtFour conn $ tail chapter
                                
 goPtFive :: Socket -> [ByteString] -> IO ()
-goPtFive conn [] = do threadDelay 2000000
+goPtFive conn [] = do sendAll conn $ campSelect "1"
+                      threadDelay 200000
                       C.putStrLn "Done"
                       close conn
-goPtFive conn chapter = do threadDelay 2000000
+goPtFive conn chapter = do threadDelay 1000000
                            msg <- recv conn 2048
                            unless (C.isInfixOf "0900210300" $ encode msg) $ goPtFive conn chapter
                            when (C.isInfixOf "0900210300" $ encode msg) $ do
@@ -184,20 +180,14 @@ lastN n xs = C.drop (C.length xs - n) xs
 eCombat :: ByteString -> Integer
 eCombat = hexDeserialize . lastN 6
 
-combat conn = do threadDelay 2000000
-                 msg <- recv conn 1024
-                 unless (C.isInfixOf "0090130000" $ encode msg) $ combat conn
-                 when (C.isInfixOf "0090130000" $ encode msg) $ do
-                    sendAll conn $ choiceCombat (C.pack . show . eCombat $ fst $ C.breakSubstring "0090130000" $ encode msg)
-                    threadDelay 2000000
-                    sendAll conn copyBlock
-                    sendAll conn $ chapter "C01B02"
-                    goPtOne conn (chapterOne ++ chapterTwo)
+regString :: String -> [Int] -> [String]
+regString p n = zipWith (++) (repeat p) (map show n)
 
-regString = zipWith (++) (repeat "revive") (map show [11..22])
-                
-massReg (x:xs) = do cChar x "123456" "1"
-                    massReg xs              
+massReg :: String -> [Int] -> String -> IO ()
+massReg p n s = do
+    let rString = regString p n
+    forM_ rString $ \u -> do
+        cChar u "replyme" s 
 
 cChar u p s = do 
     (conn, res) <- reg u p s
@@ -209,6 +199,8 @@ cChar u p s = do
     let pl = Player u (uid res) (opname res) s (displayNovice res) 
                     (create_time res) (key res) chN (amount res)    
     appendJSON "Clone.json" (pl:pls)
+    threadDelay 2000000
+    close conn
 
 lvlup_ = do pl <- cPls
             forM_ pl $ \u -> do

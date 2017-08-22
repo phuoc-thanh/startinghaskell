@@ -89,12 +89,7 @@ newUser uname = C.append (hexEnterSerialize $ C.length s) s
 chapter :: ByteString -> ByteString                
 chapter c = C.append (hexSerialize $ C.length s) s
                 where s = C.append "copy enter "
-                        $ C.append  c " 1\NUL"
-
-xchapter :: ByteString -> ByteString                
-xchapter c = C.append (hexSerialize $ C.length s) s
-                where s = C.append "xb_copy enter "
-                        $ C.append  c "\NUL"                        
+                        $ C.append  c " 1\NUL"                   
                                          
 copyBlock :: ByteString
 copyBlock = C.append (hexSerialize $ C.length s) s
