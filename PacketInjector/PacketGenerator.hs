@@ -105,15 +105,6 @@ copySwap c = C.append (hexSerialize $ C.length s) s
                 where s = C.append "copy swap "
                         $ C.append  c " 1 18\NUL"
 
--- firstReward :: ByteString                
--- firstReward = C.append (hexSerialize $ C.length s) s
---                 where s = "activity_reward 326 0\NUL"
-
--- Kim Dung Truyen
-firstReward :: ByteString                
-firstReward = C.append (hexSerialize $ C.length s) s
-                where s = "activity_reward 86332 0\NUL"
-
 registeReward :: ByteString
 registeReward = C.append (hexSerialize $ C.length s) s
     where s = "registeReward reward\NUL"

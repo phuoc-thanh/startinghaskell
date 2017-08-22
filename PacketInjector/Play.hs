@@ -2,6 +2,7 @@
 
 module Play where
 
+import Authenticator
 import Injector
 import PacketGenerator
 import Parser hiding (encode, decode)
@@ -139,8 +140,7 @@ goPtTwo conn chapter = do  threadDelay 4000000
 
 goPtThree :: Socket -> [ByteString] -> IO ()           
 goPtThree conn [] = do threadDelay 2000000
-                       sendAll conn firstReward
-                       threadDelay 2000000
+                       sendAll conn registeReward
                        sendAll conn useEnergy
                        threadDelay 2000000
                        sendAll conn $ chapter "C03B01"
@@ -154,10 +154,7 @@ goPtThree conn chapter = do threadDelay 3000000
                               goPtThree conn $ tail chapter
 
 goPtFour :: Socket -> [ByteString] -> IO ()           
-goPtFour conn [] = do threadDelay 2000000
-                      sendAll conn registeReward
-                      threadDelay 2000000
-                      sendAll conn useEnergy
+goPtFour conn [] = do sendAll conn useEnergy
                       threadDelay 2000000
                       sendAll conn $ (copySwap "C03B01")
                       goPtFive conn $ [(copySwap "C03B01"), (copySwap "C03B01")]                     
@@ -203,8 +200,14 @@ massReg (x:xs) = do cChar x "123456" "1"
                     massReg xs              
 
 cChar u p s = do 
-    pl <- reg u p s
+    (conn, res) <- reg u p s
+    sendAll conn $ newUser (C.pack u)
+    msg <- recv conn 256
+    let chN = show . newChNumber $ encode msg
+    sendAll conn $ enterW (C.pack $ uid res) (C.pack chN)
     pls <- cPls
+    let pl = Player u (uid res) (opname res) s (displayNovice res) 
+                    (create_time res) (key res) chN (amount res)    
     appendJSON "Clone.json" (pl:pls)
 
 lvlup_ = do pl <- cPls

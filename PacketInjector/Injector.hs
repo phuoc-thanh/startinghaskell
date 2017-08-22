@@ -3,7 +3,6 @@
 module Injector where
 import Authenticator
 import HttpRq
-import PacketGenerator (newUser)
 import Parser hiding (encode)
 import Network.Socket hiding (send, recv)
 import Network.Socket.ByteString (send, recv, sendAll)
@@ -84,19 +83,13 @@ login u p = do res <- loginVerify u p
                                (show . getChNumber $ encode msg)
                                (amount res)
 
-reg :: String -> String -> String -> IO Player                               
+reg :: String -> String -> String -> IO (Socket, Player)                    
 reg u p s = do res <- regAccount u p
                uServer <- getServerInfo s
                sock <- connect_ (ip uServer) (port uServer)
                sendAll sock $ loginData res (C.pack s)
                recv sock 256
-               sendAll sock $ newUser (C.pack u)
-               msg <- recv sock 256
-               let chN = show . newChNumber $ encode msg
-               sendAll sock $ enterW (C.pack $ uid res) (C.pack chN)
-               return $ Player u (uid res) (opname res) s
-                               (displayNovice res) (create_time res) (key res)
-                               chN (amount res)
+               return (sock, res)
 
 joinWorld :: Player -> IO Socket
 joinWorld user = do uServer <- getServerInfo (defaultsid $ user)
