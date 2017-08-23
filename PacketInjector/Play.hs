@@ -76,8 +76,17 @@ listenA conn t = do threadDelay 2000000
                         sendAll conn armyMisSpdUp
                         sendAll conn armyMisList
                         listenA conn t
-                    
---2300e904 010501dc05 0000 0202015802 0000 030501dc05 0000 0401012c01 000000 2d020000
+
+missionTarget :: ByteString                        
+missionTarget = "0501dc05|0401b004"
+
+missionFilter msg
+    | (C.isInfixOf (refineM !! 0) missionTarget) = Just "1"
+    | (C.isInfixOf (refineM !! 1) missionTarget) = Just "2"
+    | (C.isInfixOf (refineM !! 2) missionTarget) = Just "3"
+    | (C.isInfixOf (refineM !! 3) missionTarget) = Just "4"
+    | otherwise = Nothing
+    where refineM = map (C.pack . drop 6) . split (startsWith "0000") . take 56 . drop 4 $ C.unpack msg
 --2300e904 010501dc05 0000 0202015802 0000 030501dc05 0000 0401012c01 000000 0c010000
 --2300e904 010401b004 0000 020501dc05 0000 0303018403 0000 040401b004 000000 a1000000
 --2300e904 0104030000 0000 0201030000 0000 030401b004 0000 0403018403 000000 00000000
