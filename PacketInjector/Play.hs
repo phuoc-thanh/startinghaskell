@@ -40,7 +40,7 @@ armyMis  = do bUsers <- buffPls
                     sendAll conn armyBase
                     sendAll conn armyReward
                     sendAll conn armyMisList
-                    listenA' conn tid
+                    missionGo conn tid
 
 requestA :: Socket -> ThreadId -> IO ()
 requestA conn t = do threadDelay 2000000
@@ -77,23 +77,25 @@ listenA conn t = do threadDelay 2000000
                         sendAll conn armyMisList
                         listenA conn t
 
-missionTarget :: ByteString                        
-missionTarget = "0501dc05|0401b004"
+missionV :: (ByteString, Int) -> Int
+missionV (m, i) = if (C.isInfixOf m "0501dc05|0401b004") then i else 0
 
-missionFilter msg
-    | (C.isInfixOf (refineM !! 0) missionTarget) = Just "1"
-    | (C.isInfixOf (refineM !! 1) missionTarget) = Just "2"
-    | (C.isInfixOf (refineM !! 2) missionTarget) = Just "3"
-    | (C.isInfixOf (refineM !! 3) missionTarget) = Just "4"
-    | otherwise = Nothing
+missionFilter :: ByteString -> [Int]
+missionFilter msg = filter (>0) . map missionV $ zip refineM [1,2,3,4]
     where refineM = map (C.pack . drop 6) . split (startsWith "0000") . take 56 . drop 4 $ C.unpack msg
---2300e904 010501dc05 0000 0202015802 0000 030501dc05 0000 0401012c01 000000 0c010000
---2300e904 010401b004 0000 020501dc05 0000 0303018403 0000 040401b004 000000 a1000000
---2300e904 0104030000 0000 0201030000 0000 030401b004 0000 0403018403 000000 00000000
---2300e904 0102015802 0000 020501dc05 0000 030501dc05 0000 0402015802 000000 08070000
--- the 3rd byte
---yellow:0501dc05
---purple:0401b004
+
+missionGo conn t = do
+    threadDelay 1000000
+    msg <- recv conn 1024
+    unless (C.isInfixOf "2300e904" $ encode msg) $ missionGo conn t
+    when (C.isInfixOf "2300e904" $ encode msg) $ do
+        let m = missionFilter . snd . C.breakSubstring "2300e904" $ encode msg
+        if (length m > 1)
+            then forM_ m $ \m0 -> do
+                sendAll conn $ armyMisAccept (C.pack $ show m0)
+                threadDelay 2000000
+            else C.putStrLn "not found"
+
 listenA' :: Socket -> ThreadId -> IO ()              
 listenA' conn t = do    threadDelay 200000
                         msg <- recv conn 2048
