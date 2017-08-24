@@ -37,6 +37,10 @@ armyMisList :: ByteString
 armyMisList = C.append (hexSerialize $ C.length s) s
                 where s = "army mislist\NUL"
 
+armyMisRefresh :: ByteString
+armyMisRefresh = C.append (hexSerialize $ C.length s) s
+                where s = "army misreflesh\NUL"                
+
 armyMisSpdUp :: ByteString
 armyMisSpdUp = C.append (hexSerialize $ C.length s) s
                  where s = "army misAcc\NUL"

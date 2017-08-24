@@ -39,8 +39,9 @@ armyMis  = do bUsers <- buffPls
                     conn <- joinWorld u
                     sendAll conn armyBase
                     sendAll conn armyReward
+                    sendAll conn armyJoss
                     sendAll conn armyMisList
-                    missionGo conn tid
+                    missionGo 4 conn tid
 
 requestA :: Socket -> ThreadId -> IO ()
 requestA conn t = do threadDelay 2000000
@@ -84,17 +85,43 @@ missionFilter :: ByteString -> [Int]
 missionFilter msg = filter (>0) . map missionV $ zip refineM [1,2,3,4]
     where refineM = map (C.pack . drop 6) . split (startsWith "0000") . take 56 . drop 4 $ C.unpack msg
 
-missionGo conn t = do
+missionAccept e m conn t
+    | e == length m = do
+        forM_ m $ \m0 -> do
+            sendAll conn $ armyMisAccept (C.pack $ show m0)
+        threadDelay 1000000
+        sendAll conn armyMisSpdUp
+        sendAll conn armyMisList
+        threadDelay 2000000
+        forM_ (map (armyMisAward) ["1","2","3","4"]) $ \p -> do
+            sendAll conn p
+        sendAll conn armyMisList
+        missionGo 4 conn t
+    | 0 < length m = do
+        forM_ m $ \m0 -> do
+            sendAll conn $ armyMisAccept (C.pack $ show m0)
+        threadDelay 1000000
+        sendAll conn armyMisRefresh
+        sendAll conn armyMisList
+        missionGo (e - length m) conn t 
+    | otherwise = do
+        sendAll conn armyMisRefresh
+        sendAll conn armyMisList
+        missionGo e conn t
+
+missionGo e conn t = do
     threadDelay 1000000
     msg <- recv conn 1024
-    unless (C.isInfixOf "2300e904" $ encode msg) $ missionGo conn t
+    when (C.isInfixOf "0300a12905" $ encode msg) $ do
+        -- sendAll conn armyExit
+        threadDelay 1000000
+        C.putStrLn "exit Army!"
+        close conn
+        killThread t
+    unless (C.isInfixOf "2300e904" $ encode msg) $ missionGo e conn t
     when (C.isInfixOf "2300e904" $ encode msg) $ do
         let m = missionFilter . snd . C.breakSubstring "2300e904" $ encode msg
-        if (length m > 1)
-            then forM_ m $ \m0 -> do
-                sendAll conn $ armyMisAccept (C.pack $ show m0)
-                threadDelay 2000000
-            else C.putStrLn "not found"
+        missionAccept e m conn t
 
 listenA' :: Socket -> ThreadId -> IO ()              
 listenA' conn t = do    threadDelay 200000
