@@ -39,45 +39,20 @@ armyMis  = do bUsers <- buffPls
                     conn <- joinWorld u
                     sendAll conn armyBase
                     sendAll conn armyReward
-                    sendAll conn armyJoss
-                    sendAll conn armyMisList
-                    missionGo 4 conn tid
+                    threadDelay 2000000
+                    C.putStrLn "Done"
 
 requestA :: Socket -> ThreadId -> IO ()
 requestA conn t = do threadDelay 2000000
-                     msg <- recv conn 2048
+                     msg <- recv conn 1024
                      unless (C.isInfixOf "0300aa0801" $ encode msg) $ requestA conn t
                      when (C.isInfixOf "0300aa0801" $ encode msg) $ do
+                         sendAll conn armyBase
                          sendAll conn armyReward
+                         sendAll conn armyJoss
                          sendAll conn armyMisList
-                         listenA conn t
+                         missionGo 4 conn t
                     
-
-listenA :: Socket -> ThreadId -> IO ()              
-listenA conn t = do threadDelay 2000000
-                    msg <- recv conn 2048
-                    when (C.isInfixOf "0300a12905" $ encode msg) $ do
-                        sendAll conn armyExit
-                        threadDelay 1000000
-                        C.putStrLn "exit Army!"
-                        close conn
-                        killThread t
-                    unless (C.isInfixOf "2300e904" $ encode msg) $ listenA conn t
-                    when (C.isInfixOf "2300e904" $ encode msg) $ do
-                        sendAll conn armyBase
-                        threadDelay 200000
-                        sendAll conn armyJoss
-                        forM_ (map (armyMisAward) ["1","2","3","4"]) $ \p -> do
-                            sendAll conn p
-                        threadDelay 1000000
-                        recv conn 2048
-                        forM_ (map (armyMisAccept) ["1","2","3","4"]) $ \p -> do
-                            sendAll conn p
-                        threadDelay 2000000
-                        sendAll conn armyMisSpdUp
-                        sendAll conn armyMisList
-                        listenA conn t
-
 missionV :: (ByteString, Int) -> Int
 missionV (m, i) = if (C.isInfixOf m "0501dc05|0401b004") then i else 0
 
@@ -91,8 +66,7 @@ missionAccept e m conn t
             sendAll conn $ armyMisAccept (C.pack $ show m0)
         threadDelay 1000000
         sendAll conn armyMisSpdUp
-        sendAll conn armyMisList
-        threadDelay 2000000
+        threadDelay 1000000
         forM_ (map (armyMisAward) ["1","2","3","4"]) $ \p -> do
             sendAll conn p
         sendAll conn armyMisList
@@ -113,10 +87,14 @@ missionGo e conn t = do
     threadDelay 1000000
     msg <- recv conn 1024
     when (C.isInfixOf "0300a12905" $ encode msg) $ do
-        -- sendAll conn armyExit
+        sendAll conn armyMisSpdUp
         threadDelay 1000000
-        C.putStrLn "exit Army!"
+        forM_ (map (armyMisAward) ["1","2","3","4"]) $ \p -> do
+            sendAll conn p
+        threadDelay 2000000
+        sendAll conn armyExit
         close conn
+        C.putStrLn "exit Army!"
         killThread t
     unless (C.isInfixOf "2300e904" $ encode msg) $ missionGo e conn t
     when (C.isInfixOf "2300e904" $ encode msg) $ do
