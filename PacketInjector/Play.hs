@@ -22,6 +22,26 @@ sendP uname n = do user <- getPlayer uname
                    conn <- joinWorld user
                    sendNTimes n conn tPacket
 
+main = do pls <- cPls
+          forM_ (groupOf 3 pls) $ \gr -> do
+              forkIO $ do
+                  mHandler gr           
+
+groupOf :: Int -> [Player] -> [[Player]]          
+groupOf _ [] = []           
+groupOf n pls = (take n pls) : groupOf n (drop n pls)
+
+mHandler :: [Player] -> IO ()
+mHandler pls = do
+    forM_ pls $ \p -> do
+        forkIO $ do
+            tid <- myThreadId
+            conn <- joinWorld p
+            sendAll conn (armyRequest "48000006")
+            requestA conn tid
+        threadDelay 120000000
+    
+
 armyMis_ :: IO ()                  
 armyMis_ = do clone <- cPls
               forM_ clone $ \u -> do
@@ -60,6 +80,7 @@ missionFilter :: ByteString -> [Int]
 missionFilter msg = filter (>0) . map missionV $ zip refineM [1,2,3,4]
     where refineM = map (C.pack . drop 6) . split (startsWith "0000") . take 56 . drop 4 $ C.unpack msg
 
+missionAccept :: Int -> [Int] -> Socket -> ThreadId -> IO ()    
 missionAccept e m conn t
     | e == length m = do
         forM_ m $ \m0 -> do
@@ -83,6 +104,7 @@ missionAccept e m conn t
         sendAll conn armyMisList
         missionGo e conn t
 
+missionGo :: Int -> Socket -> ThreadId -> IO ()
 missionGo e conn t = do
     threadDelay 1000000
     msg <- recv conn 1024
@@ -93,6 +115,7 @@ missionGo e conn t = do
             sendAll conn p
         threadDelay 2000000
         sendAll conn armyExit
+        threadDelay 2000000
         close conn
         C.putStrLn "exit Army!"
         killThread t
@@ -128,6 +151,7 @@ lvlup pl = do conn <- joinWorld pl
               sendAll conn $ chapter "C01B01"
               goPtOne conn
 
+goPtOne :: Socket -> IO ()              
 goPtOne conn = do 
     threadDelay 2000000
     msg <- recv conn 1024
@@ -142,7 +166,7 @@ goPtOne conn = do
 goPtTwo :: Socket -> [ByteString] -> IO ()           
 goPtTwo conn [] = do sendAll conn $ chapter "C03B01"
                      goPtThree conn $ repeatchapter 24
-goPtTwo conn chapter = do  threadDelay 3600000
+goPtTwo conn chapter = do  threadDelay 4000000
                            msg <- recv conn 2048
                            unless (C.isInfixOf "0d00440700" $ encode msg) $ goPtTwo conn chapter
                            when (C.isInfixOf "0d00440700" $ encode msg) $ do
@@ -155,7 +179,7 @@ goPtThree conn [] = do sendAll conn registeReward
                        sendAll conn useEnergy
                        threadDelay 200000
                        sendAll conn $ chapter "C03B01"
-                       goPtFour conn $ repeatchapter 23
+                       goPtFour conn $ repeatchapter 24
 goPtThree conn chapter = do threadDelay 3000000
                             msg <- recv conn 2048
                             unless (C.isInfixOf "0d00440700" $ encode msg) $ goPtThree conn chapter
@@ -203,7 +227,7 @@ massReg :: String -> [Int] -> String -> IO ()
 massReg p n s = do
     let rString = regString p n
     forM_ rString $ \u -> do
-        cChar u "replyme" s 
+            cChar u "replyme" s 
 
 cChar u p s = do 
     (conn, res) <- reg u p s
