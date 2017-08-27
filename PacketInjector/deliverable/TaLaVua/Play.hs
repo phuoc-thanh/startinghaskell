@@ -16,7 +16,6 @@ import Network.Socket.ByteString (recv, sendAll)
 import Control.Monad
 import Control.Concurrent
 
-          
 sendP :: String -> Integer -> IO ()
 sendP uname n = do user <- getPlayer uname
                    conn <- joinWorld user
@@ -202,7 +201,7 @@ goPtFour conn chapter = do threadDelay 3000000
                                goPtFour conn $ tail chapter
                                
 goPtFive :: Socket -> [ByteString] -> IO ()
-goPtFive conn [] = do sendAll conn $ campSelect "2"
+goPtFive conn [] = do sendAll conn $ campSelect "1"
                       threadDelay 200000
                       C.putStrLn "Done"
                       close conn
