@@ -201,8 +201,7 @@ goPtFour conn chapter = do threadDelay 3000000
                                goPtFour conn $ tail chapter
                                
 goPtFive :: Socket -> [ByteString] -> IO ()
-goPtFive conn [] = do sendAll conn $ campSelect "1"
-                      threadDelay 200000
+goPtFive conn [] = do threadDelay 200000
                       C.putStrLn "Done"
                       close conn
 goPtFive conn chapter = do threadDelay 1000000
@@ -226,7 +225,7 @@ massReg :: String -> [Int] -> String -> IO ()
 massReg p n s = do
     let rString = regString p n
     forM_ rString $ \u -> do
-            cChar u "replyme" s 
+            cChar u "112211" s 
 
 cChar u p s = do 
     (conn, res) <- reg u p s

@@ -23,9 +23,10 @@ sendP uname n = do user <- getPlayer uname
                    sendNTimes n conn rankReward
 
 main = do pls <- cPls
-          forM_ (groupOf 2 pls) $ \gr -> do
+          forM_ (groupOf 16 pls) $ \gr -> do
               forkIO $ do
-                  mHandler gr           
+                  mHandler gr
+              threadDelay 120000000
 
 groupOf :: Int -> [Player] -> [[Player]]          
 groupOf _ [] = []           
@@ -39,7 +40,6 @@ mHandler pls = do
             conn <- joinWorld p
             sendAll conn (armyRequest "48000006")
             requestA conn tid
-        threadDelay 120000000
     
 
 armyMis_ :: IO ()                  
@@ -202,7 +202,7 @@ goPtFour conn chapter = do threadDelay 3000000
                                goPtFour conn $ tail chapter
                                
 goPtFive :: Socket -> [ByteString] -> IO ()
-goPtFive conn [] = do sendAll conn $ campSelect "2"
+goPtFive conn [] = do sendAll conn $ campSelect "1"
                       threadDelay 200000
                       C.putStrLn "Done"
                       close conn
@@ -227,7 +227,7 @@ massReg :: String -> [Int] -> String -> IO ()
 massReg p n s = do
     let rString = regString p n
     forM_ rString $ \u -> do
-            cChar u "replyme" s 
+            cChar u "112211" s 
 
 cChar u p s = do 
     (conn, res) <- reg u p s
