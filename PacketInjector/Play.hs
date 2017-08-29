@@ -195,7 +195,8 @@ goPtFour conn chapter = do threadDelay 3000000
 goPtFive :: Socket -> [ByteString] -> IO ()
 goPtFive conn [] = do cf <- getConfig
                       sendAll conn $ campSelect $ C.pack (cloneCamp cf)
-                      threadDelay 200000
+                      sendAll conn $ copySwap_ "C03B01"
+                      threadDelay 2000000
                       C.putStrLn "Done"
                       close conn
 goPtFive conn chapter = do threadDelay 1000000
@@ -215,12 +216,12 @@ eCombat = hexDeserialize . lastN 6
 regString :: String -> [Int] -> [String]
 regString p n = zipWith (++) (repeat p) (map show n)
 
-massReg :: String -> [Int] -> String -> IO ()
-massReg p n s = do
+massReg :: String -> [Int] -> IO ()
+massReg p n = do
     cf <- getConfig
     let rString = regString p n
     forM_ rString $ \u -> do
-            cChar u (defaultPass cf) s 
+            cChar u (defaultPass cf) (cloneServer cf) 
 
 cChar u p s = do 
     (conn, res) <- reg u p s

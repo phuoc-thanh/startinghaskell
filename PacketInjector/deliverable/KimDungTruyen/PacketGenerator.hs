@@ -19,7 +19,6 @@ armyReward = C.append (hexSerialize $ C.length s) s
 armyJoss :: ByteString 
 armyJoss = C.append (hexSerialize $ C.length s) s
                 where s = "army joss 2\NUL"
-                                
 
 armyMisAward :: ByteString -> ByteString
 armyMisAward n = C.append (hexSerialize $ C.length s) s
@@ -35,6 +34,10 @@ armyMisList :: ByteString
 armyMisList = C.append (hexSerialize $ C.length s) s
                 where s = "army mislist\NUL"
 
+armyMisRefresh :: ByteString
+armyMisRefresh = C.append (hexSerialize $ C.length s) s
+                where s = "army misreflesh\NUL"                
+
 armyMisSpdUp :: ByteString
 armyMisSpdUp = C.append (hexSerialize $ C.length s) s
                  where s = "army misAcc\NUL"
@@ -47,6 +50,15 @@ armyRequest :: ByteString -> ByteString
 armyRequest idx = C.append (hexSerialize $ C.length s) s
                     where s = C.append "army request "
                             $ C.append idx "\NUL"    
+
+armyReqList :: ByteString
+armyReqList = C.append (hexSerialize $ C.length s) s
+                where s = "army reqlist\NUL"
+
+armyAgree :: ByteString -> ByteString
+armyAgree idx = C.append (hexSerialize $ C.length s) s
+        where s = C.append "army agree "
+                $ C.append idx "\NUL"              
 
 tPacket :: ByteString
 tPacket = C.append (hexSerialize $ C.length s) s
@@ -87,20 +99,20 @@ newUser uname = C.append (hexEnterSerialize $ C.length s) s
 chapter :: ByteString -> ByteString                
 chapter c = C.append (hexSerialize $ C.length s) s
                 where s = C.append "copy enter "
-                        $ C.append  c " 1\NUL"
-
-xchapter :: ByteString -> ByteString                
-xchapter c = C.append (hexSerialize $ C.length s) s
-                where s = C.append "xb_copy enter "
-                        $ C.append  c "\NUL"                        
+                        $ C.append  c " 1\NUL"                   
                                          
 copyBlock :: ByteString
 copyBlock = C.append (hexSerialize $ C.length s) s
                 where s = "copy block\NUL"
 
-firstReward :: ByteString                
-firstReward = C.append (hexSerialize $ C.length s) s
-                where s = "activity_reward 86332 0\NUL"
+copySwap :: ByteString -> ByteString
+copySwap c = C.append (hexSerialize $ C.length s) s
+                where s = C.append "copy swap "
+                        $ C.append  c " 1 18\NUL"
+
+registeReward :: ByteString
+registeReward = C.append (hexSerialize $ C.length s) s
+    where s = "registeReward reward\NUL"
 
 useEnergy :: ByteString                
 useEnergy = C.append (hexSerialize $ C.length s) s
@@ -110,5 +122,8 @@ choiceCombat :: ByteString -> ByteString
 choiceCombat idx = C.append (hexSerialize $ C.length s) s
                     where s = C.append "choice_combat 0| "
                             $ C.append idx "#| -1\NUL"
-
+campSelect :: ByteString -> ByteString
+campSelect idc = C.append (hexSerialize $ C.length s) s
+                where s = C.append "camp select "
+                        $ C.append idc "\NUL"
                     

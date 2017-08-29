@@ -17,8 +17,6 @@ import Control.Monad
 import Control.Concurrent
 
 -- HD ZM40, CBT ZM41, VNT ZM43, VTM ZM44, HT ZM45, TVK ZM48, KP ZM49, TDLT ZM51
-huntTarget :: ByteString
-huntTarget = "ZM49|ZM51"
 
 main = do pls <- cPls
           forM_ pls $ \u -> do
@@ -38,21 +36,23 @@ splitM conn t = do
         findHr h conn t
     else splitM conn t
 
-hrVerify :: [ByteString] -> Maybe ByteString
-hrVerify heroes
+hrVerify :: [ByteString] -> ByteString -> Maybe ByteString
+hrVerify heroes huntTarget
     | (C.isInfixOf (heroes !! 0) huntTarget) = Just "0"
     | (C.isInfixOf (heroes !! 1) huntTarget) = Just "1"
     | (C.isInfixOf (heroes !! 2) huntTarget) = Just "2"
     | otherwise = Nothing
 
 findHr :: [ByteString] -> Socket -> ThreadId -> IO ()   
-findHr heroes conn t = case hrVerify heroes of
-                Just idx -> do C.putStrLn $ C.append "found hero at " idx
-                               sendAll conn $ openRoom idx
-                               hunt idx conn t
-                Nothing  -> do threadDelay 1000000
-                               sendAll conn $ renewHunt
-                               splitM conn t
+findHr heroes conn t = do 
+    cf <- getConfig
+    case hrVerify heroes (C.pack $ huntTarget cf) of
+        Just idx -> do C.putStrLn $ C.append "found hero at " idx
+                       sendAll conn $ openRoom idx
+                       hunt idx conn t
+        Nothing  -> do threadDelay 1000000
+                       sendAll conn $ renewHunt
+                       splitM conn t
 
 hunt' :: ByteString -> Socket -> IO ()                               
 hunt' idx conn = do threadDelay 1000000
@@ -68,6 +68,7 @@ hunt' idx conn = do threadDelay 1000000
 
 hunt :: ByteString -> Socket -> ThreadId -> IO ()                               
 hunt idx conn t = do threadDelay 1000000
+                     cf <- getConfig
                      msg <- recv conn 1024
                      unless (C.isInfixOf "1b14010102" $ encode msg) $ hunt idx conn t
                      when (C.isInfixOf "1b14010102" $ encode msg) $ do
