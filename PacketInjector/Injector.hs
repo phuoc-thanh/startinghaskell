@@ -38,10 +38,20 @@ cPls = do
     pls <- parseFile "Clone.json" :: IO (Maybe [Player])
     return $ fromJust pls
 
+getConfig :: IO PreConfig
+getConfig = do
+    cf <- parseFile "Config.json" :: IO (Maybe PreConfig)
+    return $ fromJust cf
+
 getPlayer :: String -> IO Player    
 getPlayer uname = do
     users <- parseFile "Players.json" :: IO (Maybe [Player])
-    return $ head $ filter (\u -> (acc u) == uname) (fromJust $ users)    
+    return $ head $ filter (\u -> (acc u) == uname) (fromJust $ users)
+
+getClone :: String -> IO Player    
+getClone uname = do
+    users <- parseFile "Clone.json" :: IO (Maybe [Player])
+    return $ head $ filter (\u -> (acc u) == uname) (fromJust $ users)
 
 sendNTimes :: Integer -> Socket -> ByteString -> IO ()
 sendNTimes 1 c s = sendAll c s

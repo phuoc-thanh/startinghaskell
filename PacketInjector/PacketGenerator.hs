@@ -54,6 +54,15 @@ armyRequest idx = C.append (hexSerialize $ C.length s) s
                     where s = C.append "army request "
                             $ C.append idx "\NUL"    
 
+armyReqList :: ByteString
+armyReqList = C.append (hexSerialize $ C.length s) s
+                where s = "army reqlist\NUL"
+
+armyAgree :: ByteString -> ByteString
+armyAgree idx = C.append (hexSerialize $ C.length s) s
+        where s = C.append "army agree "
+                $ C.append idx "\NUL"              
+
 tPacket :: ByteString
 tPacket = C.append (hexSerialize $ C.length s) s
              where s = "store 8 2\NUL"

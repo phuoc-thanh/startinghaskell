@@ -7,6 +7,7 @@ module Parser ( encode
               , Server(..)
               , Player(..)
               , Match(..)
+              , PreConfig (..)
               , FromJSON(..)
               , ToJSON(..)
               ) where
@@ -31,6 +32,7 @@ data Server = Server { sid   :: String,
                        ip    :: String,
                        port  :: String }
                    deriving (Show, Eq, Generic)
+
 data Player = Player { acc           :: String,
                        uid           :: String,
                        opname        :: String,
@@ -47,6 +49,17 @@ data Match = Match { mid  :: String,
                      lose :: String }
                    deriving (Show, Eq, Generic)
 
+data PreConfig = PreConfig { armyId       :: String,
+                             armyLead     :: Player,
+                             armyGroup    :: Int,
+                             cloneCamp    :: String,
+                             cloneKeyword :: String,
+                             cloneServer  :: String,
+                             defaultPass  :: String,
+                             huntTarget   :: String,
+                             huntDelay    :: Int }                   
+                    deriving (Show, Generic)
+
 instance FromJSON Server
 instance ToJSON Server
 
@@ -55,3 +68,6 @@ instance ToJSON Player
 
 instance FromJSON Match
 instance ToJSON Match
+
+instance FromJSON PreConfig
+instance ToJSON PreConfig
