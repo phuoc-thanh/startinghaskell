@@ -95,7 +95,7 @@ requestA_ :: Socket -> ThreadId -> IO ()
 requestA_ conn t = do 
     threadDelay 800000
     msg <- recv conn 2048
-    unless (C.isInfixOf "0300aa0801" $ encode msg) $ requestA conn t
+    unless (C.isInfixOf "0300aa0801" $ encode msg) $ requestA_ conn t
     when (C.isInfixOf "0300aa0801" $ encode msg) $ do
         sendAll conn armyBase
         sendAll conn armyReward
