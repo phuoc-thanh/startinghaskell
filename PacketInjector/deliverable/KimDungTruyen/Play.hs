@@ -190,6 +190,7 @@ goPtFour conn chapter = do threadDelay 3000000
 goPtFive :: Socket -> [ByteString] -> IO ()
 goPtFive conn [] = do cf <- getConfig
                       sendAll conn $ campSelect $ C.pack (cloneCamp cf)
+                      sendAll conn $ copySwap_ "C03B01"
                       threadDelay 200000
                       C.putStrLn "Done"
                       close conn
