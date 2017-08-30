@@ -16,61 +16,100 @@ import Network.Socket.ByteString (recv, sendAll)
 import Control.Monad
 import Control.Concurrent
 
+          
 sendP :: String -> Integer -> IO ()
 sendP uname n = do user <- getPlayer uname
                    conn <- joinWorld user
-                   sendNTimes n conn rankReward
+                   sendNTimes n conn tPacket
 
-main = do pls <- cPls
-          forM_ (groupOf 2 pls) $ \gr -> do
-              forkIO $ do
-                  mHandler gr           
+main = do 
+    cf <- getConfig    
+    forkIO $ do
+        conn <- joinWorld $ armyLead cf
+        sendAll conn armyBase
+        armyAgree_ conn $ C.pack $ cloneKeyword cf
+    threadDelay 5000000
+    forkIO $ do
+        pls <- cPls
+        forM_ (groupOf (armyGroup cf) pls) $ \gr -> do
+            forkIO $ do
+                mHandler gr (C.pack $ armyId cf)
+            threadDelay 120000000
 
 groupOf :: Int -> [Player] -> [[Player]]          
 groupOf _ [] = []           
 groupOf n pls = (take n pls) : groupOf n (drop n pls)
 
-mHandler :: [Player] -> IO ()
-mHandler pls = do
+mHandler :: [Player] -> ByteString -> IO ()
+mHandler pls armyid = do
     forM_ pls $ \p -> do
         forkIO $ do
             tid <- myThreadId
             conn <- joinWorld p
-            sendAll conn (armyRequest "48000006")
+            sendAll conn (armyRequest armyid)
             requestA conn tid
-        threadDelay 120000000
-    
 
-armyMis_ :: IO ()                  
-armyMis_ = do clone <- cPls
-              forM_ clone $ \u -> do
-                forkIO $ do
-                    tid <- myThreadId
-                    conn <- joinWorld u
-                    sendAll conn (armyRequest "48000006")
-                    requestA conn tid
+armyAgree_ :: Socket -> ByteString -> IO ()            
+armyAgree_ conn keyword = do
+    sendAll conn armyReqList
+    threadDelay 800000
+    msg <- recv conn 2048
+    unless (C.isInfixOf keyword msg) $ armyAgree_ conn keyword
+    when (C.isInfixOf keyword msg) $ do
+        pl <- getClone . C.unpack . C.take (4 + C.length keyword) . snd $ C.breakSubstring keyword msg
+        sendAll conn $ armyAgree (C.pack $ chNumber pl)
+        armyAgree_ conn keyword
 
 armyMis :: IO ()                  
-armyMis  = do bUsers <- buffPls
-              forM_ bUsers $ \u -> do
-                forkIO $ do
-                    tid <- myThreadId
-                    conn <- joinWorld u
-                    sendAll conn armyBase
-                    sendAll conn armyReward
-                    threadDelay 2000000
-                    C.putStrLn "Done"
+armyMis  = do 
+    bUsers <- buffPls
+    forM_ bUsers $ \u -> do
+        forkIO $ do
+            tid <- myThreadId
+            conn <- joinWorld u
+            sendAll conn armyBase
+            sendAll conn armyReward
+            threadDelay 2000000
+            C.putStrLn "Done"
+
+armyMis_ :: IO ()                  
+armyMis_  = do
+    cf <- getConfig
+    bUsers <- buffPls
+    let armyid = C.pack $ armyId cf
+    forM_ bUsers $ \u -> do
+        forkIO $ do
+            tid <- myThreadId
+            conn <- joinWorld u
+            sendAll conn (armyRequest armyid)
+            requestA_ conn tid                  
 
 requestA :: Socket -> ThreadId -> IO ()
-requestA conn t = do threadDelay 2000000
-                     msg <- recv conn 1024
-                     unless (C.isInfixOf "0300aa0801" $ encode msg) $ requestA conn t
-                     when (C.isInfixOf "0300aa0801" $ encode msg) $ do
-                         sendAll conn armyBase
-                         sendAll conn armyReward
-                         sendAll conn armyJoss
-                         sendAll conn armyMisList
-                         missionGo 4 conn t
+requestA conn t = do 
+    threadDelay 800000
+    msg <- recv conn 2048
+    unless (C.isInfixOf "0300aa0801" $ encode msg) $ requestA conn t
+    when (C.isInfixOf "0300aa0801" $ encode msg) $ do
+        sendAll conn armyBase
+        sendAll conn armyReward
+        sendAll conn armyJoss
+        sendAll conn armyMisList
+        missionGo 4 conn t
+
+requestA_ :: Socket -> ThreadId -> IO ()
+requestA_ conn t = do 
+    threadDelay 800000
+    msg <- recv conn 2048
+    unless (C.isInfixOf "0300aa0801" $ encode msg) $ requestA conn t
+    when (C.isInfixOf "0300aa0801" $ encode msg) $ do
+        sendAll conn armyBase
+        sendAll conn armyReward
+        threadDelay 2000000
+        sendAll conn armyExit
+        threadDelay 2000000
+        close conn
+        killThread t
+        C.putStrLn "DONE!"                        
                     
 missionV :: (ByteString, Int) -> Int
 missionV (m, i) = if (C.isInfixOf m "0501dc05|0401b004") then i else 0
@@ -106,7 +145,7 @@ missionAccept e m conn t
 missionGo :: Int -> Socket -> ThreadId -> IO ()
 missionGo e conn t = do
     threadDelay 1000000
-    msg <- recv conn 1024
+    msg <- recv conn 2048
     when (C.isInfixOf "0300a12905" $ encode msg) $ do
         sendAll conn armyMisSpdUp
         threadDelay 1000000
@@ -123,24 +162,6 @@ missionGo e conn t = do
         let m = missionFilter . snd . C.breakSubstring "2300e904" $ encode msg
         missionAccept e m conn t
 
-listenA' :: Socket -> ThreadId -> IO ()              
-listenA' conn t = do    threadDelay 200000
-                        msg <- recv conn 2048
-                        when (C.isInfixOf "0300a12905" $ encode msg) $ do
-                            C.putStrLn "done!"
-                            close conn
-                            killThread t
-                        unless (C.isInfixOf "2300e904" $ encode msg) $ listenA' conn t
-                        when (C.isInfixOf "2300e904" $ encode msg) $ do
-                            forM_ (map (armyMisAward) ["1","2","3","4"]) $ \p -> do
-                                sendAll conn p
-                            threadDelay 1000000
-                            forM_ (map (armyMisAccept) ["1","2","3","4"]) $ \p -> do
-                                sendAll conn p
-                            threadDelay 2000000
-                            sendAll conn armyMisSpdUp
-                            sendAll conn armyMisList
-                            listenA' conn t
 
 chapterOne = map (chapter) ["C01B03","C01B04","C01B05","C01B06","C01B07","C01B08"]
 chapterTwo = map (chapter) ["C02B01","C02B02","C02B03","C02B04","C02B05","C02B06","C02B07","C02B08","C02B09","C02B10"]
@@ -201,7 +222,10 @@ goPtFour conn chapter = do threadDelay 3000000
                                goPtFour conn $ tail chapter
                                
 goPtFive :: Socket -> [ByteString] -> IO ()
-goPtFive conn [] = do threadDelay 200000
+goPtFive conn [] = do cf <- getConfig
+                      sendAll conn $ campSelect $ C.pack (cloneCamp cf)
+                      sendAll conn $ copySwap_ "C03B01"
+                      threadDelay 2000000
                       C.putStrLn "Done"
                       close conn
 goPtFive conn chapter = do threadDelay 1000000
@@ -221,11 +245,12 @@ eCombat = hexDeserialize . lastN 6
 regString :: String -> [Int] -> [String]
 regString p n = zipWith (++) (repeat p) (map show n)
 
-massReg :: String -> [Int] -> String -> IO ()
-massReg p n s = do
+massReg :: String -> [Int] -> IO ()
+massReg p n = do
+    cf <- getConfig
     let rString = regString p n
     forM_ rString $ \u -> do
-            cChar u "112211" s 
+            cChar u (defaultPass cf) (cloneServer cf) 
 
 cChar u p s = do 
     (conn, res) <- reg u p s

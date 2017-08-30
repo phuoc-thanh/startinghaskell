@@ -10,7 +10,7 @@ import qualified Data.ByteString.Char8 as C
 rankReward :: ByteString
 rankReward = C.append (hexSerialize $ C.length s) s
                 where s = "rankList reward 8\NUL"
-                
+
 armyBase :: ByteString
 armyBase = C.append (hexSerialize $ C.length s) s
                 where s = "army base 0\NUL"
@@ -53,6 +53,15 @@ armyRequest :: ByteString -> ByteString
 armyRequest idx = C.append (hexSerialize $ C.length s) s
                     where s = C.append "army request "
                             $ C.append idx "\NUL"    
+
+armyReqList :: ByteString
+armyReqList = C.append (hexSerialize $ C.length s) s
+                where s = "army reqlist\NUL"
+
+armyAgree :: ByteString -> ByteString
+armyAgree idx = C.append (hexSerialize $ C.length s) s
+        where s = C.append "army agree "
+                $ C.append idx "\NUL"              
 
 tPacket :: ByteString
 tPacket = C.append (hexSerialize $ C.length s) s
@@ -103,6 +112,11 @@ copySwap :: ByteString -> ByteString
 copySwap c = C.append (hexSerialize $ C.length s) s
                 where s = C.append "copy swap "
                         $ C.append  c " 1 18\NUL"
+                        
+copySwap_ :: ByteString -> ByteString
+copySwap_ c = C.append (hexSerialize $ C.length s) s
+                where s = C.append "copy swap "
+                        $ C.append  c " 1 8\NUL"                        
 
 registeReward :: ByteString
 registeReward = C.append (hexSerialize $ C.length s) s

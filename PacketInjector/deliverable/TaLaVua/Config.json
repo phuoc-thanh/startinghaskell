@@ -1,0 +1,11 @@
+{
+    "armyId" : "159000003",
+    "armyLead" : {} ,
+    "armyGroup" : 16,
+    "cloneCamp" : "2",
+    "cloneKeyword" :"november",
+    "cloneServer" : "102",
+    "defaultPass" : "abctest123",
+    "huntTarget" : "ZM49,ZM51",
+    "huntDelay" : 7000000
+}
