@@ -76,6 +76,7 @@ armyMis_  = do
         forkIO $ do
             tid <- myThreadId
             conn <- joinWorld u
+            activityRewards conn
             sendAll conn (armyRequest armyid)
             requestA_ conn tid                  
 
@@ -158,6 +159,19 @@ missionGo e conn t = do
         missionAccept e m conn t
 
 
+activityRewards :: Socket -> IO ()
+activityRewards conn = do
+    sendAll conn $ activityItem "11091"
+    recv conn 2048
+    forM_ ["86333", "86334","86361"] $ \n -> do
+        sendAll conn $ activityReward n
+        recv conn 2048
+    sendAll conn $ propUse "1031" "8"
+
+
+----------------------------------------------------------
+
+
 chapterOne = map (chapter) ["C01B03","C01B04","C01B05","C01B06","C01B07","C01B08"]
 chapterTwo = map (chapter) ["C02B01","C02B02","C02B03","C02B04","C02B05","C02B06","C02B07","C02B08","C02B09","C02B10"]
 repeatchapter x = take x . repeat $ (chapter "C03B01")
@@ -191,10 +205,10 @@ goPtTwo conn chapter = do  threadDelay 4000000
 
 goPtThree :: Socket -> [ByteString] -> IO ()           
 goPtThree conn [] = do sendAll conn registeReward
-                       sendAll conn useEnergy
+                       sendAll conn $ propUse "1022" "2"
                        threadDelay 200000
                        sendAll conn $ chapter "C03B01"
-                       goPtFour conn $ repeatchapter 24
+                       goPtFour conn $ repeatchapter 22
 goPtThree conn chapter = do threadDelay 3000000
                             msg <- recv conn 2048
                             unless (C.isInfixOf "0d00440700" $ encode msg) $ goPtThree conn chapter
@@ -204,7 +218,7 @@ goPtThree conn chapter = do threadDelay 3000000
                               goPtThree conn $ tail chapter
 
 goPtFour :: Socket -> [ByteString] -> IO ()           
-goPtFour conn [] = do sendAll conn useEnergy
+goPtFour conn [] = do sendAll conn $ propUse "1022" "2"
                       threadDelay 200000
                       sendAll conn $ (copySwap "C03B01")
                       goPtFive conn $ [(copySwap "C03B01"), (copySwap "C03B01")]
@@ -227,7 +241,7 @@ goPtFive conn chapter = do threadDelay 1000000
                            msg <- recv conn 2048
                            unless (C.isInfixOf "0900210300" $ encode msg) $ goPtFive conn chapter
                            when (C.isInfixOf "0900210300" $ encode msg) $ do
-                               sendAll conn useEnergy
+                               sendAll conn $ propUse "1022" "2"
                                sendAll conn $ head chapter
                                goPtFive conn $ tail chapter
 

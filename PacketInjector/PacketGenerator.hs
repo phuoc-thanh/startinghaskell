@@ -15,6 +15,16 @@ rankReward :: ByteString
 rankReward = C.append (hexSerialize $ C.length s) s
                 where s = "rankList reward 8\NUL"
 
+activityItem :: ByteString -> ByteString
+activityItem n = C.append (hexSerialize $ C.length s) s
+                    where s = C.append "activity_items "
+                            $ C.append n "\NUL"
+
+activityReward :: ByteString -> ByteString
+activityReward n = C.append (hexSerialize $ C.length s) s
+                    where s = C.append "activity_reward "
+                            $ C.append n " 0\NUL"                            
+
 armyBase :: ByteString
 armyBase = C.append (hexSerialize $ C.length s) s
                 where s = "army base 0\NUL"
@@ -122,9 +132,12 @@ registeReward :: ByteString
 registeReward = C.append (hexSerialize $ C.length s) s
     where s = "registeReward reward\NUL"
 
-useEnergy :: ByteString                
-useEnergy = C.append (hexSerialize $ C.length s) s
-                where s = "prop_use 1022 2\NUL"
+propUse :: ByteString -> ByteString -> ByteString
+propUse c n = C.append (hexSerialize $ C.length s) s
+                where s = C.append "prop_use " 
+                        $ C.append c
+                        $ C.append " "
+                        $ C.append n "\NUL"
                 
 choiceCombat :: ByteString -> ByteString                
 choiceCombat idx = C.append (hexSerialize $ C.length s) s

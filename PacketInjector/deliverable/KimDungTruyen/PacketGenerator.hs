@@ -8,6 +8,16 @@ import Data.ByteString (ByteString)
 import qualified Data.ByteString.Char8 as C
 
 
+activityItem :: ByteString -> ByteString
+activityItem n = C.append (hexSerialize $ C.length s) s
+                    where s = C.append "activity_items "
+                            $ C.append n "\NUL"
+
+activityReward :: ByteString -> ByteString
+activityReward n = C.append (hexSerialize $ C.length s) s
+                    where s = C.append "activity_reward "
+                            $ C.append n " 0\NUL"                            
+
 armyBase :: ByteString
 armyBase = C.append (hexSerialize $ C.length s) s
                 where s = "army base 0\NUL"
@@ -59,10 +69,6 @@ armyAgree :: ByteString -> ByteString
 armyAgree idx = C.append (hexSerialize $ C.length s) s
         where s = C.append "army agree "
                 $ C.append idx "\NUL"              
-
-tPacket :: ByteString
-tPacket = C.append (hexSerialize $ C.length s) s
-             where s = "store 8 2\NUL"
 
 bet100 :: ByteString -> ByteString
 bet100 idx = C.append (hexSerialize $ C.length s) s
@@ -119,9 +125,12 @@ registeReward :: ByteString
 registeReward = C.append (hexSerialize $ C.length s) s
     where s = "registeReward reward\NUL"
 
-useEnergy :: ByteString                
-useEnergy = C.append (hexSerialize $ C.length s) s
-                where s = "prop_use 1022 2\NUL"
+propUse :: ByteString -> ByteString -> ByteString
+propUse c n = C.append (hexSerialize $ C.length s) s
+                where s = C.append "prop_use " 
+                        $ C.append c
+                        $ C.append " "
+                        $ C.append n "\NUL"
                 
 choiceCombat :: ByteString -> ByteString                
 choiceCombat idx = C.append (hexSerialize $ C.length s) s
