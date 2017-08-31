@@ -7,6 +7,10 @@ import Serializer
 import Data.ByteString (ByteString)
 import qualified Data.ByteString.Char8 as C
 
+tPacket :: ByteString
+tPacket = C.append (hexSerialize $ C.length s) s
+             where s = "store 8 2\NUL"
+
 rankReward :: ByteString
 rankReward = C.append (hexSerialize $ C.length s) s
                 where s = "rankList reward 8\NUL"
@@ -62,10 +66,6 @@ armyAgree :: ByteString -> ByteString
 armyAgree idx = C.append (hexSerialize $ C.length s) s
         where s = C.append "army agree "
                 $ C.append idx "\NUL"              
-
-tPacket :: ByteString
-tPacket = C.append (hexSerialize $ C.length s) s
-             where s = "store 8 2\NUL"
 
 bet100 :: ByteString -> ByteString
 bet100 idx = C.append (hexSerialize $ C.length s) s

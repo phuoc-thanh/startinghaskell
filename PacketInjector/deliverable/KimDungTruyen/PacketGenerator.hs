@@ -109,6 +109,11 @@ copySwap :: ByteString -> ByteString
 copySwap c = C.append (hexSerialize $ C.length s) s
                 where s = C.append "copy swap "
                         $ C.append  c " 1 18\NUL"
+                        
+copySwap_ :: ByteString -> ByteString
+copySwap_ c = C.append (hexSerialize $ C.length s) s
+                where s = C.append "copy swap "
+                        $ C.append  c " 1 8\NUL"                        
 
 registeReward :: ByteString
 registeReward = C.append (hexSerialize $ C.length s) s
