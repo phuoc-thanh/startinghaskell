@@ -109,3 +109,17 @@ joinWorld user = do uServer <- getServerInfo (defaultsid $ user)
                     sendAll sock $ enterW (C.pack $ uid user) (C.pack $ chNumber user)
                     C.putStrLn $ C.append (C.pack $ acc user) " has joined the KD world!"
                     return sock
+
+waitfor str conn tid f = do 
+    threadDelay 1000000
+    msg <- recv conn 1024
+    let m = C.isInfixOf str msg
+    unless m $ waitfor str conn tid f
+    when m $ f
+    
+waitfor_ str conn tid f = do 
+    threadDelay 1000000
+    msg <- recv conn 1024
+    let m = C.isInfixOf str msg
+    unless m $ waitfor_ str conn tid f
+    when m $ f msg conn tid
