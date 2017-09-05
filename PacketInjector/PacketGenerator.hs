@@ -147,4 +147,13 @@ campSelect :: ByteString -> ByteString
 campSelect idc = C.append (hexSerialize $ C.length s) s
                 where s = C.append "camp select "
                         $ C.append idc "\NUL"
-                    
+   
+--wboss 4 2
+wboss :: ByteString
+wboss = C.append (hexSerialize $ C.length s) s
+        where s = "wboss 3 2\NUL"
+        
+frSearch :: ByteString -> ByteString
+frSearch fr = C.append (hexSerialize $ C.length s) s
+                where s = C.append "friend search "
+                        $ C.append fr "\NUL"

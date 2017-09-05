@@ -24,17 +24,14 @@ main = do pls <- cPls
                 tid <- myThreadId
                 conn <- joinWorld u
                 sendAll conn $ iniHunt
+                -- waitforM "ZM" conn tid splitM
                 splitM conn tid
 
 splitM :: Socket -> ThreadId -> IO ()              
 splitM conn t = do
-    threadDelay 1000000
-    msg <- recv conn 1024
-    if C.isInfixOf "ZM" msg
-    then do
-        let h = tail . map (C.pack . take 4) $ split (startsWith "ZM") $ C.unpack msg
-        findHr h conn t
-    else splitM conn t
+    msg <- waitforM "5a4d" (1000000, 1024) conn
+    let h = tail . map (C.pack . take 4) $ split (startsWith "5a4d") $ C.unpack msg
+    findHr h conn t
 
 hrVerify :: [ByteString] -> ByteString -> Maybe ByteString
 hrVerify heroes huntTarget
@@ -54,28 +51,11 @@ findHr heroes conn t = do
                        sendAll conn $ renewHunt
                        splitM conn t
 
-hunt' :: ByteString -> Socket -> IO ()                               
-hunt' idx conn = do threadDelay 1000000
-                    msg <- recv conn 1024
-                    unless (C.isInfixOf "TuHaTienTu" msg) $ hunt' idx conn
-                    when (C.isInfixOf "TuHaTienTu" msg) $ do
-                        threadDelay 3000000
-                        sendAll conn $ goHunt idx
-                        msg <- recv conn 1024
-                        threadDelay 3000000
-                        close conn
-
-
 hunt :: ByteString -> Socket -> ThreadId -> IO ()                               
-hunt idx conn t = do threadDelay 1000000
-                     cf <- getConfig
-                     msg <- recv conn 1024
-                     unless (C.isInfixOf "1b14010102" $ encode msg) $ hunt idx conn t
-                     when (C.isInfixOf "1b14010102" $ encode msg) $ do
-                         threadDelay 7000000
-                         sendAll conn $ goHunt idx
-                         msg <- recv conn 1024
-                         threadDelay 3000000
-                         close conn
-                         killThread t
-                
+hunt idx conn t = waitfor "1b14010102" (1000000, 1024) conn $ do
+    threadDelay 7000000
+    sendAll conn $ goHunt idx
+    msg <- recv conn 1024
+    threadDelay 3000000
+    close conn
+    killThread t     

@@ -110,33 +110,16 @@ joinWorld user = do uServer <- getServerInfo (defaultsid $ user)
                     C.putStrLn $ C.append (C.pack $ acc user) " has joined the KD world!"
                     return sock
 
-waitfor str conn tid f = do 
-    threadDelay 1000000
-    msg <- recv conn 1024
-    let m = C.isInfixOf str msg
-    unless m $ waitfor str conn tid f
-    when m $ f
-
--- fast version of waitfor
-waitfor_ str conn tid f = do 
-    threadDelay 800000
-    msg <- recv conn 2048
-    let m = C.isInfixOf str msg
-    unless m $ waitfor_ str conn tid f
-    when m $ f
-
--- waitfor and call action on catched msg
-waitforM str conn tid f = do 
-    threadDelay 1000000
-    msg <- recv conn 1024
-    let m = C.isInfixOf str msg
-    unless m $ waitforM str conn tid f
-    when m $ f msg conn tid
-
--- fast version of waitforM
-waitforM_ str conn tid f = do 
-    threadDelay 800000
-    msg <- recv conn 2048
-    let m = C.isInfixOf str msg
-    unless m $ waitforM_ str conn tid f
-    when m $ f msg conn tid    
+waitfor str (delay, byte) conn f = do 
+    threadDelay delay
+    msg <- recv conn byte
+    let m = C.isInfixOf str $ encode msg
+    if m then f else waitfor str (delay, byte) conn f
+    
+-- wait and return the message
+waitforM :: ByteString -> (Int, Int) -> Socket -> IO (ByteString)
+waitforM str (delay, byte) conn = do 
+    threadDelay delay
+    msg <- recv conn byte
+    let m = C.isInfixOf str $ encode msg
+    if m then return msg else waitforM str (delay, byte) conn

@@ -24,11 +24,13 @@ main = do pls <- cPls
                 tid <- myThreadId
                 conn <- joinWorld u
                 sendAll conn $ iniHunt
-                waitforM "ZM" conn tid splitM
+                -- waitforM "ZM" conn tid splitM
+                splitM conn tid
 
-splitM :: ByteString -> Socket -> ThreadId -> IO ()              
-splitM msg conn t = do
-    let h = tail . map (C.pack . take 4) $ split (startsWith "ZM") $ C.unpack msg
+splitM :: Socket -> ThreadId -> IO ()              
+splitM conn t = do
+    msg <- waitforM "5a4d" (1000000, 1024) conn
+    let h = tail . map (C.pack . take 4) $ split (startsWith "5a4d") $ C.unpack msg
     findHr h conn t
 
 hrVerify :: [ByteString] -> ByteString -> Maybe ByteString
@@ -47,10 +49,10 @@ findHr heroes conn t = do
                        hunt idx conn t
         Nothing  -> do threadDelay 1000000
                        sendAll conn $ renewHunt
-                       waitforM "ZM" conn t splitM
+                       splitM conn t
 
 hunt :: ByteString -> Socket -> ThreadId -> IO ()                               
-hunt idx conn t = waitfor "1b14010102" conn t $ do
+hunt idx conn t = waitfor "1b14010102" (1000000, 1024) conn $ do
     threadDelay 7000000
     sendAll conn $ goHunt idx
     msg <- recv conn 1024

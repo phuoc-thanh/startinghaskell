@@ -81,31 +81,23 @@ armyMis_  = do
             requestA_ conn tid                  
 
 requestA :: Socket -> ThreadId -> IO ()
-requestA conn t = do 
-    threadDelay 800000
-    msg <- recv conn 2048
-    unless (C.isInfixOf "0300aa0801" $ encode msg) $ requestA conn t
-    when (C.isInfixOf "0300aa0801" $ encode msg) $ do
-        sendAll conn armyBase
-        sendAll conn armyReward
-        sendAll conn armyJoss
-        sendAll conn armyMisList
-        missionGo 4 conn t
+requestA conn t = waitfor "0300aa0801" (800000, 2048) conn $ do
+    sendAll conn armyBase
+    sendAll conn armyReward
+    sendAll conn armyJoss
+    sendAll conn armyMisList
+    missionGo 4 conn t
 
 requestA_ :: Socket -> ThreadId -> IO ()
-requestA_ conn t = do 
-    threadDelay 800000
-    msg <- recv conn 2048
-    unless (C.isInfixOf "0300aa0801" $ encode msg) $ requestA_ conn t
-    when (C.isInfixOf "0300aa0801" $ encode msg) $ do
-        sendAll conn armyBase
-        sendAll conn armyReward
-        threadDelay 2000000
-        sendAll conn armyExit
-        threadDelay 2000000
-        close conn
-        killThread t
-        C.putStrLn "DONE!"                        
+requestA_ conn t = waitfor "0300aa0801" (800000, 2048) conn $ do
+    sendAll conn armyBase
+    sendAll conn armyReward
+    threadDelay 2000000
+    sendAll conn armyExit
+    threadDelay 2000000
+    close conn
+    killThread t
+    C.putStrLn "DONE!"
                     
 missionV :: (ByteString, Int) -> Int
 missionV (m, i) = if (C.isInfixOf m "0501dc05|0401b004") then i else 0
@@ -181,69 +173,58 @@ lvlup pl = do conn <- joinWorld pl
               goPtOne conn
 
 goPtOne :: Socket -> IO ()              
-goPtOne conn = do 
+goPtOne conn = do
+    msg <- waitforM "0090130000" (2000000, 1024) conn
+    sendAll conn $ choiceCombat (C.pack . show . eCombat $ fst $ C.breakSubstring "0090130000" $ encode msg)
     threadDelay 2000000
-    msg <- recv conn 1024
-    unless (C.isInfixOf "0090130000" $ encode msg) $ goPtOne conn
-    when (C.isInfixOf "0090130000" $ encode msg) $ do
-        sendAll conn $ choiceCombat (C.pack . show . eCombat $ fst $ C.breakSubstring "0090130000" $ encode msg)
-        threadDelay 2000000
-        sendAll conn copyBlock
-        sendAll conn $ chapter "C01B02"
-        goPtTwo conn (chapterOne ++ chapterTwo)
+    sendAll conn copyBlock
+    sendAll conn $ chapter "C01B02"
+    goPtTwo conn (chapterOne ++ chapterTwo)
 
 goPtTwo :: Socket -> [ByteString] -> IO ()           
-goPtTwo conn [] = do sendAll conn $ chapter "C03B01"
-                     goPtThree conn $ repeatchapter 24
-goPtTwo conn chapter = do  threadDelay 4000000
-                           msg <- recv conn 2048
-                           unless (C.isInfixOf "0d00440700" $ encode msg) $ goPtTwo conn chapter
-                           when (C.isInfixOf "0d00440700" $ encode msg) $ do
-                               sendAll conn copyBlock
-                               sendAll conn $ head chapter
-                               goPtTwo conn $ tail chapter
+goPtTwo conn [] = do 
+    sendAll conn $ chapter "C03B01"
+    goPtThree conn $ repeatchapter 24
+goPtTwo conn chapter = waitfor "0d00440700" (4000000, 2048) conn $ do
+    sendAll conn copyBlock
+    sendAll conn $ head chapter
+    goPtTwo conn $ tail chapter
 
 goPtThree :: Socket -> [ByteString] -> IO ()           
-goPtThree conn [] = do sendAll conn registeReward
-                       sendAll conn $ propUse "1022" "2"
-                       threadDelay 200000
-                       sendAll conn $ chapter "C03B01"
-                       goPtFour conn $ repeatchapter 22
-goPtThree conn chapter = do threadDelay 3000000
-                            msg <- recv conn 2048
-                            unless (C.isInfixOf "0d00440700" $ encode msg) $ goPtThree conn chapter
-                            when (C.isInfixOf "0d00440700" $ encode msg) $ do
-                              sendAll conn copyBlock
-                              sendAll conn $ head chapter
-                              goPtThree conn $ tail chapter
+goPtThree conn [] = do 
+    sendAll conn registeReward
+    sendAll conn $ propUse "1022" "2"
+    threadDelay 1600000
+    sendAll conn $ chapter "C03B01"
+    goPtFour conn $ repeatchapter 22
+goPtThree conn chapter = waitfor "0d00440700" (3200000, 2048) conn $ do
+    sendAll conn copyBlock
+    sendAll conn $ head chapter
+    goPtThree conn $ tail chapter
 
 goPtFour :: Socket -> [ByteString] -> IO ()           
-goPtFour conn [] = do sendAll conn $ propUse "1022" "2"
-                      threadDelay 200000
-                      sendAll conn $ (copySwap "C03B01")
-                      goPtFive conn $ [(copySwap "C03B01"), (copySwap "C03B01")]
-goPtFour conn chapter = do threadDelay 3000000
-                           msg <- recv conn 2048
-                           unless (C.isInfixOf "0d00440700" $ encode msg) $ goPtFour conn chapter
-                           when (C.isInfixOf "0d00440700" $ encode msg) $ do
-                               sendAll conn copyBlock
-                               sendAll conn $ head chapter
-                               goPtFour conn $ tail chapter
+goPtFour conn [] = do 
+    sendAll conn $ propUse "1022" "2"
+    threadDelay 1600000
+    sendAll conn $ (copySwap "C03B01")
+    goPtFive conn $ [(copySwap "C03B01"), (copySwap "C03B01")]
+goPtFour conn chapter = waitfor "0d00440700" (3200000, 2048) conn $ do
+    sendAll conn copyBlock
+    sendAll conn $ head chapter
+    goPtFour conn $ tail chapter
                                
 goPtFive :: Socket -> [ByteString] -> IO ()
-goPtFive conn [] = do cf <- getConfig
-                      sendAll conn $ campSelect $ C.pack (cloneCamp cf)
-                      sendAll conn $ copySwap_ "C03B01"
-                      threadDelay 2000000
-                      C.putStrLn "Done"
-                      close conn
-goPtFive conn chapter = do threadDelay 1000000
-                           msg <- recv conn 2048
-                           unless (C.isInfixOf "0900210300" $ encode msg) $ goPtFive conn chapter
-                           when (C.isInfixOf "0900210300" $ encode msg) $ do
-                               sendAll conn $ propUse "1022" "2"
-                               sendAll conn $ head chapter
-                               goPtFive conn $ tail chapter
+goPtFive conn [] = do 
+    cf <- getConfig
+    sendAll conn $ campSelect $ C.pack (cloneCamp cf)
+    sendAll conn $ copySwap_ "C03B01"
+    threadDelay 2400000
+    C.putStrLn "Done"
+    close conn
+goPtFive conn chapter = waitfor "0900210300" (1600000, 2048) conn $ do
+    sendAll conn $ propUse "1022" "2"
+    sendAll conn $ head chapter
+    goPtFive conn $ tail chapter
 
 lastN :: Int -> ByteString -> ByteString
 lastN n xs = C.drop (C.length xs - n) xs

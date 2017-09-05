@@ -109,3 +109,17 @@ joinWorld user = do uServer <- getServerInfo (defaultsid $ user)
                     sendAll sock $ enterW (C.pack $ uid user) (C.pack $ chNumber user)
                     C.putStrLn $ C.append (C.pack $ acc user) " has joined the KD world!"
                     return sock
+
+waitfor str (delay, byte) conn f = do 
+    threadDelay delay
+    msg <- recv conn byte
+    let m = C.isInfixOf str $ encode msg
+    if m then f else waitfor str (delay, byte) conn f
+    
+-- wait and return the message
+waitforM :: ByteString -> (Int, Int) -> Socket -> IO (ByteString)
+waitforM str (delay, byte) conn = do 
+    threadDelay delay
+    msg <- recv conn byte
+    let m = C.isInfixOf str $ encode msg
+    if m then return msg else waitforM str (delay, byte) conn
