@@ -116,10 +116,27 @@ waitfor str conn tid f = do
     let m = C.isInfixOf str msg
     unless m $ waitfor str conn tid f
     when m $ f
-    
+
+-- fast version of waitfor
 waitfor_ str conn tid f = do 
+    threadDelay 800000
+    msg <- recv conn 2048
+    let m = C.isInfixOf str msg
+    unless m $ waitfor_ str conn tid f
+    when m $ f
+
+-- waitfor and call action on catched msg
+waitforM str conn tid f = do 
     threadDelay 1000000
     msg <- recv conn 1024
     let m = C.isInfixOf str msg
-    unless m $ waitfor_ str conn tid f
+    unless m $ waitforM str conn tid f
     when m $ f msg conn tid
+
+-- fast version of waitforM
+waitforM_ str conn tid f = do 
+    threadDelay 800000
+    msg <- recv conn 2048
+    let m = C.isInfixOf str msg
+    unless m $ waitforM_ str conn tid f
+    when m $ f msg conn tid    

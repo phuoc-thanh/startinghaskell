@@ -24,7 +24,7 @@ main = do pls <- cPls
                 tid <- myThreadId
                 conn <- joinWorld u
                 sendAll conn $ iniHunt
-                waitfor_ "ZM" conn tid splitM
+                waitforM "ZM" conn tid splitM
 
 splitM :: ByteString -> Socket -> ThreadId -> IO ()              
 splitM msg conn t = do
@@ -47,7 +47,7 @@ findHr heroes conn t = do
                        hunt idx conn t
         Nothing  -> do threadDelay 1000000
                        sendAll conn $ renewHunt
-                       waitfor_ "ZM" conn t splitM
+                       waitforM "ZM" conn t splitM
 
 hunt :: ByteString -> Socket -> ThreadId -> IO ()                               
 hunt idx conn t = waitfor "1b14010102" conn t $ do

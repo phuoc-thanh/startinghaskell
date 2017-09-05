@@ -156,17 +156,6 @@
     {
         "amount": 0,
         "displayNovice": 1,
-        "chNumber": "159001092",
-        "uid": "1257806925",
-        "key": "ceaca5be776501c995da1544d91b63e4",
-        "defaultsid": "159",
-        "opname": "10",
-        "create_time": 1504543005,
-        "acc": "november0167"
-    },
-    {
-        "amount": 0,
-        "displayNovice": 1,
         "chNumber": "159001091",
         "uid": "1257806923",
         "key": "91973bd2864e5efc7f175eb4b173cd39",
