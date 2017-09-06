@@ -8,7 +8,6 @@ import Network.Socket hiding (send, recv)
 import Network.Socket.ByteString (send, recv, sendAll)
 import Data.ByteString.Base16
 import Data.Maybe
-import Control.Monad
 import Control.Concurrent
 import qualified Data.ByteString.Char8 as C
 import Data.ByteString (ByteString)
@@ -37,11 +36,6 @@ cPls :: IO [Player]
 cPls = do
     pls <- parseFile "Clone.json" :: IO (Maybe [Player])
     return $ fromJust pls
-
-getConfig :: IO PreConfig
-getConfig = do
-    cf <- parseFile "Config.json" :: IO (Maybe PreConfig)
-    return $ fromJust cf
 
 getPlayer :: String -> IO Player    
 getPlayer uname = do
@@ -110,13 +104,13 @@ joinWorld user = do uServer <- getServerInfo (defaultsid $ user)
                     C.putStrLn $ C.append (C.pack $ acc user) " has joined the KD world!"
                     return sock
 
+waitfor :: ByteString -> (Int, Int) -> Socket -> IO b -> IO b
 waitfor str (delay, byte) conn f = do 
     threadDelay delay
     msg <- recv conn byte
     let m = C.isInfixOf str $ encode msg
     if m then f else waitfor str (delay, byte) conn f
     
--- wait and return the message
 waitforM :: ByteString -> (Int, Int) -> Socket -> IO (ByteString)
 waitforM str (delay, byte) conn = do 
     threadDelay delay

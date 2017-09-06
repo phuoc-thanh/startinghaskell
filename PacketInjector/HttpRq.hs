@@ -6,36 +6,27 @@ module HttpRq where
 
 import Data.Maybe
 import Data.ByteString.Lazy (ByteString)
+import qualified Data.ByteString.Char8 as S
 import qualified Data.ByteString.Lazy.Char8 as C
 
 import Parser
 import Network.HTTP.Simple
 
--- loginVerifyURI = "/sgwww/vega/loginVerify"
 
-
-loginVerifyURI = "/jinyong/vega/loginVerify"
 checkUserURI = "/payclient.ashx?op=CheckUser"
 getUserURI = "/payclient.ashx?op=GetUser"
 regUserURI = "/payclient.ashx?op=RegisterUser"
 
--- apiHost = "api.alv.gaba.vn"
--- apiHost = "api.kimdungqq.com"
-apiHost = "api.kd.gaba.vn"
+checkUserRq :: ByteString -> ByteString -> S.ByteString -> Request
+checkUserRq u p h = setRequestPath checkUserURI
+                  $ setRequestHost h
+                  $ setRequestBodyLBS (userRqBody u p)
+                  $ setRequestMethod "POST"
+                  $ defaultRequest
 
--- payHost = "m-pay.kimdungqq.com"
-payHost = "m-pay.gaba.vn"
-
-checkUserRq :: ByteString -> ByteString -> Request
-checkUserRq u p = setRequestPath checkUserURI
-                $ setRequestHost payHost
-                $ setRequestBodyLBS (userRqBody u p)
-                $ setRequestMethod "POST"
-                $ defaultRequest
-
-newUserRq :: ByteString -> ByteString -> Request
-newUserRq u p   = setRequestPath regUserURI
-                $ setRequestHost payHost
+newUserRq :: ByteString -> ByteString -> S.ByteString -> Request
+newUserRq u p h = setRequestPath regUserURI
+                $ setRequestHost h
                 $ setRequestBodyLBS (userRqBody u p)
                 $ setRequestMethod "POST"
                 $ defaultRequest                
@@ -51,26 +42,32 @@ loginRqBody s = C.append "uid=" . C.append userId . C.append "&token=" $ C.appen
     where session = C.drop 8 $ (!!) (C.split '&' s) 3
           userId  = C.drop 7 $ (!!) (C.split '&' s) 2
 
-loginVerifyRq :: ByteString -> Request       
-loginVerifyRq s = setRequestPath loginVerifyURI
-                $ setRequestHost apiHost
-                $ setRequestBodyLBS (loginRqBody s)
-                $ setRequestMethod "POST"
-                $ setRequestHeader "Content-Type" ["application/x-www-form-urlencoded"]
-                $ defaultRequest
+-- loginVerifyRq :: ByteString -> ByteString -> Request       
+loginVerifyRq s host path = setRequestHost host
+                          $ setRequestPath path
+                          $ setRequestBodyLBS (loginRqBody s)
+                          $ setRequestMethod "POST"
+                          $ setRequestHeader "Content-Type" ["application/x-www-form-urlencoded"]
+                          $ defaultRequest
 
 getUserData :: FromJSON a => ByteString -> Maybe a
 getUserData s = decode $ C.append (C.drop 9 $ head $ C.split '}' s) ",\"chNumber\" : \"unknow\",\"amount\" : 0}"
 
 loginVerify :: String -> String -> IO Player
 loginVerify u p = do
-    cResponse <- httpLBS $ checkUserRq (C.pack u) (C.pack p)
+    cf <- getConfig
+    cResponse <- httpLBS $ checkUserRq (C.pack u) (C.pack p) (S.pack $ payHost cf)
     response <- httpLBS $ loginVerifyRq (getResponseBody cResponse)
+                                        (S.pack $ apiHost cf) 
+                                        (S.pack $ loginPath cf)
     return $ fromJust $ getUserData $ getResponseBody response
 
 regAccount :: String -> String -> IO Player
 regAccount u p = do
-    nResponse <- httpLBS $ newUserRq (C.pack u) (C.pack p)
-    cResponse <- httpLBS $ checkUserRq (C.pack u) (C.pack p)
+    cf <- getConfig
+    nResponse <- httpLBS $ newUserRq (C.pack u) (C.pack p) (S.pack $ payHost cf)
+    cResponse <- httpLBS $ checkUserRq (C.pack u) (C.pack p) (S.pack $ payHost cf)
     response <- httpLBS $ loginVerifyRq (getResponseBody cResponse)
-    return $ fromJust $ getUserData $ getResponseBody response    
+                                        (S.pack $ apiHost cf) 
+                                        (S.pack $ loginPath cf)
+    return $ fromJust $ getUserData $ getResponseBody response

@@ -4,6 +4,7 @@ module Parser ( encode
               , decode
               , parseFile
               , appendJSON
+              , getConfig
               , Server(..)
               , Player(..)
               , Match(..)
@@ -14,6 +15,7 @@ module Parser ( encode
 
 import Data.Aeson
 import Data.Aeson.Encode.Pretty
+import Data.Maybe
 import GHC.Generics
 import qualified Data.ByteString       as BS
 import qualified Data.ByteString.Lazy  as BSL
@@ -26,6 +28,11 @@ parseFile file = do
 
 appendJSON :: ToJSON a => FilePath -> a -> IO ()
 appendJSON fp a = do BSL.writeFile fp $ encodePretty a    
+
+getConfig :: IO PreConfig
+getConfig = do
+    cf <- parseFile "Config.json" :: IO (Maybe PreConfig)
+    return $ fromJust cf
 
 data Server = Server { sid   :: String,
                        sname :: String,
@@ -49,7 +56,10 @@ data Match = Match { mid  :: String,
                      lose :: String }
                    deriving (Show, Eq, Generic)
 
-data PreConfig = PreConfig { armyId       :: String,
+data PreConfig = PreConfig { apiHost      :: String,
+                             payHost      :: String,
+                             loginPath    :: String,
+                             armyId       :: String,
                              armyLead     :: Player,
                              armyGroup    :: Int,
                              cloneCamp    :: String,

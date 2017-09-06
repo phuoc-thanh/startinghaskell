@@ -24,7 +24,6 @@ main = do pls <- cPls
                 tid <- myThreadId
                 conn <- joinWorld u
                 sendAll conn $ iniHunt
-                -- waitforM "ZM" conn tid splitM
                 splitM conn tid
 
 splitM :: Socket -> ThreadId -> IO ()              

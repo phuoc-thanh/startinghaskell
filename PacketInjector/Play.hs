@@ -173,6 +173,7 @@ chapterOne = map (chapter) ["C01B03","C01B04","C01B05","C01B06","C01B07","C01B08
 chapterTwo = map (chapter) ["C02B01","C02B02","C02B03","C02B04","C02B05","C02B06","C02B07","C02B08","C02B09","C02B10"]
 repeatchapter x = take x . repeat $ (chapter "C03B01")
 
+lvlup :: Player -> IO ()
 lvlup pl = do conn <- joinWorld pl
               sendAll conn $ chapter "C01B01"
               goPtOne conn
@@ -260,6 +261,7 @@ cChar u p s = do
     threadDelay 2000000
     close conn
 
+lvlup_ :: IO ()    
 lvlup_ = do pl <- cPls
             forM_ pl $ \u -> do
                 forkIO $ do
