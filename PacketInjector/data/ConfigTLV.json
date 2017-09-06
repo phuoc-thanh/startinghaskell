@@ -1,5 +1,5 @@
 {
-    "apiHost": "api.tlv.gaba.vn",
+    "apiHost": "api.alv.gaba.vn",
     "payHost": "m-pay.gaba.vn",
     "loginPath": "/sgwww/vega/loginVerify",
     "armyId" : "121000011",

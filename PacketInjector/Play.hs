@@ -60,31 +60,6 @@ armyAgree_ conn keyword = do
         sendAll conn $ armyAgree (C.pack $ chNumber pl)
         armyAgree_ conn keyword
 
-armyMis :: IO ()                  
-armyMis  = do 
-    bUsers <- buffPls
-    forM_ bUsers $ \u -> do
-        forkIO $ do
-            tid <- myThreadId
-            conn <- joinWorld u
-            sendAll conn armyBase
-            sendAll conn armyReward
-            threadDelay 2000000
-            C.putStrLn "Done"
-
-armyMis_ :: IO ()                  
-armyMis_  = do
-    cf <- getConfig
-    bUsers <- buffPls
-    let armyid = C.pack $ armyId cf
-    forM_ bUsers $ \u -> do
-        forkIO $ do
-            tid <- myThreadId
-            conn <- joinWorld u
-            activityRewards conn
-            sendAll conn (armyRequest armyid)
-            requestA_ conn tid                  
-
 requestA :: Socket -> ThreadId -> IO ()
 requestA conn t = waitfor "0300aa0801" (800000, 2048) conn $ do
     sendAll conn armyBase
@@ -92,6 +67,19 @@ requestA conn t = waitfor "0300aa0801" (800000, 2048) conn $ do
     sendAll conn armyJoss
     sendAll conn armyMisList
     missionGo 4 conn t
+
+dailyMis :: IO ()                  
+dailyMis  = do
+    cf <- getConfig
+    pls <- buffPls
+    let armyid = C.pack $ armyId cf
+    forM_ pls $ \u -> do
+        forkIO $ do
+            tid <- myThreadId
+            conn <- joinWorld u
+            activityRewards conn
+            sendAll conn (armyRequest armyid)
+            requestA_ conn tid                  
 
 requestA_ :: Socket -> ThreadId -> IO ()
 requestA_ conn t = waitfor "0300aa0801" (800000, 2048) conn $ do
@@ -160,9 +148,14 @@ activityRewards :: Socket -> IO ()
 activityRewards conn = do
     sendAll conn $ activityItem "11091"
     recv conn 2048
+    threadDelay 2000000
+    forM_ [1,2,3] $ \p -> do
+        sendAll conn shot
+        threadDelay 2000000
+        recv conn 1024
     forM_ ["86333", "86334","86361"] $ \n -> do
         sendAll conn $ activityReward n
-        recv conn 2048
+        recv conn 1024
     sendAll conn $ propUse "1031" "8"
 
 

@@ -157,3 +157,7 @@ frSearch :: ByteString -> ByteString
 frSearch fr = C.append (hexSerialize $ C.length s) s
                 where s = C.append "friend search "
                         $ C.append fr "\NUL"
+
+shot :: ByteString
+shot =  C.append (hexSerialize $ C.length s) s
+    where s = "shot 1\NUL"                       

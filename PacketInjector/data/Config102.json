@@ -1,4 +1,7 @@
 {
+    "apiHost": "api.kd.gaba.vn",
+    "payHost": "m-pay.gaba.vn",
+    "loginPath": "/jinyong/vega/loginVerify",
     "armyId": "102000000",
     "armyLead": {},
     "armyGroup": 16,
