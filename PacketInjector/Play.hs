@@ -150,7 +150,7 @@ missionGo e conn t = do
 activityRewards :: Socket -> IO ()
 activityRewards conn = do
     sendAll conn $ activityItem "11091"
-    forM_ ["86333", "86334","86361"] $ \n -> do
+    forM_ ["86333","86334","86335","86336","86360","86361"] $ \n -> do
         sendAll conn $ activityReward n
     sendAll conn $ propUse "1031" "8"
 
@@ -186,41 +186,39 @@ goPtTwo conn chapter = waitfor "0d00440700" (4000000, 2048) conn $ do
     goPtTwo conn $ tail chapter
 
 goPtThree :: Socket -> [ByteString] -> IO ()           
-goPtThree conn [] = do 
-    sendAll conn registeReward
+goPtThree conn [] = do
+    sendAll conn registeReward    
     sendAll conn $ propUse "1022" "2"
     threadDelay 1600000
     sendAll conn $ chapter "C03B01"
-    goPtFour conn $ repeatchapter 22
+    goPtFour conn $ repeatchapter 20
 goPtThree conn chapter = waitfor "0d00440700" (3200000, 2048) conn $ do
     sendAll conn copyBlock
     sendAll conn $ head chapter
     goPtThree conn $ tail chapter
 
 goPtFour :: Socket -> [ByteString] -> IO ()           
-goPtFour conn [] = do 
-    sendAll conn $ propUse "1022" "2"
+goPtFour conn [] = waitfor "0d00440700" (3200000, 2048) conn $ do
+    cf <- getConfig
+    sendAll conn $ campSelect $ C.pack (cloneCamp cf)    
+    sendAll conn $ propUse "1022" "1"
     threadDelay 1600000
     sendAll conn $ (copySwap "C03B01")
-    goPtFive conn $ [(copySwap "C03B01"), (copySwap "C03B01")]
+    goPtFive conn $ [(copySwap "C03B01"), (copySwap_ "C03B01")]
 goPtFour conn chapter = waitfor "0d00440700" (3200000, 2048) conn $ do
     sendAll conn copyBlock
     sendAll conn $ head chapter
     goPtFour conn $ tail chapter
                                
 goPtFive :: Socket -> [ByteString] -> IO ()
-goPtFive conn [] = do 
-    cf <- getConfig
-    sendAll conn $ campSelect $ C.pack (cloneCamp cf)
-    sendAll conn $ copySwap_ "C03B01"
+goPtFive conn [] = waitfor "0900210300" (3200000, 2048) conn $ do
     threadDelay 2400000
     C.putStrLn "Done"
     close conn
-goPtFive conn chapter = waitfor "0900210300" (1600000, 2048) conn $ do
+goPtFive conn chapter = waitfor "0900210300" (3200000, 2048) conn $ do
     sendAll conn $ propUse "1022" "2"
     sendAll conn $ head chapter
     goPtFive conn $ tail chapter
---0300a1300105001700010000
 
 lastN :: Int -> ByteString -> ByteString
 lastN n xs = C.drop (C.length xs - n) xs
