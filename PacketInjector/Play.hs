@@ -46,6 +46,9 @@ mHandler pls armyid = do
         forkIO $ do
             tid <- myThreadId
             conn <- joinWorld p
+            activityRewards conn
+            recv conn 2048
+            threadDelay 2000000
             sendAll conn (armyRequest armyid)
             requestA conn tid
 
@@ -61,7 +64,7 @@ armyAgree_ conn keyword = do
         armyAgree_ conn keyword
 
 requestA :: Socket -> ThreadId -> IO ()
-requestA conn t = waitfor "0300aa0801" (800000, 2048) conn $ do
+requestA conn t = waitfor "0300aa0801" (800000, 2048) conn $ do    
     sendAll conn armyBase
     sendAll conn armyReward
     sendAll conn armyJoss
@@ -78,6 +81,7 @@ dailyMis  = do
             tid <- myThreadId
             conn <- joinWorld u
             activityRewards conn
+
             sendAll conn (armyRequest armyid)
             requestA_ conn tid                  
 
@@ -147,15 +151,13 @@ missionGo e conn t = do
 activityRewards :: Socket -> IO ()
 activityRewards conn = do
     sendAll conn $ activityItem "11091"
-    recv conn 2048
-    threadDelay 2000000
-    forM_ [1,2,3] $ \p -> do
-        sendAll conn shot
-        threadDelay 2000000
-        recv conn 1024
+    -- forM_ [1,2,3] $ \p -> do
+    --     sendAll conn shot
+    --     threadDelay 2000000
+    --     recv conn 1024
     forM_ ["86333", "86334","86361"] $ \n -> do
         sendAll conn $ activityReward n
-        recv conn 1024
+        -- recv conn 1024
     sendAll conn $ propUse "1031" "8"
 
 
