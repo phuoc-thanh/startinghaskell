@@ -151,12 +151,12 @@ campSelect idc = C.append (hexSerialize $ C.length s) s
 --wboss 4 2
 wboss :: ByteString
 wboss = C.append (hexSerialize $ C.length s) s
-        where s = "wboss 3 2\NUL"
+        where s = "wboss 3 2\NUL"        
         
-frSearch :: ByteString -> ByteString
-frSearch fr = C.append (hexSerialize $ C.length s) s
-                where s = C.append "friend search "
-                        $ C.append fr "\NUL"
+swallowCard :: ByteString -> ByteString
+swallowCard c = C.append (hexSerialize $ C.length s) s
+                where s = C.append "swallow_card 0 "
+                        $ C.append c "\NUL"
 
 shot :: ByteString
 shot =  C.append (hexSerialize $ C.length s) s

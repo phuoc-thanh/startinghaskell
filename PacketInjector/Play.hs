@@ -48,7 +48,7 @@ mHandler pls armyid = do
             conn <- joinWorld p
             activityRewards conn
             recv conn 2048
-            threadDelay 2000000
+            threadDelay 1600000
             sendAll conn (armyRequest armyid)
             requestA conn tid
 
@@ -80,8 +80,7 @@ dailyMis  = do
         forkIO $ do
             tid <- myThreadId
             conn <- joinWorld u
-            activityRewards conn
-
+            sendNTimes 3 conn shot
             sendAll conn (armyRequest armyid)
             requestA_ conn tid                  
 
@@ -151,13 +150,8 @@ missionGo e conn t = do
 activityRewards :: Socket -> IO ()
 activityRewards conn = do
     sendAll conn $ activityItem "11091"
-    -- forM_ [1,2,3] $ \p -> do
-    --     sendAll conn shot
-    --     threadDelay 2000000
-    --     recv conn 1024
     forM_ ["86333", "86334","86361"] $ \n -> do
         sendAll conn $ activityReward n
-        -- recv conn 1024
     sendAll conn $ propUse "1031" "8"
 
 
@@ -226,6 +220,7 @@ goPtFive conn chapter = waitfor "0900210300" (1600000, 2048) conn $ do
     sendAll conn $ propUse "1022" "2"
     sendAll conn $ head chapter
     goPtFive conn $ tail chapter
+--0300a1300105001700010000
 
 lastN :: Int -> ByteString -> ByteString
 lastN n xs = C.drop (C.length xs - n) xs
