@@ -162,11 +162,6 @@ chapterOne = map (chapter) ["C01B03","C01B04","C01B05","C01B06","C01B07","C01B08
 chapterTwo = map (chapter) ["C02B01","C02B02","C02B03","C02B04","C02B05","C02B06","C02B07","C02B08","C02B09","C02B10"]
 repeatchapter x = take x . repeat $ (chapter "C03B01")
 
-lvlup :: Player -> IO ()
-lvlup pl = do conn <- joinWorld pl
-              sendAll conn $ chapter "C01B01"
-              goPtOne conn
-
 goPtOne :: Socket -> IO ()              
 goPtOne conn = do
     msg <- waitforM "0090130000" (2000000, 1024) conn
@@ -226,31 +221,32 @@ lastN n xs = C.drop (C.length xs - n) xs
 eCombat :: ByteString -> Integer
 eCombat = hexDeserialize . lastN 6
 
-regString :: String -> [Int] -> [String]
-regString p n = zipWith (++) (repeat p) (map show n)
+nextP :: Int -> PreConfig -> IO [String]
+nextP n cf = do
+    pls <- cPls
+    let idx = read $ drop (length $ cloneKeyword cf) (acc $ head pls)
+    return $ zipWith (++) (repeat $ cloneKeyword cf) (map show [(idx+2)..(idx+n)])
 
-massReg :: String -> [Int] -> IO ()
-massReg p n = do
-    cf <- getConfig
-    let rString = regString p n
-    forM_ rString $ \u -> do
-            cChar u (defaultPass cf) (cloneServer cf) 
-
-cChar u p s = do 
+lvlup u p s = do 
     (conn, res) <- reg u p s
     sendAll conn $ newUser (C.pack u)
     msg <- recv conn 256
     let chN = show . newChNumber $ encode msg
     sendAll conn $ enterW (C.pack $ uid res) (C.pack chN)
-    pls <- cPls
     let pl = Player u (uid res) (opname res) s (displayNovice res) 
                     (create_time res) (key res) chN (amount res)    
-    appendJSON "Clone.json" (pl:pls)
-    threadDelay 2000000
-    close conn
+    threadDelay 1600000
+    putStrLn $ u ++ "registers successful"
+    return (pl, conn)
 
-lvlup_ :: IO ()    
-lvlup_ = do pl <- cPls
-            forM_ pl $ \u -> do
-                forkIO $ do
-                    lvlup u
+add :: Int -> IO ()
+add n = do
+    cf <- getConfig
+    pls <- cPls
+    np <- nextP n cf
+    forM_ np $ \u -> do
+        (pl, conn) <- lvlup u (defaultPass cf) (cloneServer cf)
+        appendJSON "Clone.json" (pl:pls)
+        forkIO $ do
+            sendAll conn $ chapter "C01B01"
+            goPtOne conn
