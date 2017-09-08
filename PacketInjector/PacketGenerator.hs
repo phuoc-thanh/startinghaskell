@@ -121,12 +121,12 @@ copyBlock = C.append (hexSerialize $ C.length s) s
 copySwap :: ByteString -> ByteString
 copySwap c = C.append (hexSerialize $ C.length s) s
                 where s = C.append "copy swap "
-                        $ C.append  c " 1 18\NUL"
+                        $ C.append  c " 1 16\NUL"
                         
 copySwap_ :: ByteString -> ByteString
 copySwap_ c = C.append (hexSerialize $ C.length s) s
                 where s = C.append "copy swap "
-                        $ C.append  c " 1 8\NUL"                        
+                        $ C.append  c " 1 20\NUL"                        
 
 registeReward :: ByteString
 registeReward = C.append (hexSerialize $ C.length s) s

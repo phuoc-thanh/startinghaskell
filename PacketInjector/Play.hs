@@ -192,20 +192,20 @@ goPtThree conn [] = do
     threadDelay 1600000
     sendAll conn $ chapter "C03B01"
     goPtFour conn $ repeatchapter 20
-goPtThree conn chapter = waitfor "0d00440700" (3200000, 2048) conn $ do
+goPtThree conn chapter = waitfor "0d00440700" (3600000, 2048) conn $ do
     sendAll conn copyBlock
     sendAll conn $ head chapter
     goPtThree conn $ tail chapter
 
 goPtFour :: Socket -> [ByteString] -> IO ()           
-goPtFour conn [] = waitfor "0d00440700" (3200000, 2048) conn $ do
+goPtFour conn [] = waitfor "0d00440700" (3600000, 2048) conn $ do
     cf <- getConfig
     sendAll conn $ campSelect $ C.pack (cloneCamp cf)    
     sendAll conn $ propUse "1022" "1"
     threadDelay 1600000
     sendAll conn $ (copySwap "C03B01")
     goPtFive conn $ [(copySwap "C03B01"), (copySwap_ "C03B01")]
-goPtFour conn chapter = waitfor "0d00440700" (3200000, 2048) conn $ do
+goPtFour conn chapter = waitfor "0d00440700" (3600000, 2048) conn $ do
     sendAll conn copyBlock
     sendAll conn $ head chapter
     goPtFour conn $ tail chapter
