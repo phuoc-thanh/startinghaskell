@@ -225,9 +225,10 @@ nextP :: Int -> PreConfig -> IO [String]
 nextP n cf = do
     pls <- cPls
     let idx = read $ drop (length $ cloneKeyword cf) (acc $ head pls)
-    return $ zipWith (++) (repeat $ cloneKeyword cf) (map show [(idx+2)..(idx+n)])
+    return $ zipWith (++) (repeat $ cloneKeyword cf) (map show [(idx+1)..(idx+n)])
 
-lvlup u p s = do 
+regA :: String -> String -> String -> IO (Player, Socket)    
+regA u p s = do 
     (conn, res) <- reg u p s
     sendAll conn $ newUser (C.pack u)
     msg <- recv conn 256
@@ -236,16 +237,16 @@ lvlup u p s = do
     let pl = Player u (uid res) (opname res) s (displayNovice res) 
                     (create_time res) (key res) chN (amount res)    
     threadDelay 1600000
-    putStrLn $ u ++ "registers successful"
+    putStrLn $ u ++ " is registered, leveling up.."
     return (pl, conn)
 
 add :: Int -> IO ()
 add n = do
     cf <- getConfig
-    pls <- cPls
     np <- nextP n cf
     forM_ np $ \u -> do
-        (pl, conn) <- lvlup u (defaultPass cf) (cloneServer cf)
+        (pl, conn) <- regA u (defaultPass cf) (cloneServer cf)
+        pls <- cPls
         appendJSON "Clone.json" (pl:pls)
         forkIO $ do
             sendAll conn $ chapter "C01B01"
