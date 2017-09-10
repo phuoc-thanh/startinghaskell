@@ -252,7 +252,7 @@ add n = do
             sendAll conn $ chapter "C01B01"
             goPtOne conn
 
-lvlup :: IO            
+lvlup :: IO ()      
 lvlup = do
     pls <- cPls
     forM_ pls $ \p -> do
