@@ -29,7 +29,7 @@ main = do pls <- cPls
 splitM :: Socket -> ThreadId -> IO ()              
 splitM conn t = do
     msg <- waitforM "5a4d" (1000000, 1024) conn
-    let h = tail . map (C.pack . take 4) $ split (startsWith "5a4d") $ C.unpack msg
+    let h = tail . map (C.pack . take 4) $ split (startsWith "ZM") $ C.unpack msg
     findHr h conn t
 
 hrVerify :: [ByteString] -> ByteString -> Maybe ByteString

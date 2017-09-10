@@ -251,3 +251,12 @@ add n = do
         forkIO $ do
             sendAll conn $ chapter "C01B01"
             goPtOne conn
+
+lvlup :: IO            
+lvlup = do
+    pls <- cPls
+    forM_ pls $ \p -> do
+        forkIO $ do
+            conn <- joinWorld p
+            sendAll conn $ chapter "C01B01"
+            goPtOne conn
