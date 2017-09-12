@@ -27,6 +27,7 @@ main = do
     forkIO $ do
         conn <- joinWorld $ armyLead cf
         sendAll conn armyBase
+        sendAll conn armyReward
         armyAgree_ conn $ C.pack $ cloneKeyword cf
     threadDelay 5000000
     forkIO $ do
@@ -71,7 +72,7 @@ requestA conn t = waitfor "0300aa0801" (800000, 2048) conn $ do
     sendAll conn armyMisList
     missionGo 4 conn t
 
-dailyMis :: IO ()                  
+dailyMis :: IO ()
 dailyMis  = do
     cf <- getConfig
     pls <- buffPls
