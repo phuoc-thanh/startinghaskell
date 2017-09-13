@@ -51,7 +51,7 @@ mHandler pls armyid = do
             recv conn 2048
             threadDelay 1600000
             sendAll conn (armyRequest armyid)
-            requestA conn tid
+            requestA p conn tid
 
 armyAgree_ :: Socket -> ByteString -> IO ()            
 armyAgree_ conn keyword = do
@@ -64,12 +64,13 @@ armyAgree_ conn keyword = do
         sendAll conn $ armyAgree (C.pack $ chNumber pl)
         armyAgree_ conn keyword
 
-requestA :: Socket -> ThreadId -> IO ()
-requestA conn t = waitfor "0300aa0801" (800000, 2048) conn $ do    
+requestA :: Player -> Socket -> ThreadId -> IO ()
+requestA p conn t = waitfor "0300aa0801" (800000, 2048) conn $ do    
     sendAll conn armyBase
     sendAll conn armyReward
     sendAll conn armyJoss
     sendAll conn armyMisList
+    C.putStrLn $ C.append (C.pack $ acc p) " joined army"
     missionGo 4 conn t
 
 dailyMis :: IO ()
@@ -140,7 +141,6 @@ missionGo e conn t = do
         sendAll conn armyExit
         threadDelay 2000000
         close conn
-        C.putStrLn "exit Army!"
         killThread t
     unless (C.isInfixOf "2300e904" $ encode msg) $ missionGo e conn t
     when (C.isInfixOf "2300e904" $ encode msg) $ do
@@ -207,12 +207,13 @@ goPtFour conn chapter = waitfor "0d00440700" (3600000, 2048) conn $ do
     goPtFour conn $ tail chapter
                                
 goPtFive :: Socket -> [ByteString] -> IO ()
-goPtFive conn [] = waitfor "0900210300" (3200000, 2048) conn $ do
+goPtFive conn [] = waitfor "0900210300" (2400000, 1024) conn $ do
     threadDelay 2400000
     C.putStrLn "Done"
     close conn
-goPtFive conn chapter = waitfor "0900210300" (3200000, 2048) conn $ do
+goPtFive conn chapter = waitfor "0900210300" (2400000, 1024) conn $ do
     sendAll conn $ propUse "1022" "2"
+    threadDelay 1600000
     sendAll conn $ head chapter
     goPtFive conn $ tail chapter
 
@@ -238,7 +239,7 @@ regA u p s = do
     let pl = Player u (uid res) (opname res) s (displayNovice res) 
                     (create_time res) (key res) chN (amount res)    
     threadDelay 1600000
-    putStrLn $ u ++ " is registered, leveling up.."
+    putStrLn $ u ++ " registered, leveling up.."
     return (pl, conn)
 
 add :: Int -> IO ()
