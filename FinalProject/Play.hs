@@ -82,7 +82,9 @@ dailyMis  = do
         forkIO $ do
             tid <- myThreadId
             conn <- joinWorld u
-            sendNTimes 3 conn shot
+            forM_ (map (show) [0..4]) $ \x -> do
+                sendAll conn $ edenTreeGet (C.pack x)
+            -- sendNTimes 3 conn shot
             sendAll conn (armyRequest armyid)
             requestA_ conn tid                  
 

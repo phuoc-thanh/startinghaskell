@@ -160,4 +160,9 @@ swallowCard c = C.append (hexSerialize $ C.length s) s
 
 shot :: ByteString
 shot =  C.append (hexSerialize $ C.length s) s
-    where s = "shot 1\NUL"                       
+    where s = "shot 1\NUL"
+
+edenTreeGet :: ByteString -> ByteString
+edenTreeGet c = C.append (hexSerialize $ C.length s) s
+                where s = C.append "edenTree get "
+                        $ C.append c "\NUL"

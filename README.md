@@ -10,5 +10,3 @@ Learning Haskell with CIS-194 Spring 2015
 3. Install ghc-mod: cabal install ghc-mod
 
 4. Install Haskell Syntax Highlighting, Haskell ghc-mod Extension (search on VS Code)
-
-5. Network package: http-conduit base16-bytestring split aeson-pretty
