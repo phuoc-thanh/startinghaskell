@@ -21,15 +21,13 @@ checkUserRq :: ByteString -> ByteString -> S.ByteString -> Request
 checkUserRq u p h = setRequestPath checkUserURI
                   $ setRequestHost h
                   $ setRequestBodyLBS (userRqBody u p)
-                  $ setRequestMethod "POST"
-                  $ defaultRequest
+                  $ setRequestMethod "POST" defaultRequest
 
 newUserRq :: ByteString -> ByteString -> S.ByteString -> Request
 newUserRq u p h = setRequestPath regUserURI
                 $ setRequestHost h
                 $ setRequestBodyLBS (userRqBody u p)
-                $ setRequestMethod "POST"
-                $ defaultRequest                
+                $ setRequestMethod "POST" defaultRequest                
 
 userRqBody :: ByteString -> ByteString -> ByteString
 userRqBody u p   = C.append "partnerId=0&userName="
@@ -47,8 +45,7 @@ loginVerifyRq s host path = setRequestHost host
                           $ setRequestPath path
                           $ setRequestBodyLBS (loginRqBody s)
                           $ setRequestMethod "POST"
-                          $ setRequestHeader "Content-Type" ["application/x-www-form-urlencoded"]
-                          $ defaultRequest
+                          $ setRequestHeader "Content-Type" ["application/x-www-form-urlencoded"] defaultRequest
 
 getUserData :: FromJSON a => ByteString -> Maybe a
 getUserData s = decode $ C.append (C.drop 9 $ head $ C.split '}' s) ",\"chNumber\" : \"unknow\",\"amount\" : 0}"

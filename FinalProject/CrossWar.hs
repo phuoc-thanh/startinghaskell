@@ -28,16 +28,14 @@ bet n c idx = do sendAll c (bet1000 idx)
 -- buff players will lose money                 
 loseBet :: Match -> IO ()                  
 loseBet m = do pls <- buffPls
-               forM_ pls $ \u -> do
-                 forkIO $ do
+               forM_ pls $ \u -> forkIO $ do
                    conn <- joinWorld u
                    bet (amount u) conn (C.pack $ lose m)
 
 -- players will win money                           
 winBet :: Match -> IO ()                  
 winBet m = do pls <- players
-              forM_ pls $ \u -> do
-                forkIO $ do
+              forM_ pls $ \u -> forkIO $ do
                   conn <- joinWorld u
                   bet (amount u) conn (C.pack $ win m)
 

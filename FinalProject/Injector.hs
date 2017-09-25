@@ -15,12 +15,12 @@ import Data.ByteString (ByteString)
 getServerInfo :: String -> IO Server
 getServerInfo i = do
     serverinfos <- parseFile "ServerInfo.json" :: IO (Maybe [Server])
-    return $ head $ filter (\s -> (sid s) == i) (fromJust $ serverinfos)
+    return $ head $ filter (\s -> sid s == i) (fromJust serverinfos)
 
 getMatch :: String -> IO Match
 getMatch i = do
     match <- parseFile "Match.json" :: IO (Maybe [Match])
-    return $ head $ filter (\s -> (mid s) == i) (fromJust $ match)
+    return $ head $ filter (\s -> mid s == i) (fromJust match)
 
 players :: IO [Player]
 players = do
@@ -40,12 +40,12 @@ cPls = do
 getPlayer :: String -> IO Player    
 getPlayer uname = do
     users <- parseFile "Players.json" :: IO (Maybe [Player])
-    return $ head $ filter (\u -> (acc u) == uname) (fromJust $ users)
+    return $ head $ filter (\u -> acc u == uname) (fromJust users)
 
 getClone :: String -> IO Player    
 getClone uname = do
     users <- parseFile "Clone.json" :: IO (Maybe [Player])
-    return $ head $ filter (\u -> (acc u) == uname) (fromJust $ users)
+    return $ head $ filter (\u -> acc u == uname) (fromJust users)
 
 sendNTimes :: Integer -> Socket -> ByteString -> IO ()
 sendNTimes 1 c s = sendAll c s
@@ -69,7 +69,7 @@ adc u p = do pl <- login u p
 
 connect_ :: HostName -> ServiceName -> IO Socket
 connect_ host port = do 
-    addrinfos <- getAddrInfo Nothing (Just $ host) (Just $ port)
+    addrinfos <- getAddrInfo Nothing (Just host) (Just port)
     let serveraddr = head addrinfos
     sock <- socket (addrFamily serveraddr) Stream defaultProtocol
     connect sock (addrAddress serveraddr)
@@ -96,7 +96,7 @@ reg u p s = do res <- regAccount u p
                return (sock, res)
 
 joinWorld :: Player -> IO Socket
-joinWorld user = do uServer <- getServerInfo (defaultsid $ user)
+joinWorld user = do uServer <- getServerInfo (defaultsid user)
                     sock <- connect_ (ip uServer) (port uServer)
                     sendAll sock $ loginData user (C.pack $ defaultsid user)
                     msg <- recv sock 1024
@@ -111,7 +111,7 @@ waitfor str (delay, byte) conn f = do
     let m = C.isInfixOf str $ encode msg
     if m then f else waitfor str (delay, byte) conn f
     
-waitforM :: ByteString -> (Int, Int) -> Socket -> IO (ByteString)
+waitforM :: ByteString -> (Int, Int) -> Socket -> IO ByteString
 waitforM str (delay, byte) conn = do 
     threadDelay delay
     msg <- recv conn byte

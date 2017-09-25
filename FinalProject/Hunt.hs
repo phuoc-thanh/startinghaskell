@@ -19,12 +19,11 @@ import Control.Concurrent
 -- HD ZM40, CBT ZM41, VNT ZM43, VTM ZM44, HT ZM45, TVK ZM48, KP ZM49, TDLT ZM51
 
 main = do pls <- cPls
-          forM_ pls $ \u -> do
-            forkIO $ do
-                tid <- myThreadId
-                conn <- joinWorld u
-                sendAll conn $ iniHunt
-                splitM conn tid
+          forM_ pls $ \u -> forkIO $ do
+            tid <- myThreadId
+            conn <- joinWorld u
+            sendAll conn iniHunt
+            splitM conn tid
 
 splitM :: Socket -> ThreadId -> IO ()              
 splitM conn t = do
@@ -34,9 +33,9 @@ splitM conn t = do
 
 hrVerify :: [ByteString] -> ByteString -> Maybe ByteString
 hrVerify heroes huntTarget
-    | (C.isInfixOf (heroes !! 0) huntTarget) = Just "0"
-    | (C.isInfixOf (heroes !! 1) huntTarget) = Just "1"
-    | (C.isInfixOf (heroes !! 2) huntTarget) = Just "2"
+    | C.isInfixOf (heroes !! 0) huntTarget = Just "0"
+    | C.isInfixOf (heroes !! 1) huntTarget = Just "1"
+    | C.isInfixOf (heroes !! 2) huntTarget = Just "2"
     | otherwise = Nothing
 
 findHr :: [ByteString] -> Socket -> ThreadId -> IO ()   
@@ -47,7 +46,7 @@ findHr heroes conn t = do
                        sendAll conn $ openRoom idx
                        hunt idx conn t
         Nothing  -> do threadDelay 1000000
-                       sendAll conn $ renewHunt
+                       sendAll conn renewHunt
                        splitM conn t
 
 hunt :: ByteString -> Socket -> ThreadId -> IO ()                               

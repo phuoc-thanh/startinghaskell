@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, RecordWildCards, OverloadedStrings #-}
+{-# LANGUAGE DeriveGeneric, OverloadedStrings #-}
 
 module Parser ( encode
               , decode
