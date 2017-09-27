@@ -81,18 +81,18 @@ dailyMis  = do
         forM_ (map show [0..4]) $ \x -> sendAll conn $ edenTreeGet (C.pack x)
         -- sendNTimes 3 conn shot
         sendAll conn (armyRequest armyid)
-        requestA_ conn tid                  
+        requestA_ u conn tid                  
 
-requestA_ :: Socket -> ThreadId -> IO ()
-requestA_ conn t = waitfor "0300aa0801" (800000, 2048) conn $ do
+requestA_ :: Player -> Socket -> ThreadId -> IO ()
+requestA_ p conn t = waitfor "0300aa0801" (800000, 2048) conn $ do
     sendAll conn armyBase
     sendAll conn armyReward
     threadDelay 2000000
     sendAll conn armyExit
     threadDelay 2000000
     close conn
+    C.putStrLn $ C.append (C.pack $ acc p) ": job done!"
     killThread t
-    C.putStrLn "DONE!"
                     
 missionV :: (ByteString, Int) -> Int
 missionV (m, i) = if C.isInfixOf m "0501dc05|0401b004" then i else 0
