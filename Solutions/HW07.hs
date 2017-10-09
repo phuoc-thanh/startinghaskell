@@ -35,10 +35,11 @@ swapV i1 i2 v
 -- Exercise 2 -----------------------------------------
 
 mapM :: Monad m => (a -> m b) -> [a] -> m [b]
-mapM = undefined
+mapM f xs = sequence (map f xs)
+
 
 getElts :: [Int] -> Vector a -> Maybe [a]
-getElts = undefined
+getElts xs v = filter (\x -> v, fst x > 0) $ indexed v
 
 -- Exercise 3 -----------------------------------------
 
