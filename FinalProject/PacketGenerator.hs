@@ -9,7 +9,7 @@ import qualified Data.ByteString.Char8 as C
 
 tPacket :: ByteString
 tPacket = C.append (hexSerialize $ C.length s) s
-             where s = "store 8 2\NUL"
+             where s = "rider train 238231 4\NUL"
 
 rankReward :: ByteString
 rankReward = C.append (hexSerialize $ C.length s) s
@@ -162,7 +162,35 @@ shot :: ByteString
 shot =  C.append (hexSerialize $ C.length s) s
     where s = "shot 1\NUL"
 
+-- 0,1,2,3    
 edenTreeGet :: ByteString -> ByteString
 edenTreeGet c = C.append (hexSerialize $ C.length s) s
                 where s = C.append "edenTree get "
                         $ C.append c "\NUL"
+-- 0,1,2,3
+edenTreeFinish :: ByteString -> ByteString
+edenTreeFinish c = C.append (hexSerialize $ C.length s) s
+                where s = C.append "edenTree finish "
+                        $ C.append c "\NUL"                        
+
+-- get flowers -- 
+
+-- 4|3
+tavern :: ByteString -> ByteString
+tavern i = C.append (hexSerialize $ C.length s) s
+    where s = C.append "tavern "
+            $ C.append i " 1\NUL"
+
+-- 1027|1022    
+store1 :: ByteString -> ByteString
+store1 i = C.append (hexSerialize $ C.length s) s
+    where s = C.append "store 5 "
+            $ C.append i " 1\NUL"
+
+bless :: ByteString
+bless = C.append (hexSerialize $ C.length s) s
+    where s = "bless bless 1\NUL"
+
+taskReward :: ByteString
+taskReward = C.append (hexSerialize $ C.length s) s
+    where s = "getTaskHelper reward 23\NUL"
