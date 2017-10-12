@@ -80,15 +80,40 @@ dailyMis  = do
         conn <- joinWorld u
         forM_ (map show [0..4]) $ \x -> sendAll conn $ edenTreeGet (C.pack x)
         -- sendNTimes 3 conn shot
+        sendAll conn bless
         sendAll conn (armyRequest armyid)
-        requestA_ u conn tid                  
+        requestA_ u conn tid
 
 requestA_ :: Player -> Socket -> ThreadId -> IO ()
 requestA_ p conn t = waitfor "0300aa0801" (800000, 2048) conn $ do
     sendAll conn armyBase
     sendAll conn armyReward
-    threadDelay 2000000
+    sendAll conn armyJoss
     sendAll conn armyExit
+    recv conn 1024
+    forM_ (map show [0..4]) $ \x -> sendAll conn $ edenTreeFinish (C.pack x)
+    threadDelay 1600000
+    forM_ (map show [0..4]) $ \x -> sendAll conn $ edenTreeGet (C.pack x)
+    sendAll conn $ tavern "3"
+    sendAll conn $ tavern "4"
+    threadDelay 1600000
+    sendAll conn $ store1 "1022"
+    sendAll conn $ store1 "1027"
+    recv conn 1024
+    forM_ (map show [0..4]) $ \x -> sendAll conn $ edenTreeFinish (C.pack x)
+    threadDelay 1600000
+    forM_ (map show [0..4]) $ \x -> sendAll conn $ edenTreeGet (C.pack x)
+    sendAll conn $ edenTreeFinish "1"
+    threadDelay 1600000
+    sendAll conn $ edenTreeGet "1"
+    sendAll conn iniHunt
+    threadDelay 1600000
+    forM_ (map show [0..9]) $ \x -> do
+        sendAll conn $ goHunt "1"
+        threadDelay 1600000
+        sendAll conn copyBlock
+    sendAll conn taskReward
+    recv conn 1024
     threadDelay 2000000
     close conn
     C.putStrLn $ C.append (C.pack $ acc p) ": job done!"
