@@ -23,6 +23,19 @@ sendP uname n = do user <- getPlayer uname
                    sendNTimes n conn tPacket
 
 main = do 
+    pls <- cPls
+    handler pls 0
+
+dailyMis = do
+    pls <- buffPls
+    handler pls 1
+
+groupOf :: Int -> [Player] -> [[Player]]          
+groupOf _ [] = []           
+groupOf n pls = take n pls : groupOf n (drop n pls)
+
+handler :: [Player] -> Int -> IO ThreadId
+handler pls idx = do
     cf <- getConfig    
     forkIO $ do
         conn <- joinWorld $ armyLead cf
@@ -33,24 +46,19 @@ main = do
         armyAgree_ conn
     threadDelay 5000000
     forkIO $ do
-        pls <- cPls
         forM_ (groupOf (armyGroup cf) pls) $ \gr -> do
-            forkIO $ mHandler gr (C.pack $ armyId cf)
+            forkIO $ mHandler gr (C.pack $ armyId cf) idx
             threadDelay 120000000
 
-groupOf :: Int -> [Player] -> [[Player]]          
-groupOf _ [] = []           
-groupOf n pls = take n pls : groupOf n (drop n pls)
-
-mHandler :: [Player] -> ByteString -> IO ()
-mHandler pls armyid = forM_ pls $ \p -> forkIO $ do
+mHandler :: [Player] -> ByteString -> Int -> IO ()
+mHandler pls armyid idx = forM_ pls $ \p -> forkIO $ do
     tid <- myThreadId
     conn <- joinWorld p
     activityRewards conn
     recv conn 2048
     threadDelay 1600000
     sendAll conn (armyRequest armyid)
-    requestA p conn tid
+    if (idx == 0) then requestA p conn tid else requestA_ p conn tid
 
 armyAgree_ :: Socket -> IO ()            
 armyAgree_ conn = do
@@ -61,7 +69,7 @@ armyAgree_ conn = do
     threadDelay 12000000
     armyAgree_ conn
 
-filterR msg = map (hexDeserialize . C.take 8 . lastN 12 . C.pack) (init . split (endsWith "8d13") $ C.unpack msg)    
+filterR msg = map (hexDeserialize . C.take 8 . lastN 12 . C.pack) (init . split (endsWith "8913") $ C.unpack msg)
 
 requestA :: Player -> Socket -> ThreadId -> IO ()
 requestA p conn t = waitfor "0300aa0801" (800000, 2048) conn $ do    
@@ -72,22 +80,24 @@ requestA p conn t = waitfor "0300aa0801" (800000, 2048) conn $ do
     C.putStrLn $ C.append (C.pack $ acc p) " joined army"
     missionGo 4 conn t
 
-dailyMis :: IO ()
-dailyMis  = do
-    cf <- getConfig
-    pls <- buffPls
-    let armyid = C.pack $ armyId cf
-    forM_ pls $ \u -> forkIO $ do
-        tid <- myThreadId
-        conn <- joinWorld u
-        forM_ (map show [0..4]) $ \x -> sendAll conn $ edenTreeGet (C.pack x)
-        -- sendNTimes 3 conn shot
-        sendAll conn bless
-        sendAll conn (armyRequest armyid)
-        requestA_ u conn tid
-
 requestA_ :: Player -> Socket -> ThreadId -> IO ()
 requestA_ p conn t = waitfor "0300aa0801" (800000, 2048) conn $ do
+    sendAll conn armyBase
+    sendAll conn armyReward
+    sendAll conn armyJoss0
+    sendAll conn armyExit
+    recv conn 1024
+    threadDelay 2000000
+    close conn
+    C.putStrLn $ C.append (C.pack $ acc p) ": job done!"
+    killThread t
+
+requestB :: Player -> Socket -> ThreadId -> IO ()
+requestB p conn t = waitfor "0300aa0801" (800000, 2048) conn $ do
+    forM_ (map show [0..4]) $ \x -> sendAll conn $ edenTreeGet (C.pack x)
+    -- sendNTimes 3 conn shot
+    sendAll conn bless
+    threadDelay 1600000
     sendAll conn armyBase
     sendAll conn armyReward
     sendAll conn armyJoss0
@@ -119,7 +129,7 @@ requestA_ p conn t = waitfor "0300aa0801" (800000, 2048) conn $ do
     threadDelay 2000000
     close conn
     C.putStrLn $ C.append (C.pack $ acc p) ": job done!"
-    killThread t
+    killThread t    
                     
 missionV :: (ByteString, Int) -> Int
 missionV (m, i) = if C.isInfixOf m "0501dc05|0401b004" then i else 0
