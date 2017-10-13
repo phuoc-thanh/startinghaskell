@@ -117,3 +117,21 @@ waitforM str (delay, byte) conn = do
     msg <- recv conn byte
     let m = C.isInfixOf str $ encode msg
     if m then return msg else waitforM str (delay, byte) conn
+
+preload :: Socket -> Int -> IO Int
+preload sock byte = do
+    threadDelay 3600000
+    msg <- recv sock byte
+    C.putStrLn $ C.pack $ show $ C.length msg
+    if (C.length msg == byte)
+        then preload sock byte
+        else return $ C.length msg
+
+preloadM :: Socket -> Int -> IO ByteString
+preloadM sock byte = do
+    threadDelay 3600000
+    msg <- recv sock byte
+    if (C.length msg == byte)
+        then do msg2 <- recv sock byte
+                return $ C.append msg msg2
+        else return msg

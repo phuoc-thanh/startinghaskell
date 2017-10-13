@@ -9,7 +9,7 @@ import qualified Data.ByteString.Char8 as C
 
 tPacket :: ByteString
 tPacket = C.append (hexSerialize $ C.length s) s
-             where s = "rider train 238231 4\NUL"
+             where s = "store 8 2\NUL"
 
 rankReward :: ByteString
 rankReward = C.append (hexSerialize $ C.length s) s
@@ -36,6 +36,10 @@ armyReward = C.append (hexSerialize $ C.length s) s
 armyJoss :: ByteString 
 armyJoss = C.append (hexSerialize $ C.length s) s
                 where s = "army joss 2\NUL"
+
+armyJoss0 :: ByteString 
+armyJoss0 = C.append (hexSerialize $ C.length s) s
+                where s = "army joss 0\NUL"                
 
 armyMisAward :: ByteString -> ByteString
 armyMisAward n = C.append (hexSerialize $ C.length s) s

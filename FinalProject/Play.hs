@@ -28,7 +28,9 @@ main = do
         conn <- joinWorld $ armyLead cf
         sendAll conn armyBase
         sendAll conn armyReward
-        armyAgree_ conn $ C.pack $ cloneKeyword cf
+        preload conn 32768
+        C.putStrLn "player is ready"
+        armyAgree_ conn
     threadDelay 5000000
     forkIO $ do
         pls <- cPls
@@ -50,16 +52,16 @@ mHandler pls armyid = forM_ pls $ \p -> forkIO $ do
     sendAll conn (armyRequest armyid)
     requestA p conn tid
 
-armyAgree_ :: Socket -> ByteString -> IO ()            
-armyAgree_ conn keyword = do
+armyAgree_ :: Socket -> IO ()            
+armyAgree_ conn = do
     sendAll conn armyReqList
     threadDelay 800000
     msg <- recv conn 2048
-    unless (C.isInfixOf keyword msg) $ armyAgree_ conn keyword
-    when (C.isInfixOf keyword msg) $ do
-        pl <- getClone . C.unpack . C.take (4 + C.length keyword) . snd $ C.breakSubstring keyword msg
-        sendAll conn $ armyAgree (C.pack $ chNumber pl)
-        armyAgree_ conn keyword
+    forM_ (map show $ filterR $ encode msg) $ \r -> sendAll conn $ armyAgree (C.pack r)
+    threadDelay 12000000
+    armyAgree_ conn
+
+filterR msg = map (hexDeserialize . C.take 8 . lastN 12 . C.pack) (init . split (endsWith "8d13") $ C.unpack msg)    
 
 requestA :: Player -> Socket -> ThreadId -> IO ()
 requestA p conn t = waitfor "0300aa0801" (800000, 2048) conn $ do    
@@ -88,7 +90,7 @@ requestA_ :: Player -> Socket -> ThreadId -> IO ()
 requestA_ p conn t = waitfor "0300aa0801" (800000, 2048) conn $ do
     sendAll conn armyBase
     sendAll conn armyReward
-    sendAll conn armyJoss
+    sendAll conn armyJoss0
     sendAll conn armyExit
     recv conn 1024
     forM_ (map show [0..4]) $ \x -> sendAll conn $ edenTreeFinish (C.pack x)
