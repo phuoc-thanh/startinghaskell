@@ -185,6 +185,11 @@ tavern i = C.append (hexSerialize $ C.length s) s
     where s = C.append "tavern "
             $ C.append i " 1\NUL"
 
+refineCard :: ByteString -> ByteString            
+refineCard idx = C.append (hexSerialize $ C.length s) s
+    where s = C.append "refine_card 2 "
+            $ C.append idx "#\NUL"
+
 -- 1027|1022    
 store1 :: ByteString -> ByteString
 store1 i = C.append (hexSerialize $ C.length s) s

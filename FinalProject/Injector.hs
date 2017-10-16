@@ -101,7 +101,7 @@ joinWorld user = do uServer <- getServerInfo (defaultsid user)
                     sendAll sock $ loginData user (C.pack $ defaultsid user)
                     msg <- recv sock 1024
                     sendAll sock $ enterW (C.pack $ uid user) (C.pack $ chNumber user)
-                    C.putStrLn $ C.append (C.pack $ acc user) " has joined the KD world!"
+                    C.putStrLn $ C.append (C.pack $ acc user) " has joined the world!"
                     return sock
 
 waitfor :: ByteString -> (Int, Int) -> Socket -> IO b -> IO b
@@ -122,7 +122,6 @@ preload :: Socket -> Int -> IO Int
 preload sock byte = do
     threadDelay 3600000
     msg <- recv sock byte
-    C.putStrLn $ C.pack $ show $ C.length msg
     if (C.length msg == byte)
         then preload sock byte
         else return $ C.length msg

@@ -30,6 +30,10 @@ dailyMis = do
     pls <- buffPls
     handler pls 1
 
+dailyQ = do
+    pls <- buffPls
+    handler pls 2
+
 groupOf :: Int -> [Player] -> [[Player]]          
 groupOf _ [] = []           
 groupOf n pls = take n pls : groupOf n (drop n pls)
@@ -42,7 +46,7 @@ handler pls idx = do
         sendAll conn armyBase
         sendAll conn armyReward
         preload conn 32768
-        C.putStrLn "player is ready"
+        C.putStrLn $ C.append (C.pack $ acc $ armyLead cf) " is ready"
         armyAgree_ conn
     threadDelay 5000000
     forkIO $ do
@@ -58,15 +62,20 @@ mHandler pls armyid idx = forM_ pls $ \p -> forkIO $ do
     recv conn 2048
     threadDelay 1600000
     sendAll conn (armyRequest armyid)
-    if (idx == 0) then requestA p conn tid else requestA_ p conn tid
+    case idx of
+        0 -> requestA p conn tid
+        1 -> requestA_ p conn tid
+        2 -> requestB p conn tid
 
 armyAgree_ :: Socket -> IO ()            
 armyAgree_ conn = do
     sendAll conn armyReqList
     threadDelay 800000
     msg <- recv conn 2048
+    -- C.putStrLn $ encode msg
+    -- C.putStrLn $ C.pack $ show $ filterR $ encode msg
     forM_ (map show $ filterR $ encode msg) $ \r -> sendAll conn $ armyAgree (C.pack r)
-    threadDelay 12000000
+    threadDelay 6000000
     armyAgree_ conn
 
 filterR msg = map (hexDeserialize . C.take 8 . lastN 12 . C.pack) (init . split (endsWith "8913") $ C.unpack msg)
@@ -95,7 +104,6 @@ requestA_ p conn t = waitfor "0300aa0801" (800000, 2048) conn $ do
 requestB :: Player -> Socket -> ThreadId -> IO ()
 requestB p conn t = waitfor "0300aa0801" (800000, 2048) conn $ do
     forM_ (map show [0..4]) $ \x -> sendAll conn $ edenTreeGet (C.pack x)
-    -- sendNTimes 3 conn shot
     sendAll conn bless
     threadDelay 1600000
     sendAll conn armyBase
@@ -107,6 +115,8 @@ requestB p conn t = waitfor "0300aa0801" (800000, 2048) conn $ do
     threadDelay 1600000
     forM_ (map show [0..4]) $ \x -> sendAll conn $ edenTreeGet (C.pack x)
     sendAll conn $ tavern "3"
+    card <- waitforM "9200300001" (2000000, 1024) conn
+    sendAll conn $ refineCard $ ref $ encode card
     sendAll conn $ tavern "4"
     threadDelay 1600000
     sendAll conn $ store1 "1022"
@@ -129,8 +139,12 @@ requestB p conn t = waitfor "0300aa0801" (800000, 2048) conn $ do
     threadDelay 2000000
     close conn
     C.putStrLn $ C.append (C.pack $ acc p) ": job done!"
-    killThread t    
-                    
+    killThread t   
+    
+
+ref :: ByteString -> ByteString    
+ref m = C.pack . show . hexDeserialize . C.drop 10 . C.take 16 . snd $ C.breakSubstring "9200300001" m
+
 missionV :: (ByteString, Int) -> Int
 missionV (m, i) = if C.isInfixOf m "0501dc05|0401b004" then i else 0
 
