@@ -52,15 +52,14 @@ handler pls idx = do
     forkIO $ do
         forM_ (groupOf (armyGroup cf) pls) $ \gr -> do
             forkIO $ mHandler gr (C.pack $ armyId cf) idx
-            threadDelay 120000000
+            threadDelay 90000000
 
 mHandler :: [Player] -> ByteString -> Int -> IO ()
 mHandler pls armyid idx = forM_ pls $ \p -> forkIO $ do
     tid <- myThreadId
     conn <- joinWorld p
+    preload conn 32768
     activityRewards conn
-    recv conn 2048
-    threadDelay 1600000
     sendAll conn (armyRequest armyid)
     case idx of
         0 -> requestA p conn tid
@@ -78,7 +77,11 @@ armyAgree_ conn = do
     threadDelay 6000000
     armyAgree_ conn
 
-filterR msg = map (hexDeserialize . C.take 8 . lastN 12 . C.pack) (init . split (endsWith "8913") $ C.unpack msg)
+filterR :: ByteString -> [Integer]    
+filterR msg
+    |C.isInfixOf "8913" msg = map (hexDeserialize . C.take 8 . lastN 12 . C.pack) (init . split (endsWith "8913") $ C.unpack msg)
+    |C.isInfixOf "8d13" msg = map (hexDeserialize . C.take 8 . lastN 12 . C.pack) (init . split (endsWith "8d13") $ C.unpack msg)
+    |otherwise = map (hexDeserialize . C.take 8 . lastN 12 . C.pack) (init . split (endsWith "8e13") $ C.unpack msg)
 
 requestA :: Player -> Socket -> ThreadId -> IO ()
 requestA p conn t = waitfor "0300aa0801" (800000, 2048) conn $ do    
@@ -141,7 +144,6 @@ requestB p conn t = waitfor "0300aa0801" (800000, 2048) conn $ do
     C.putStrLn $ C.append (C.pack $ acc p) ": job done!"
     killThread t   
     
-
 ref :: ByteString -> ByteString    
 ref m = C.pack . show . hexDeserialize . C.drop 10 . C.take 16 . snd $ C.breakSubstring "9200300001" m
 
