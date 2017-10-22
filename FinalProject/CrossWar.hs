@@ -4,9 +4,11 @@ module CrossWar where
 
 import Injector
 import PacketGenerator
-import Parser
+import Parser hiding (encode, decode)
+import Serializer (hexDeserialize)
 import qualified Data.ByteString.Char8 as C
 import Data.ByteString (ByteString)
+import Data.ByteString.Base16
 import Network.Socket hiding (send, recv)
 import Network.Socket.ByteString (recv, sendAll)
 import Control.Monad
@@ -39,3 +41,19 @@ winBet m = do pls <- players
                   conn <- joinWorld u
                   bet (amount u) conn (C.pack $ win m)
 
+
+---------------------------------------------------------
+flower idx n = do
+    pls <- buffPls
+    forM_ pls $ \p -> do
+        conn <- joinWorld p
+        sendAll conn $ cwarflower (C.pack idx) (C.pack n)
+
+---------------------------------------------------------
+info = do
+    pls <- buffPls
+    forM_ pls $ \p -> forkIO $ do
+        conn <- joinWorld p
+        msg <- recv conn 80
+        C.putStrLn $ C.append (C.pack $ acc p)
+                   $ C.append ": " (C.pack $ show $ hexDeserialize $ C.drop 152 $ encode msg)

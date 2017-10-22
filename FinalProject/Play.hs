@@ -80,8 +80,12 @@ armyAgree_ conn = do
 filterR :: ByteString -> [Integer]    
 filterR msg
     |C.isInfixOf "8913" msg = map (hexDeserialize . C.take 8 . lastN 12 . C.pack) (init . split (endsWith "8913") $ C.unpack msg)
+    |C.isInfixOf "8a13" msg = map (hexDeserialize . C.take 8 . lastN 12 . C.pack) (init . split (endsWith "8a13") $ C.unpack msg)
+    |C.isInfixOf "8b13" msg = map (hexDeserialize . C.take 8 . lastN 12 . C.pack) (init . split (endsWith "8b13") $ C.unpack msg)
+    |C.isInfixOf "8c13" msg = map (hexDeserialize . C.take 8 . lastN 12 . C.pack) (init . split (endsWith "8c13") $ C.unpack msg)
     |C.isInfixOf "8d13" msg = map (hexDeserialize . C.take 8 . lastN 12 . C.pack) (init . split (endsWith "8d13") $ C.unpack msg)
-    |otherwise = map (hexDeserialize . C.take 8 . lastN 12 . C.pack) (init . split (endsWith "8e13") $ C.unpack msg)
+    |C.isInfixOf "8e13" msg = map (hexDeserialize . C.take 8 . lastN 12 . C.pack) (init . split (endsWith "8e13") $ C.unpack msg)
+    |otherwise = map (hexDeserialize . C.take 8 . lastN 12 . C.pack) (init . split (endsWith "8f13") $ C.unpack msg)
 
 requestA :: Player -> Socket -> ThreadId -> IO ()
 requestA p conn t = waitfor "0300aa0801" (800000, 2048) conn $ do    

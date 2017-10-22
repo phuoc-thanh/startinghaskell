@@ -203,3 +203,17 @@ bless = C.append (hexSerialize $ C.length s) s
 taskReward :: ByteString
 taskReward = C.append (hexSerialize $ C.length s) s
     where s = "getTaskHelper reward 23\NUL"
+
+cwarflower :: ByteString -> ByteString -> ByteString
+cwarflower idx n = C.append (hexSerialize $ C.length s) s
+    where s = C.append "crossserverwar flower "
+            $ C.append idx
+            $ C.append " " 
+            $ C.append n "\NUL"
+
+
+-- top32: 51,52,53 | top16: 54,55,56 | top8: 57,58,59            
+cwarReward :: ByteString -> ByteString
+cwarReward i = C.append (hexSerialize $ C.length s) s
+     where s = C.append "crossserverwar getgamereward "
+            $ C.append i "\NUL"

@@ -99,7 +99,7 @@ joinWorld :: Player -> IO Socket
 joinWorld user = do uServer <- getServerInfo (defaultsid user)
                     sock <- connect_ (ip uServer) (port uServer)
                     sendAll sock $ loginData user (C.pack $ defaultsid user)
-                    msg <- recv sock 1024
+                    msg <- recv sock 256
                     sendAll sock $ enterW (C.pack $ uid user) (C.pack $ chNumber user)
                     C.putStrLn $ C.append (C.pack $ acc user) " has joined the world!"
                     return sock
