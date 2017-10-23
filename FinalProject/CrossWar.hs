@@ -47,6 +47,7 @@ winBet m = do pls <- players
 
 
 ---------------------------------------------------------
+flower :: ByteString -> ByteString -> IO ()
 flower idx n = do
     pls <- buffPls
     forM_ pls $ \p -> do
@@ -58,6 +59,7 @@ flower idx n = do
 coinInfo :: ByteString -> Integer
 coinInfo msg = hexDeserialize $ C.drop 152 $ encode msg
 
+info :: IO ()
 info = do
     pls <- buffPls
     forM_ pls $ \p -> do
@@ -65,3 +67,12 @@ info = do
         msg <- recv conn 80
         C.putStrLn $ C.append "coin info: " (C.pack $ show $ coinInfo msg)
         close conn
+
+---------------------------------------------------------
+reward :: IO ()
+reward = do
+    pls <- buffPls
+    forM_ pls $ \p -> forkIO $ do
+        conn <- joinWorld p
+        forM_ (map (C.pack . show) [51..65]) $ \r -> do
+            sendAll conn (cwarReward r)
