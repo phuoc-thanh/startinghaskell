@@ -101,7 +101,7 @@ joinWorld user = do uServer <- getServerInfo (defaultsid user)
                     sendAll sock $ loginData user (C.pack $ defaultsid user)
                     msg <- recv sock 256
                     sendAll sock $ enterW (C.pack $ uid user) (C.pack $ chNumber user)
-                    C.putStrLn $ C.append (C.pack $ acc user) " has joined the world!"
+                    C.putStrLn $ C.append (C.pack $ acc user) " has joined!"
                     return sock
 
 waitfor :: ByteString -> (Int, Int) -> Socket -> IO b -> IO b

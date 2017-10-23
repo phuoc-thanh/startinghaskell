@@ -21,25 +21,29 @@ main = do match <- getMatch "1"
 
 ---------------------------------------------------------
 -- the last 1000 xu should bet 10 times 100xu
-bet :: Integer -> Socket -> ByteString -> IO ()
-bet 0 c idx = sendAll c (bet100 idx)
-bet 1 c idx = sendNTimes 10 c (bet100 idx)
-bet n c idx = do sendAll c (bet1000 idx)
-                 bet (n - 1) c idx
+bet :: Integer -> Integer -> Socket -> ByteString -> IO ()
+bet 0 lim c idx = bet lim lim c idx
+bet 1 lim c idx = sendNTimes 10 c (bet100 idx)
+bet n lim c idx
+    | n > lim = bet lim lim c idx
+    | otherwise = do sendNTimes (n - 1) c (bet1000 idx)
+                     bet 1 lim c idx
 
 -- buff players will lose money                 
-loseBet :: Match -> IO ()                  
+loseBet :: Match -> IO ()
 loseBet m = do pls <- buffPls
                forM_ pls $ \u -> forkIO $ do
                    conn <- joinWorld u
-                   bet (amount u) conn (C.pack $ lose m)
+                   msg <- recv conn 80
+                   bet (amount u) (div (coinInfo msg) 1000) conn (C.pack $ lose m)
 
--- players will win money                           
-winBet :: Match -> IO ()                  
+-- players will win money
+winBet :: Match -> IO ()
 winBet m = do pls <- players
               forM_ pls $ \u -> forkIO $ do
                   conn <- joinWorld u
-                  bet (amount u) conn (C.pack $ win m)
+                  msg <- recv conn 80
+                  bet (amount u) (div (coinInfo msg) 1000) conn (C.pack $ win m)
 
 
 ---------------------------------------------------------
@@ -50,10 +54,14 @@ flower idx n = do
         sendAll conn $ cwarflower (C.pack idx) (C.pack n)
 
 ---------------------------------------------------------
+-- looking coin info, get 80 bytes from socket after join and return number of coin
+coinInfo :: ByteString -> Integer
+coinInfo msg = hexDeserialize $ C.drop 152 $ encode msg
+
 info = do
     pls <- buffPls
-    forM_ pls $ \p -> forkIO $ do
+    forM_ pls $ \p -> do
         conn <- joinWorld p
         msg <- recv conn 80
-        C.putStrLn $ C.append (C.pack $ acc p)
-                   $ C.append ": " (C.pack $ show $ hexDeserialize $ C.drop 152 $ encode msg)
+        C.putStrLn $ C.append "coin info: " (C.pack $ show $ coinInfo msg)
+        close conn

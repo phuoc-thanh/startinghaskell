@@ -212,7 +212,7 @@ cwarflower idx n = C.append (hexSerialize $ C.length s) s
             $ C.append n "\NUL"
 
 
--- top32: 51,52,53 | top16: 54,55,56 | top8: 57,58,59            
+-- top32: 51,52,53 | top16: 54,55,56 | top8: 57,58,59 | top4: 60,61,62
 cwarReward :: ByteString -> ByteString
 cwarReward i = C.append (hexSerialize $ C.length s) s
      where s = C.append "crossserverwar getgamereward "
