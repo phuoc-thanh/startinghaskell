@@ -125,12 +125,3 @@ preload sock byte = do
     if (C.length msg == byte)
         then preload sock byte
         else return $ C.length msg
-
-preloadM :: Socket -> Int -> IO ByteString
-preloadM sock byte = do
-    threadDelay 3600000
-    msg <- recv sock byte
-    if (C.length msg == byte)
-        then do msg2 <- recv sock byte
-                return $ C.append msg msg2
-        else return msg

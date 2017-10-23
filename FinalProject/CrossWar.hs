@@ -47,17 +47,23 @@ winBet m = do pls <- players
 
 
 ---------------------------------------------------------
-flower :: ByteString -> ByteString -> IO ()
-flower idx n = do
+flower :: String -> IO ()
+flower idx = do
     pls <- buffPls
     forM_ pls $ \p -> do
         conn <- joinWorld p
-        sendAll conn $ cwarflower (C.pack idx) (C.pack n)
+        threadDelay 480000
+        msg <- recv conn 2048
+        sendAll conn $ cwarflower (C.pack idx) (C.pack $ show $ flowerInfo msg)
 
 ---------------------------------------------------------
 -- looking coin info, get 80 bytes from socket after join and return number of coin
 coinInfo :: ByteString -> Integer
-coinInfo msg = hexDeserialize $ C.drop 152 $ encode msg
+coinInfo msg = hexDeserialize . C.drop 152 $ encode msg
+
+-- looking flower info, 6405 is item code
+flowerInfo :: ByteString -> Integer
+flowerInfo msg = hexDeserialize . C.drop 24 . C.take 28 . snd . C.breakSubstring "6405" $ encode msg
 
 info :: IO ()
 info = do
@@ -65,7 +71,10 @@ info = do
     forM_ pls $ \p -> do
         conn <- joinWorld p
         msg <- recv conn 80
-        C.putStrLn $ C.append "coin info: " (C.pack $ show $ coinInfo msg)
+        threadDelay 480000
+        msg2 <- recv conn 2048
+        C.putStr $ C.append "coin: " (C.pack $ show $ coinInfo msg)        
+        C.putStrLn $ C.append ", flower: " (C.pack $ show $ flowerInfo msg2)
         close conn
 
 ---------------------------------------------------------

@@ -21,7 +21,8 @@ decToHex c
     | otherwise = C.pack $ showHex c ""
 
 hexDeserialize :: C.ByteString -> Integer
-hexDeserialize = read . concat . ("0x":) . reverse . chunksOf 2 . C.unpack
+hexDeserialize "" = 0
+hexDeserialize b  = read . concat . ("0x":) . reverse . chunksOf 2 $ C.unpack b
 
 hexSerialize' :: (Show a, Integral a) => a -> C.ByteString
 hexSerialize' d = C.append (decToHex (d + 4))

@@ -74,7 +74,7 @@ armyAgree_ conn = do
     -- C.putStrLn $ encode msg
     -- C.putStrLn $ C.pack $ show $ filterR $ encode msg
     forM_ (map show $ filterR $ encode msg) $ \r -> sendAll conn $ armyAgree (C.pack r)
-    threadDelay 6000000
+    threadDelay 2000000
     armyAgree_ conn
 
 filterR :: ByteString -> [Integer]    
