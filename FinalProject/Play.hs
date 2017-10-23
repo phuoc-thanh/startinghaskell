@@ -93,7 +93,6 @@ requestA_ :: Player -> Socket -> ThreadId -> IO ()
 requestA_ p conn t = waitfor "0300aa0801" (800000, 2048) conn $ do
     sendAll conn armyBase
     sendAll conn armyReward
-    sendAll conn armyJoss0
     sendAll conn armyExit
     recv conn 1024
     threadDelay 2000000
