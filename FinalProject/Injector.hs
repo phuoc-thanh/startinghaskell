@@ -120,7 +120,7 @@ waitforM str (delay, byte) conn = do
 
 preload :: Socket -> Int -> IO Int
 preload sock byte = do
-    threadDelay 3600000
+    threadDelay 2400000
     msg <- recv sock byte
     if (C.length msg == byte)
         then preload sock byte

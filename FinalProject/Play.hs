@@ -45,22 +45,21 @@ handler pls idx = do
         conn <- joinWorld $ armyLead cf
         sendAll conn armyBase
         sendAll conn armyReward
-        preload conn 32768
+        preload conn 36864
         C.putStrLn $ C.append (C.pack $ acc $ armyLead cf) " is ready"
         armyAgree_ conn
     threadDelay 5000000
     forkIO $ do
         forM_ (groupOf (armyGroup cf) pls) $ \gr -> do
             forkIO $ mHandler gr (C.pack $ armyId cf) idx
-            threadDelay 90000000
+            threadDelay 40000000
 
 mHandler :: [Player] -> ByteString -> Int -> IO ()
 mHandler pls armyid idx = forM_ pls $ \p -> forkIO $ do
     tid <- myThreadId
     conn <- joinWorld p
-    preload conn 32768
-    activityRewards conn
-    sendAll conn (armyRequest armyid)
+    preload conn 36864
+    sendAll conn (armyRequest armyid)    
     case idx of
         0 -> requestA p conn tid
         1 -> requestA_ p conn tid
@@ -81,7 +80,7 @@ filterR :: ByteString -> [Integer]
 filterR msg = map (hexDeserialize . C.take 8 . lastN 16 . C.pack) (init . split (endsWith "130000") $ C.unpack msg)
 
 requestA :: Player -> Socket -> ThreadId -> IO ()
-requestA p conn t = waitfor "0300aa0801" (800000, 2048) conn $ do    
+requestA p conn t = waitfor "0300aa06" (240000, 4096) conn $ do    
     sendAll conn armyBase
     sendAll conn armyReward
     sendAll conn armyJoss
@@ -90,7 +89,7 @@ requestA p conn t = waitfor "0300aa0801" (800000, 2048) conn $ do
     missionGo 4 conn t
 
 requestA_ :: Player -> Socket -> ThreadId -> IO ()
-requestA_ p conn t = waitfor "0300aa0801" (800000, 2048) conn $ do
+requestA_ p conn t = waitfor "0300aa06" (240000, 4096) conn $ do
     sendAll conn armyBase
     sendAll conn armyReward
     sendAll conn armyExit
@@ -101,7 +100,7 @@ requestA_ p conn t = waitfor "0300aa0801" (800000, 2048) conn $ do
     killThread t
 
 requestB :: Player -> Socket -> ThreadId -> IO ()
-requestB p conn t = waitfor "0300aa0801" (800000, 2048) conn $ do
+requestB p conn t = waitfor "0300aa06" (240000, 4096) conn $ do
     forM_ (map show [0..4]) $ \x -> sendAll conn $ edenTreeGet (C.pack x)
     sendAll conn bless
     threadDelay 1600000
@@ -173,13 +172,13 @@ missionAccept e m conn t
 
 missionGo :: Int -> Socket -> ThreadId -> IO ()
 missionGo e conn t = do
-    threadDelay 1000000
+    threadDelay 240000
     msg <- recv conn 2048
     when (C.isInfixOf "0300a12905" $ encode msg) $ do
         sendAll conn armyMisSpdUp
         threadDelay 1000000
         forM_ (map armyMisAward ["1","2","3","4"]) $ \p -> sendAll conn p
-        threadDelay 2000000
+        threadDelay 1000000
         sendAll conn armyExit
         threadDelay 2000000
         close conn
