@@ -42,12 +42,14 @@ handler :: [Player] -> Int -> IO ThreadId
 handler pls idx = do
     cf <- getConfig    
     forkIO $ do
-        conn <- joinWorld $ armyLead cf
-        sendAll conn armyBase
-        sendAll conn armyReward
-        preload conn 36864
-        C.putStrLn $ C.append (C.pack $ acc $ armyLead cf) " is ready"
-        armyAgree_ conn
+        pls <- players
+        forM_ pls $ \p -> forkIO $ do
+            conn <- joinWorld p
+            sendAll conn armyBase
+            sendAll conn armyReward
+            preload conn 36864
+            C.putStrLn $ C.append (C.pack $ acc p) " is ready"
+            armyAgree_ conn
     threadDelay 5000000
     forkIO $ do
         forM_ (groupOf (armyGroup cf) pls) $ \gr -> do

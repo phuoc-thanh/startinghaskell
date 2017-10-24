@@ -3,17 +3,6 @@
     "payHost": "m-pay.gaba.vn",
     "loginPath": "/jinyong/vega/loginVerify",
     "armyId": "108000018",
-    "armyLead": {
-        "amount": 0,
-        "displayNovice": 1,
-        "chNumber": "108000980",
-        "uid": "1257856879",
-        "key": "776cd07780a79599067aaebf07d6f874",
-        "defaultsid": "108",
-        "opname": "10",
-        "create_time": 1505393875,
-        "acc": "april999"
-    },
     "armyGroup": 24,
     "cloneCamp": "2",
     "cloneKeyword": "april",
