@@ -37,7 +37,8 @@ getConfig = do
 data Server = Server { sid   :: String,
                        sname :: String,
                        ip    :: String,
-                       port  :: String }
+                       port  :: String,
+                       army  :: String }
                    deriving (Show, Eq, Generic)
 
 data Player = Player { acc           :: String,
@@ -59,7 +60,6 @@ data Match = Match { mid  :: String,
 data PreConfig = PreConfig { apiHost      :: String,
                              payHost      :: String,
                              loginPath    :: String,
-                             armyId       :: String,
                              armyGroup    :: Int,
                              cloneCamp    :: String,
                              cloneKeyword :: String,

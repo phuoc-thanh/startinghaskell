@@ -2,7 +2,6 @@
     "apiHost": "api.kd.gaba.vn",
     "payHost": "m-pay.gaba.vn",
     "loginPath": "/jinyong/vega/loginVerify",
-    "armyId": "108000018",
     "armyGroup": 24,
     "cloneCamp": "2",
     "cloneKeyword": "april",

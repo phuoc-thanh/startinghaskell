@@ -38,6 +38,20 @@ groupOf :: Int -> [Player] -> [[Player]]
 groupOf _ [] = []
 groupOf n pls = take n pls : groupOf n (drop n pls)
 
+lastN :: Int -> ByteString -> ByteString
+lastN n xs = C.drop (C.length xs - n) xs
+
+joinArmy :: Player -> IO Socket
+joinArmy user = do  sv <- getServerInfo (defaultsid user)
+                    sock <- connect_ (ip sv) (port sv)
+                    sendAll sock $ loginData user (C.pack $ defaultsid user)
+                    msg <- recv sock 256
+                    sendAll sock $ enterW (C.pack $ uid user) (C.pack $ chNumber user)
+                    preload sock 36864
+                    sendAll sock $ armyRequest (C.pack $ army sv)
+                    C.putStrLn $ C.append (C.pack $ acc user) " has joined, requesting army..."
+                    return sock
+
 handler :: [Player] -> Int -> IO ThreadId
 handler pls idx = do
     cf <- getConfig    
@@ -53,15 +67,13 @@ handler pls idx = do
     threadDelay 5000000
     forkIO $ do
         forM_ (groupOf (armyGroup cf) pls) $ \gr -> do
-            forkIO $ mHandler gr (C.pack $ armyId cf) idx
-            threadDelay 40000000
+            forkIO $ mHandler gr idx
+            threadDelay 45000000
 
-mHandler :: [Player] -> ByteString -> Int -> IO ()
-mHandler pls armyid idx = forM_ pls $ \p -> forkIO $ do
+mHandler :: [Player] -> Int -> IO ()
+mHandler pls idx = forM_ pls $ \p -> forkIO $ do
     tid <- myThreadId
-    conn <- joinWorld p
-    preload conn 36864
-    sendAll conn (armyRequest armyid)    
+    conn <- joinArmy p
     case idx of
         0 -> requestA p conn tid
         1 -> requestA_ p conn tid
@@ -72,8 +84,6 @@ armyAgree_ conn = do
     sendAll conn armyReqList
     threadDelay 800000
     msg <- recv conn 2048
-    -- C.putStrLn $ encode msg
-    -- C.putStrLn $ C.pack $ show $ filterR $ encode msg
     forM_ (map show $ filterR $ encode msg) $ \r -> sendAll conn $ armyAgree (C.pack r)
     threadDelay 2000000
     armyAgree_ conn
@@ -81,8 +91,10 @@ armyAgree_ conn = do
 filterR :: ByteString -> [Integer]    
 filterR msg = map (hexDeserialize . C.take 8 . lastN 16 . C.pack) (init . split (endsWith "130000") $ C.unpack msg)
 
+----------------------------------------------------------------
+
 requestA :: Player -> Socket -> ThreadId -> IO ()
-requestA p conn t = waitfor "0300aa06" (240000, 4096) conn $ do    
+requestA p conn t = waitfor "0300aa06" (480000, 2048) conn $ do    
     sendAll conn armyBase
     sendAll conn armyReward
     sendAll conn armyJoss
@@ -91,7 +103,7 @@ requestA p conn t = waitfor "0300aa06" (240000, 4096) conn $ do
     missionGo 4 conn t
 
 requestA_ :: Player -> Socket -> ThreadId -> IO ()
-requestA_ p conn t = waitfor "0300aa06" (240000, 4096) conn $ do
+requestA_ p conn t = waitfor "0300aa06" (480000, 2048) conn $ do
     sendAll conn armyBase
     sendAll conn armyReward
     sendAll conn armyExit
@@ -102,7 +114,7 @@ requestA_ p conn t = waitfor "0300aa06" (240000, 4096) conn $ do
     killThread t
 
 requestB :: Player -> Socket -> ThreadId -> IO ()
-requestB p conn t = waitfor "0300aa06" (240000, 4096) conn $ do
+requestB p conn t = waitfor "0300aa06" (480000, 2048) conn $ do
     forM_ (map show [0..4]) $ \x -> sendAll conn $ edenTreeGet (C.pack x)
     sendAll conn bless
     threadDelay 1600000
@@ -199,7 +211,7 @@ activityRewards conn = do
     sendAll conn $ propUse "1031" "8"
 
 
-----------------------------------------------------------
+----------------------------------------------------------------
 
 
 chapterOne = map chapter ["C01B03","C01B04","C01B05","C01B06","C01B07","C01B08"]
@@ -259,9 +271,6 @@ goPtFive conn chapter = waitfor "0900210300" (2400000, 1024) conn $ do
     threadDelay 1600000
     sendAll conn $ head chapter
     goPtFive conn $ tail chapter
-
-lastN :: Int -> ByteString -> ByteString
-lastN n xs = C.drop (C.length xs - n) xs
 
 eCombat :: ByteString -> Integer
 eCombat = hexDeserialize . lastN 6
