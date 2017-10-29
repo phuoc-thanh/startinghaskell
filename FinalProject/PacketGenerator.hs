@@ -7,9 +7,10 @@ import Serializer
 import Data.ByteString (ByteString)
 import qualified Data.ByteString.Char8 as C
 
-tPacket :: ByteString
-tPacket = C.append (hexSerialize $ C.length s) s
-             where s = "store 8 2\NUL"
+
+riderTrain :: ByteString
+riderTrain = C.append (hexSerialize $ C.length s) s
+             where s = "rider train 245416 4\NUL"             
 
 rankReward :: ByteString
 rankReward = C.append (hexSerialize $ C.length s) s
@@ -195,6 +196,19 @@ store1 :: ByteString -> ByteString
 store1 i = C.append (hexSerialize $ C.length s) s
     where s = C.append "store 5 "
             $ C.append i " 1\NUL"
+
+store7 :: ByteString
+store7 = C.append (hexSerialize $ C.length s) s
+             where s = "store 7\NUL"
+
+store8 :: ByteString
+store8 = C.append (hexSerialize $ C.length s) s
+             where s = "store 8 2\NUL"
+
+store9 :: ByteString -> ByteString
+store9 idx = C.append (hexSerialize $ C.length s) s
+                    where s = C.append "store 9 "
+                            $ C.append idx " 1\NUL"            
 
 bless :: ByteString
 bless = C.append (hexSerialize $ C.length s) s

@@ -2,6 +2,7 @@
 
 module CrossWar where
 
+import Authenticator    
 import Injector
 import PacketGenerator
 import Parser hiding (encode, decode)
@@ -68,14 +69,20 @@ flowerInfo msg = hexDeserialize . C.drop 24 . C.take 28 . snd . C.breakSubstring
 info :: IO ()
 info = do
     pls <- buffPls
-    forM_ pls $ \p -> do
-        conn <- joinWorld p
-        msg <- recv conn 80
+    forM_ pls $ \p -> forkIO $ do
+        uServer <- getServerInfo (defaultsid p)
+        sock <- connect_ (ip uServer) (port uServer)
+        sendAll sock $ loginData p (C.pack $ defaultsid p)
+        msg <- recv sock 256
+        sendAll sock $ enterW (C.pack $ uid p) (C.pack $ chNumber p)
+        msg <- recv sock 80
         threadDelay 480000
-        msg2 <- recv conn 2048
-        C.putStr $ C.append "coin: " (C.pack $ show $ coinInfo msg)        
-        C.putStrLn $ C.append ", flower: " (C.pack $ show $ flowerInfo msg2)
-        close conn
+        msg2 <- recv sock 2048
+        C.putStrLn $ C.append (C.pack $ acc p) 
+                   $ C.append ", coin: " 
+                   $ C.append (C.pack $ show $ coinInfo msg)
+                   $ C.append ", flower: " (C.pack $ show $ flowerInfo msg2)
+        close sock
 
 ---------------------------------------------------------
 reward :: IO ()
