@@ -43,11 +43,17 @@ patch u = do
 
 refStore conn (str, idx) = do
     sendAll conn store8
-    threadDelay 1000000
+    threadDelay 960000
     msg <- recv conn 1024
     when (C.isInfixOf "0300a17b" $ encode msg) $ do
         C.putStrLn "Done!"
         close conn
-    if (C.isInfixOf str msg)
-        then C.putStrLn "found"
+    if (C.isInfixOf str msg) then do
+        C.putStrLn "Patch found"
+        sendAll conn $ store9 idx
+        msg2 <- recv conn 512
+        if (C.isInfixOf "0300a17b" $ encode msg2) then do
+            C.putStrLn "Done!"
+            close conn
+            else refStore conn (str, idx)
         else refStore conn (str, idx)

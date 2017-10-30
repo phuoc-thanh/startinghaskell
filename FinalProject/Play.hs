@@ -47,7 +47,7 @@ joinArmy user = do  sv <- getServerInfo (defaultsid user)
                     sendAll sock $ loginData user (C.pack $ defaultsid user)
                     msg <- recv sock 256
                     sendAll sock $ enterW (C.pack $ uid user) (C.pack $ chNumber user)
-                    preload sock 36864
+                    preload sock 32768
                     sendAll sock $ armyRequest (C.pack $ army sv)
                     C.putStrLn $ C.append (C.pack $ acc user) " has joined, requesting army..."
                     return sock
