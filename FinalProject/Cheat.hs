@@ -24,15 +24,13 @@ reward uname n = do
 train uname n = do 
     user <- getPlayer uname
     conn <- joinWorld user
-    sendNTimes n conn riderTrain 
+    sendNTimes n conn riderTrain
 
 --vtm: HERO_PATCH_NAME08/store 9 91 1/store 9 45 1 (2)
 --dccb: HERO_PATCH_NAME16/ store 9 96 1
 --dd: HERO_PATCH_NAME11/ store 9 98 1
 --dpbb: HERO_PATCH_NAME39/ store 9 99 1
 --tdt: HERO_PATCH_NAME48/ store 9 100 1
-
-
 
 patch u = do
     p <- getPlayer u
@@ -45,9 +43,6 @@ refStore conn (str, idx) = do
     sendAll conn store8
     threadDelay 960000
     msg <- recv conn 1024
-    when (C.isInfixOf "0300a17b" $ encode msg) $ do
-        C.putStrLn "Done!"
-        close conn
     if (C.isInfixOf str msg) then do
         C.putStrLn "Patch found"
         sendAll conn $ store9 idx

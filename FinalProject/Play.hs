@@ -16,11 +16,6 @@ import Network.Socket.ByteString (recv, sendAll)
 import Control.Monad
 import Control.Concurrent
 
-          
-sendP :: String -> Integer -> IO ()
-sendP uname n = do user <- getPlayer uname
-                   conn <- joinWorld user
-                   sendNTimes n conn tPacket
 
 main = do 
     pls <- cPls
