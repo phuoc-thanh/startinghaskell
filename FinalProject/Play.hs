@@ -25,10 +25,6 @@ dailyMis = do
     pls <- buffPls
     handler pls 1
 
-dailyQ = do
-    pls <- buffPls
-    handler pls 2
-
 groupOf :: Int -> [Player] -> [[Player]]          
 groupOf _ [] = []
 groupOf n pls = take n pls : groupOf n (drop n pls)
@@ -72,7 +68,6 @@ mHandler pls idx = forM_ pls $ \p -> forkIO $ do
     case idx of
         0 -> requestA p conn tid
         1 -> requestA_ p conn tid
-        2 -> requestB p conn tid
 
 armyAgree_ :: Socket -> IO ()            
 armyAgree_ conn = do
@@ -108,16 +103,11 @@ requestA_ p conn t = waitfor "0300aa06" (480000, 2048) conn $ do
     C.putStrLn $ C.append (C.pack $ acc p) ": job done!"
     killThread t
 
-requestB :: Player -> Socket -> ThreadId -> IO ()
-requestB p conn t = waitfor "0300aa06" (480000, 2048) conn $ do
+dailyQ :: Socket -> ThreadId -> IO ()
+dailyQ conn t = do
     forM_ (map show [0..4]) $ \x -> sendAll conn $ edenTreeGet (C.pack x)
     sendAll conn bless
     threadDelay 1600000
-    sendAll conn armyBase
-    sendAll conn armyReward
-    sendAll conn armyJoss0
-    sendAll conn armyExit
-    recv conn 1024
     forM_ (map show [0..4]) $ \x -> sendAll conn $ edenTreeFinish (C.pack x)
     threadDelay 1600000
     forM_ (map show [0..4]) $ \x -> sendAll conn $ edenTreeGet (C.pack x)
@@ -145,8 +135,7 @@ requestB p conn t = waitfor "0300aa06" (480000, 2048) conn $ do
     recv conn 1024
     threadDelay 2000000
     close conn
-    C.putStrLn $ C.append (C.pack $ acc p) ": job done!"
-    killThread t   
+    killThread t
     
 ref :: ByteString -> ByteString    
 ref m = C.pack . show . hexDeserialize . C.drop 10 . C.take 16 . snd $ C.breakSubstring "9200300001" m
@@ -190,8 +179,7 @@ missionGo e conn t = do
         threadDelay 1000000
         sendAll conn armyExit
         threadDelay 2000000
-        close conn
-        killThread t
+        -- dailyQ conn t
     unless (C.isInfixOf "2300e904" $ encode msg) $ missionGo e conn t
     when (C.isInfixOf "2300e904" $ encode msg) $ do
         let m = missionFilter . snd . C.breakSubstring "2300e904" $ encode msg
