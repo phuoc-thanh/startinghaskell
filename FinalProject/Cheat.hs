@@ -26,18 +26,19 @@ train uname n = do
     conn <- joinWorld user
     sendNTimes n conn riderTrain
 
---vtm: HERO_PATCH_NAME08/store 9 91 1/store 9 45 1 (2)
---dccb: HERO_PATCH_NAME16/ store 9 96 1
---dd: HERO_PATCH_NAME11/ store 9 98 1
---dpbb: HERO_PATCH_NAME39/ store 9 99 1
---tdt: HERO_PATCH_NAME48/ store 9 100 1
+hcode h
+    | h == "kp" = ("HERO_PATCH_NAME21", "93")
+    | h == "dd" = ("HERO_PATCH_NAME11", "98")
+    | h == "dccb" = ("HERO_PATCH_NAME16", "96")
+    | h == "dpbb" = ("HERO_PATCH_NAME39", "99")
+    | otherwise = ("HERO_PATCH_NAME48", "100")
 
-patch u = do
+patch u h = do
     p <- getPlayer u
     conn <- joinWorld p
     threadDelay 2000000    
     preload conn 36864
-    refStore conn ("HERO_PATCH_NAME11", "98")
+    refStore conn (hcode h)
 
 refStore conn (str, idx) = do
     sendAll conn store8
