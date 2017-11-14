@@ -29,6 +29,7 @@ train uname n = do
 hcode h
     | h == "kp" = ("HERO_PATCH_NAME21", "93")
     | h == "dd" = ("HERO_PATCH_NAME11", "98")
+    | h == "vtd" = ("HERO_PATCH_NAME19", "97")
     | h == "dccb" = ("HERO_PATCH_NAME16", "96")
     | h == "dpbb" = ("HERO_PATCH_NAME39", "99")
     | otherwise = ("HERO_PATCH_NAME48", "100")

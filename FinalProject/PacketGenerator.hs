@@ -16,6 +16,11 @@ rankReward :: ByteString
 rankReward = C.append (hexSerialize $ C.length s) s
                 where s = "rankList reward 8\NUL"
 
+--evolution 108695# 108906# 108907# 108905#.
+tPacket :: ByteString
+tPacket = C.append (hexSerialize $ C.length s) s
+                where s = "evolution 45233#\NUL"                
+
 activityItem :: ByteString -> ByteString
 activityItem n = C.append (hexSerialize $ C.length s) s
                     where s = C.append "activity_items "
