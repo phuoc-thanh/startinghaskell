@@ -1,0 +1,12 @@
+{
+    "apiHost": "api.alv.gaba.vn",
+    "payHost": "m-pay.gaba.vn",
+    "loginPath": "/sgwww/vega/loginVerify",
+    "armyGroup": 20,
+    "cloneCamp": "2",
+    "cloneKeyword": "april",
+    "cloneServer": "56",
+    "defaultPass": "666666",
+    "huntTarget": "ZM49,ZM51",
+    "huntDelay": 7000000
+}

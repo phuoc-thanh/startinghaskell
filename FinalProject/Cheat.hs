@@ -26,7 +26,8 @@ train uname n = do
     conn <- joinWorld user
     sendNTimes n conn riderTrain
 
---hp HERO_PATCH_NAME35/14    
+--hp HERO_PATCH_NAME35/14
+--ndd HERO_PATCH_NAME40/38
 hcode h
     | h == "kp" = ("HERO_PATCH_NAME21", "93")
     | h == "dd" = ("HERO_PATCH_NAME11", "98")
