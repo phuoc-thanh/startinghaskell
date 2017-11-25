@@ -22,8 +22,8 @@ main = do
 bet :: Integer -> Socket -> ByteString -> IO ()
 bet 0 c idx = close c
 bet 1 c idx = sendNTimes 10 c (bet100 idx)
-bet n c idx = do sendNTimes (n - 1) c (bet1000 idx)
-                 bet 1 c idx
+bet n c idx = do sendAll c (bet1000 idx)
+                 bet (n - 1) c idx
 
 -- bet 3 match same time
 quickBet :: Player -> [ByteString] -> IO ()                  
@@ -43,5 +43,5 @@ loseBet = do
     pls <- buffPls
     forM_ pls $ \p -> forkIO $ quickBet p loseC                 
 
-winC = ["28001474", "114000433", "109000079"]
-loseC = ["28001474", "114000433", "109000079"]
+winC = ["58000030"]
+loseC = ["28001474"]
