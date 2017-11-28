@@ -131,9 +131,10 @@ dailyQ conn t = do
         sendAll conn $ goHunt "1"
         threadDelay 1600000
         sendAll conn copyBlock
+    threadDelay 2400000
     sendAll conn taskReward
     recv conn 1024
-    threadDelay 2000000
+    threadDelay 1600000
     close conn
     killThread t
     
