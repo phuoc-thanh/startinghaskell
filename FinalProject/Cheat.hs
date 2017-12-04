@@ -30,6 +30,7 @@ train uname n = do
 --ndd HERO_PATCH_NAME40/38
 --vtm HERO_PATCH_NAME08/45
 --hd HERO_PATCH_NAME15/41
+--vnt HERO_PATCH_NAME46/43
 hcode h
     | h == "kp" = ("HERO_PATCH_NAME21", "93")
     | h == "dd" = ("HERO_PATCH_NAME11", "98")
