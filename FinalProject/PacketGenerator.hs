@@ -10,7 +10,7 @@ import qualified Data.ByteString.Char8 as C
 
 riderTrain :: ByteString
 riderTrain = C.append (hexSerialize $ C.length s) s
-             where s = "rider train 245416 4\NUL"             
+             where s = "rider train 8202 4\NUL"             
 
 rankReward :: ByteString
 rankReward = C.append (hexSerialize $ C.length s) s
@@ -95,7 +95,13 @@ bet100 idx = C.append (hexSerialize $ C.length s) s
 bet1000 :: ByteString -> ByteString
 bet1000 idx = C.append (hexSerialize $ C.length s) s
                 where s = C.append "crossserverwar betting "
-                         $ C.append idx " 1000\NUL"                        
+                         $ C.append idx " 1000\NUL"
+                         
+betX :: ByteString -> ByteString
+betX idx = C.append (hexSerialize $ C.length s) s
+                where s = C.append "crossserverwar betting "
+                         $ C.append idx " 100000\NUL"
+                         
 iniHunt :: ByteString
 iniHunt = C.append (hexSerialize $ C.length s) s
                 where s = "teamHunt 1\NUL"
