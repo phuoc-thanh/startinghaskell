@@ -15,6 +15,7 @@ import Control.Concurrent
 main :: IO ()
 main = do 
     winBet
+    threadDelay 3600000
     loseBet
 
 ---------------------------------------------------------

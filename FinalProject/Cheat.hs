@@ -26,13 +26,14 @@ train uname n = do
     conn <- joinWorld user
     sendNTimes n conn riderTrain
 
---hp HERO_PATCH_NAME35/14
 --ndd HERO_PATCH_NAME40/38
---vtm HERO_PATCH_NAME08/45
 --hd HERO_PATCH_NAME15/41
---vnt HERO_PATCH_NAME46/43
 hcode h
+    | h == "qt" = ("HERO_PATCH_NAME41", "46")
+    | h == "vnt" = ("HERO_PATCH_NAME46", "43")
+    | h == "vtm" = ("HERO_PATCH_NAME08", "45")
     | h == "kp" = ("HERO_PATCH_NAME21", "93")
+    | h == "tdlt" = ("HERO_PATCH_NAME47", "95")
     | h == "dd" = ("HERO_PATCH_NAME11", "98")
     | h == "vtd" = ("HERO_PATCH_NAME19", "97")
     | h == "dccb" = ("HERO_PATCH_NAME16", "96")
