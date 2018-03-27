@@ -21,6 +21,18 @@ reward uname n = do
     conn <- joinWorld user
     sendNTimes n conn rankReward
 
+
+sevenR uname 0 = print "done"
+sevenR uname x = do
+    user <- getPlayer uname
+    conn <- joinWorld user
+    preload conn 32768
+    sendAll conn $ activityItem "11091"
+    forM_ ["86333","86334","86335","86336","86360","86361"] $ \n 
+        -> sendAll conn $ activityReward n
+    threadDelay 2000000
+    sevenR uname (x - 1)
+
 train uname n = do 
     user <- getPlayer uname
     conn <- joinWorld user
