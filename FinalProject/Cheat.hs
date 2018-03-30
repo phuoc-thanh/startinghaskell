@@ -22,16 +22,17 @@ reward uname n = do
     sendNTimes n conn rankReward
 
 
-sevenR uname 0 = print "done"
-sevenR uname x = do
+gift uname 0 = print "done"
+gift uname x = do
     user <- getPlayer uname
     conn <- joinWorld user
     preload conn 32768
-    sendAll conn $ activityItem "11091"
+    sendAll conn $ activityItem "11091" --tlv 15633
+    -- tlv ["149125","149126", "149127", "149128" "149152", "149153"]
     forM_ ["86333","86334","86335","86336","86360","86361"] $ \n 
         -> sendAll conn $ activityReward n
     threadDelay 2000000
-    sevenR uname (x - 1)
+    gift uname (x - 1)
 
 train uname n = do 
     user <- getPlayer uname
