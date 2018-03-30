@@ -28,7 +28,7 @@ gift uname x = do
     conn <- joinWorld user
     preload conn 32768
     sendAll conn $ activityItem "11091" --tlv 15633
-    -- tlv ["149125","149126", "149127", "149128" "149152", "149153"]
+    -- tlv ["149126", "149128"]
     forM_ ["86333","86334","86335","86336","86360","86361"] $ \n 
         -> sendAll conn $ activityReward n
     threadDelay 2000000
