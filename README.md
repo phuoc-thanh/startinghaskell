@@ -1,5 +1,14 @@
 # startinghaskell
-Learning Haskell with CIS-194 Spring 2015
+
+A place to learning Haskell
+
+Resource:
+
+[CIS-194 Spring 2015](http://www.cis.upenn.edu/~cis194/spring15/)
+
+[Euler Problems](https://projecteuler.net/archives)
+
+And the final project is a TCP Injector, also considering as a cheating tool.
 
 ## Haskell Platform Install
 
