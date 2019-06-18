@@ -1,7 +1,8 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleContexts #-}
 
 module Sorting where
 
+import Data.Bits 
 
 -- In-efficient sorts will be skipped (selection, insertion...)
 -- Only efficient sorts and not-imperative sorts are implemented:
@@ -56,7 +57,23 @@ quick_sort (x:xs) = (quick_sort left) ++ [x] ++ (quick_sort right) where
     right = filter (<  x) xs
 
 -- Non Comparison-based
-radix_sort (x:xs) = map (\x -> mod x 10) (x:xs) 
+-- Most Significant Digit - MSD Radix Sort
+-- Time Complexity O(w.n) with w = length of word/key
+-- Time n Space Complexity of Radix Sort is still open discussion
+radix_sort [] = []
+radix_sort xs = msd_sort (msd mx) l ++ radix_sort r where
+    (l, r)    = partition (\x -> base x == base mx) xs
+    mx        = max_ xs
 
--- n times power of 10
-radix n xs  = filter (\x -> div x (10^n) == 0) xs
+-- Most Significant Digit Sort, for list of same base numbers
+msd_sort 0 xs = xs
+msd_sort n xs = l ++ msd_sort (n - 1) r where
+    (l, r)    = partition (\x -> msd x == n) xs
+
+-- Partition by predicate p 
+partition p xs = (filter p xs, filter (not . p) xs)
+-- Most Significant Digit of a number
+msd n  = if n < 10 then n else msd (div n 10)
+-- Calculate radix (base) of a number
+base x = if x < 10 then 1 else 10 * base (div x 10)
+
