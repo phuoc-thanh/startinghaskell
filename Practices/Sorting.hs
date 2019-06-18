@@ -33,8 +33,9 @@ bubble_sort xs = last (bubble xs) : bubble_sort (init $ bubble xs) where
     bubble (x1:x2:xs) = min x1 x2 : bubble ((max x1 x2) : xs)
 
 -- | Merge Sort
--- Time Complexity : O(n log n)
--- Do merge (n) times, each merge takes (log n) steps
+-- Time Complexity : O(n log n) in theory, but using merge list may be more efficient in some cases
+-- Analyse1: Do merge (n) times, each merge requires (log n) dividing steps
+-- Analyse2: Do (log n) merge steps, each step takes 8 comparison merges
 -- Space Complexity: O(n), or O(1) with linked list *
 -- Can optimize with Natural Merge, which divide elems to sorted sets
 -- The the best case of it, should be O(n)
