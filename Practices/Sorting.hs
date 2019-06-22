@@ -8,7 +8,7 @@ import Data.Bits
 -- Only efficient sorts and not-imperative sorts are implemented:
 -- Bubble Sort | Merge Sort | Quick Sort | Radix Sort
 
-arr = [170, 45, 75, 90, 02, 802, 2, 66]
+arr = [170, 45, 75, 90, 2, 802, 2, 66]
 
 -- Maximum of a list, can be done with one bubble (swap method) sort
 -- Or with default Prelude func
