@@ -4,13 +4,14 @@ module TreeTraversal where
 data Tree a = Empty | Leaf a | Node a (Tree a) (Tree a) deriving Show
 -- Instance of Functor, to use fmap()
 instance Functor Tree where
+    fmap f (Empty)             = Empty
     fmap f (Leaf l)            = Leaf (f l)
     fmap f (Node n left right) = Node (f n) (fmap f left) (fmap f right)
 -- Instance of Foldable, to use foldmap()
 instance Foldable Tree where
+    foldMap f (Empty)  = mempty
     foldMap f (Leaf l) = f l
     foldMap f (Node n left right) = f n <> foldMap f left <> foldMap f right
-
 -- Sample tree
 --         1
 --        / \
@@ -40,12 +41,16 @@ preorder Empty        = []
 preorder (Leaf a)     = [a]
 preorder (Node a l r) = a : preorder l ++ preorder r
 
-inorder Empty  = []
-inorder (Leaf a) = [a]
-inorder (Node a l r) = inorder l ++ [a] ++ inorder r
+inorder Empty         = []
+inorder (Leaf a)      = [a]
+inorder (Node a l r)  = inorder l ++ [a] ++ inorder r
 
-postorder Empty  = []
-postorder (Leaf a) = [a]
+postorder Empty        = []
+postorder (Leaf a)     = [a]
 postorder (Node a l r) = postorder l ++ postorder r ++ [a]
 
-levelorder  = undefined
+levelorder tree = traverse [tree] where
+    traverse [] = []
+    traverse (Empty:tree) = traverse tree
+    traverse (Leaf a:tree)  = a : traverse tree 
+    traverse (Node a l r:tree) = a : traverse (tree ++ [l, r])
