@@ -14,6 +14,6 @@ eFib x = sum $ filter (even) (map fib [1..x])
 
 -- Call eFib 33 to get result, fib33 is the last values that < four millions
 fib :: Int -> Int
-fib 0 = 0
 fib 1 = 1
+fib 2 = 2
 fib n = fib (n-1) + fib (n-2)

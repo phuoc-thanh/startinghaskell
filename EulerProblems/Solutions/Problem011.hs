@@ -38,6 +38,7 @@ shiftRightGrid [] = []
 l2rDiagonalGrid :: [[Integer]] -> [[Integer]]
 l2rDiagonalGrid xs = map (filter (> (-1))) $ transpose xs
 
+-- 4 sets to finding: top-down, left-right, diagonal and reverse diagonal
 -- *Main> greatest4inGrid $ grid
 -- *Main> greatest4inGrid $ transpose grid
 -- *Main> greatest4inGrid $ l2rDiagonalGrid $ shiftRightGrid grid

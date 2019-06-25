@@ -25,11 +25,11 @@ import Problem003
 divisors :: Integer -> [Integer]
 divisors n = 1 : filter (\x -> mod n x == 0) [2 .. n]
 
+-- Divisors Count can calculate from prime factors, see links at the end of file.
 divisorsCount :: Int -> Int
 divisorsCount n = product $ primesCount $ primeFactors n
-    where primesCount :: [Int] -> [Int]
-          primesCount [] = []
-          primesCount (x:xs) = ((length $ filter (==x) $ x:xs) + 1) : primesCount (filter (/=x) (x:xs))
+primesCount [] = []
+primesCount (x:xs) = ((length $ filter (==x) $ x:xs) + 1) : primesCount (filter (/=x) (x:xs))
 
 listOfTriangle :: Int -> [Int]
 listOfTriangle 0 = [0]

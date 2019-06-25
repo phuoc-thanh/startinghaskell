@@ -25,6 +25,8 @@ sundayInYear n = map (+ (-n + 1)) (sundayInYear 1)
 
 -- 
 -- intersect sundayInYear with normal/leap sundays, I have:
+-- firstMSunday (isLeap) (year start: Mon/Tue..Sun -> 1..7)
+-- result (days_count, year-end date)
 firstMSunday leap 1 = if leap then (2, 3) else (2, 2)
 firstMSunday leap 2 = if leap then (1, 4) else (2, 3)
 firstMSunday leap 3 = if leap then (2, 5) else (1, 4)
@@ -38,5 +40,7 @@ firstMSunday _ _ = (0,0)
 sundayCount _ [] = []
 sundayCount (c, t) (x:xs) = z : sundayCount z xs
     where z = firstMSunday (isLeap x) t
---result
+
+-- 01 Jan 1900 is Mon, so first date of 1901 is Tue.
+-- (0, 2) <- (nothing_to_count, year_start)
 problem19 = sum $ [i | (i, _) <- sundayCount (0,2) [1901..2000]]

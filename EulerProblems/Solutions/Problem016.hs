@@ -9,3 +9,4 @@ toDigits :: Integer -> [Integer]
 toDigits = map (fromIntegral . digitToInt) . show
 
 -- foldr (\x y -> y + digitToInt x) 0 (show (2^1000))
+p16 = sum $ toDigits (2^1000)

@@ -8,9 +8,9 @@ module Problem003 where
 primeFactors :: Int -> [Int]
 primeFactors 1 = []
 primeFactors n
-    | factors == []  = [n]
-    | otherwise = factors ++ primeFactors (div n (head factors))
-        where factors = take 1 $ filter (\x -> (mod n x) == 0) [2 .. n-1]
+    | fst_fact n 2 == n  = [n]
+    | otherwise = (fst_fact n 2) : primeFactors (div n (fst_fact n 2))
+        where fst_fact x y = if (mod x y == 0) then y else fst_fact x (y+1)
 
 --https://en.wikipedia.org/wiki/Prime_factor
 --https://www.mathsisfun.com/prime-factorization.html

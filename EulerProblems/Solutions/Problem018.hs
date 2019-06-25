@@ -37,7 +37,14 @@ triangleNum = [[75],
                [63, 66, 04, 68, 89, 53, 67, 30, 73, 16, 69, 87, 40, 31],
                [04, 62, 98, 27, 23, 09, 70, 98, 73, 93, 38, 53, 60, 04, 23]]
 
+-- zipWith Max, the find the max val pair-to-pair
+-- ex: [2,4,8,6] -> [4,8,8]
 reduce x = zipWith max x (tail x)
 
-euler18 = head $ foldl1 (\a b -> zipWith (+) b (reduce a)) (reverse triangleNum)
+-- find the maximum path of 2 rows
+-- with xs length = ys length + 1 (from bottom up of triangle)
+sum2 xs ys = zipWith (+) ys (reduce xs)
+
+euler18 = foldl1 sum2 (reverse triangleNum)
+
 --https://stackoverflow.com/questions/8002252/euler-project-18-approach

@@ -8,3 +8,6 @@ multiples35 n = (n `mod` 3 == 0) || (n `mod` 5 == 0)
 
 sumList :: Int
 sumList = sum $ filter (multiples35) [1..999]
+
+-- A faster version using prebuilt list
+result = sum [3,6..999] + sum [5,10..995] - sum [15,30..990]
