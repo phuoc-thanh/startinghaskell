@@ -40,3 +40,28 @@ has_overlap xs = if length xs /= length sorted then True else comp sorted
           comp (b1:b2:[]) = (snd b1 >= fst b2) -- in case there are no more bookings to process
           -- return False if overlap is detected, otherwise recursive do next compare
           comp (b1:b2:bs) = if (snd b1 >= fst b2) then True else comp (b2:bs) 
+
+
+-- D. Alternatives (an idea to use no-sql)
+
+-- By using Map (key-value like Data Structure)
+-- A Key should be a room:id#date
+-- Value should be bookings of that room:id#date, in form of a list/array
+-- Ex: k: room#06:06062019, v: [booking#2, booking#4, booking#6]
+
+-- So each time a new booking (06 -> 08 Jun) needs a placement, to a room 06
+-- Select all days in the range of that booking
+-- Ex: find(room:06#06062019)
+--     find(room:06#06072019)
+--     find(room:06#06082019)
+--     if all Empty, so the booking on room 06 is possible
+
+-- E. Relate to interview question
+
+-- Keep 8 records of booking type: 01bed, 02bed .. 08bed
+-- Each record: (01bed, [book#2, book#4, book#6]), (02bed, [book#3, book#5, book#7])...
+-- And Zip the two records (01-07) (02-06)... together
+
+-- Atm, my solution during interview is sort the pairing (first-last).
+
+
