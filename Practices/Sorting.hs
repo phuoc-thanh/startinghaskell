@@ -35,21 +35,26 @@ bubble_sort xs = last (bubble xs) : bubble_sort (init $ bubble xs) where
 -- | Merge Sort
 -- Time Complexity : O(n log n) in theory, but using merge list may be more efficient in some cases
 -- Analyse1: Do merge (n) times, each merge requires (log n) dividing steps
--- Analyse2: Do (log n) merge steps, each step takes 8 comparison merges
+-- Analyse2: Do (log n) merge steps, each step takes n (linear) comparison merges
 -- Space Complexity: O(n), or O(1) with linked list *
 -- Can optimize with Natural Merge, which divide elems to sorted sets
 -- The the best case of it, should be O(n)
 merge_sort (x:[]) = [x]
-merge_sort xs  = merge (merge_sort (fst m))  (merge_sort (snd m)) where
-    m          = splitAt (div (length xs) 2) xs
-    merge x [] = x
-    merge [] y = y
-    merge x y
-        | head x > head y = head x : (merge (tail x) y)
-        | otherwise       = head y : (merge x (tail y))
+merge_sort xs     = merge (merge_sort left) (merge_sort right) where
+    (left, right) = splitAt (div (length xs) 2) xs
+
+
+-- Merge 2 sorted lists/arrays function, by descending
+-- O(n)
+merge x [] = x
+merge [] y = y
+merge x y
+    | head x > head y = head x : (merge (tail x) y)
+    | otherwise       = head y : (merge x (tail y))
 
 -- | Quick Sort
--- Time Complexity : O(n^2) for the worse case, O(n log n) for best/average cases
+-- Time Complexity : O(n^2) for the worse case: already sorted, pivot num always the greatest or lowest.
+-- Time Complexity : O(n log n) for best case: pivot number is in the mid, left ~ right
 -- Space Complexity: O(n) naive implementation
 -- Can optimize with tail recursive and smarter partioning (i.e choose pivot at the middle of list)
 quick_sort [] = []
@@ -76,5 +81,5 @@ partition p xs = (filter p xs, filter (not . p) xs)
 -- Most Significant Digit of a number
 msd n  = if n < 10 then n else msd (div n 10)
 -- Calculate radix (base) of a number
-base x = if x < 10 then 1 else 10 * base (div x 10)
+base n = if n < 10 then 1 else 10 * base (div n 10)
 
