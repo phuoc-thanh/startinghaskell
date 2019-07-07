@@ -1,3 +1,5 @@
+-- The issue was found in a code challenge, part of Christina's recruitment process.
+
 module OverlapBooking where
 
 -- A. Logical Question
@@ -46,7 +48,7 @@ has_overlap xs = if length xs /= length sorted then True else comp sorted
 
 -- By using Map (key-value like Data Structure)
 -- A Key should be a room:id#date
--- Value should be bookings of that room:id#date, in form of a list/array
+-- Value should be bookings of that room, in form of a list/array
 -- Ex: k: room#06:06062019, v: [booking#2, booking#4, booking#6]
 
 -- So each time a new booking (06 -> 08 Jun) needs a placement, to a room 06
@@ -62,6 +64,6 @@ has_overlap xs = if length xs /= length sorted then True else comp sorted
 -- Each record: (01bed, [book#2, book#4, book#6]), (02bed, [book#3, book#5, book#7])...
 -- And Zip the two records (01-07) (02-06)... together
 
--- Atm, my solution during interview is sort the pairing (first-last).
+-- Atm, my solution during interview is sort then pair (first-last).
 
 
