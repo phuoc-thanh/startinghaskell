@@ -1,7 +1,7 @@
 module Lists where
 
 -- https://www.hackerrank.com/challenges/new-year-chaos
--- Not as good performance
+-- Bad performance if applying on large list
 
 minimumBribes xs
     | res == 0  = "Too chaotic"
